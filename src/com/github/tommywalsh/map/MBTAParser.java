@@ -12,13 +12,14 @@ import android.util.Xml;
 import org.xml.sax.Attributes;
 
 import java.util.TreeSet;
+import java.io.InputStream;
 
 import android.util.Log;
 
 
 public class MBTAParser {
 
-    public TreeSet<Departure> parse(String xml) {
+    public TreeSet<Departure> parse(InputStream is) {
 
 	
 	final String NS = "";
@@ -55,7 +56,7 @@ public class MBTAParser {
 	    });
 	
 	try {
-	    Xml.parse(xml, root.getContentHandler());
+	    Xml.parse(is, Xml.Encoding.UTF_8, root.getContentHandler());
 	} catch (Exception e) {
 	    Log.d("kml", e.toString());
 	}
