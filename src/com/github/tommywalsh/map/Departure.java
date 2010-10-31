@@ -7,12 +7,12 @@ package com.github.tommywalsh.mbta;
 
 public class Departure extends Stop implements Comparable {
 
-    public int when;
+    public long when;
     public String direction;
 
     public int compareTo(Object o) {
 	Departure other = (Departure) o;
-	int result = when - other.when;
+	int result = (int) (when - other.when);
 	if (result == 0) {
 	    result = route.compareTo(other.route);
 	}

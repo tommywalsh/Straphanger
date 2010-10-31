@@ -50,7 +50,7 @@ public class MBTAParser {
 		    d.route = pendingDeparture.route;
 		    d.where = pendingDeparture.where;
 		    d.direction = pendingDeparture.direction;
-		    d.when = Integer.decode(atts.getValue("minutes")); // should use epochTime!
+		    d.when = Long.decode(atts.getValue("epochTime")); // should use epochTime!
 		    departures.add(d);
 		}
 	    });
