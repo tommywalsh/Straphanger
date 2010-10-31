@@ -1,6 +1,5 @@
 
 Near Term: 
-Parameterize prediction request instead of hard-coding from Union Sq.
 Use "epochTime" instead of minutes
 Count down time on screen instead of "freezing" at last update
 Refresh every 30 seconds or so, but only when active on screen

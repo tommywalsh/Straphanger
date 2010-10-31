@@ -11,13 +11,23 @@ import java.io.InputStream;
 public class MBTADataService
 {
 
-    public static InputStream getPredictionStream() throws java.io.IOException {
+    private static URL getURLForProfile(Profile p) 
+    {
+	String urlString = "http://webservices.nextbus.com/service/publicXMLFeed?command=predictionsForMultiStops&a=mbta";
+	for (Stop s : p.stops) {
+	    urlString += "&stops=" + s.route + "|null|" + s.where;
+	}
 	try {
-	    URL url = new URL("http://webservices.nextbus.com/service/publicXMLFeed?command=predictionsForMultiStops&a=mbta&stops=748|null|2531&stops=748|null|2612&stops=91|null|2531&stops=91|null|2612&stops=86|null|25712&stops=86|null|2615&stops=85|null|2612&stops=87|null|2510");
-	    return url.openStream();
+	    return new URL(urlString);
 	} catch (java.net.MalformedURLException e) {
 	    return null;
 	}
+
+    }
+
+    public static InputStream getPredictionStream() throws java.io.IOException {
+	URL url = getURLForProfile(Profile.getHomeToWorkProfile());
+	return url.openStream();
     }
 
 }

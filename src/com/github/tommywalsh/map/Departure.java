@@ -5,11 +5,9 @@
 
 package com.github.tommywalsh.mbta;
 
-public class Departure implements Comparable {
+public class Departure extends Stop implements Comparable {
 
     public int when;
-    public String where;
-    public String route;
     public String direction;
 
     public int compareTo(Object o) {
