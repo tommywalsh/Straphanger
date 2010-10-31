@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	  package="com.github.tommywalsh.mbta"
+	  android:versionCode="1"
+	  android:versionName="1.0">
+
+  <uses-permission android:name="android.permission.INTERNET" />
+<!--  <uses-permission android:name="android.permission.ACCESS_COURSE_LOCATION" />
+  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> -->
+
+  <uses-sdk android:minSdkVersion="3" />
+  
+  <application android:label="MBTA">
+    
+<!--
+    <uses-library android:name="com.google.android.maps" /> -->
+    
+    <activity android:name=".MBTAActivity" android:label="MBTA" android:launchMode="singleTask">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+    
+  </application>
+  
+  
+</manifest> 
