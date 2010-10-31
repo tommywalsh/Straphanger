@@ -5,13 +5,14 @@
 
 package com.github.tommywalsh.mbta;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.os.Bundle;
 
-import java.util.Vector;
+import java.util.SortedSet;
 
-public class MBTAActivity extends Activity
+public class MBTAActivity extends ListActivity
 {
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,12 +67,14 @@ String xml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?> "+
 "</predictions>"+
 "</body>";
 
-
-	Vector<Departure> ds = parser.parse(xml);
+	ArrayAdapter<String> aa = new ArrayAdapter<String>(this, R.layout.listitem);
+        SortedSet<Departure> ds = parser.parse(xml);
 	for (Departure d : ds) {
-	    Log.d("mbta", d.route + " to " + d.direction + " stops at " + d.where + " in " + new Integer(d.when).toString() + " minutes");
+	    String mess = d.route + " to " + d.direction + " stops at " + d.where + " in " + new Integer(d.when).toString() + " minutes";
+	    Log.d("mbta", mess);
+	    aa.add(mess);
 	}
-
+	setListAdapter(aa);
     }
 
 }

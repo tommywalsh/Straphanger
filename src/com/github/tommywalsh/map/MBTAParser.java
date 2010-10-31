@@ -11,18 +11,18 @@ import android.util.Xml;
 
 import org.xml.sax.Attributes;
 
-import java.util.Vector;
+import java.util.TreeSet;
 
 import android.util.Log;
 
 
 public class MBTAParser {
 
-    public Vector<Departure> parse(String xml) {
+    public TreeSet<Departure> parse(String xml) {
 
 	
 	final String NS = "";
-	final Vector<Departure> departures = new Vector<Departure>();
+	final TreeSet<Departure> departures = new TreeSet<Departure>();
 	final Departure pendingDeparture = new Departure();
 
 	RootElement root = new RootElement("body");
