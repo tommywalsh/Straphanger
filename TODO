@@ -1,8 +1,4 @@
 
-Near Term: 
-Use "epochTime" instead of minutes
-Count down time on screen instead of "freezing" at last update
-Refresh every 30 seconds or so, but only when active on screen
 
 Longer Term:
 Allow lists of "favorites" (e.g. "Home to work", "Work to home", "Busses from Sullivan")

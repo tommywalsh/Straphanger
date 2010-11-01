@@ -23,8 +23,11 @@ public class MBTAActivity extends ListActivity
 
     private Runnable m_updateDisplay = new Runnable() {
 	    public void run() {
-		if (m_departures != null) {
-		    m_aa.clear();
+		m_aa.clear();
+		if (m_departures == null) {
+		    m_aa.add(new String("Downloading data..."));
+		} else {
+		    
 		    long now = java.lang.System.currentTimeMillis();
 
 		    for (Departure d : m_departures) {
@@ -53,9 +56,9 @@ public class MBTAActivity extends ListActivity
 			    m_aa.add(mess);
 			}
 		    }
-		    setListAdapter(m_aa);
-		    m_handler.postDelayed(this, 500);
 		}
+		setListAdapter(m_aa);
+		m_handler.postDelayed(this, 500);
 	    }
 	};
 
@@ -67,24 +70,33 @@ public class MBTAActivity extends ListActivity
 
     public void onResume() {
 	super.onResume();
-	    
-	MBTAParser parser = new MBTAParser();
-
-	ArrayAdapter<String> aa = new ArrayAdapter<String>(this, R.layout.listitem);
-	try {
-	    m_departures = parser.parse(MBTADataService.getPredictionStream());
-	} catch (java.io.IOException e) {
-	}
 
 	m_handler.removeCallbacks(m_updateDisplay);
-	m_handler.postDelayed(m_updateDisplay, 100);
+	m_handler.postDelayed(m_updateDisplay, 10);
+
+	m_handler.removeCallbacks(m_updateDepartures);
+	m_handler.postDelayed(m_updateDepartures, 500);
     }
+
+    private Runnable m_updateDepartures = new Runnable() {
+	    public void run() {
+		MBTAParser parser = new MBTAParser();
+
+		try {
+		    m_departures = parser.parse(MBTADataService.getPredictionStream());
+		} catch (java.io.IOException e) {
+		}
+		m_handler.postDelayed(this, 30000);
+	    }
+	};
 
 
 		
     public void onPause() {
 	super.onPause();
 	m_handler.removeCallbacks(m_updateDisplay);
+	m_handler = null;
+	m_handler.removeCallbacks(m_updateDepartures);
 	m_handler = null;
     }
 }
