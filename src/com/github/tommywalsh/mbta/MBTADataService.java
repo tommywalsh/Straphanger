@@ -25,8 +25,8 @@ public class MBTADataService
 
     }
 
-    public static InputStream getPredictionStream() throws java.io.IOException {
-	URL url = getURLForProfile(Profile.getHomeToWorkProfile());
+    public static InputStream getPredictionStream(Profile p) throws java.io.IOException {
+	URL url = getURLForProfile(p);
 	return url.openStream();
     }
 

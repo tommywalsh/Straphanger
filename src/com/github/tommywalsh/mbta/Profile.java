@@ -10,6 +10,8 @@ import java.util.Vector;
 public class Profile
 {
     public Vector<Stop> stops = new Vector<Stop>();
+    public String name;
+    
 
     static Profile getHomeToWorkProfile() {
 	Profile p = new Profile();	
@@ -21,7 +23,7 @@ public class Profile
 	p.stops.add(new Stop("86","2615"));
 	p.stops.add(new Stop("85","2612"));
 	p.stops.add(new Stop("87","2510"));
-
+	p.name = "Home to Work";
 	return p;
     }
 }
