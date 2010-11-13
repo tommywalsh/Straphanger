@@ -26,7 +26,9 @@ public class MBTAActivity extends ListActivity
     private Runnable m_updateDisplay = new Runnable() {
 	    public void run() {
 		m_aa.clear();
-		if (m_departures == null) {
+		if (m_currentProfile == null) {
+		    m_aa.add(new String ("Please select a profile from the menu"));
+		} else if (m_departures == null) {
 		    m_aa.add(new String("Downloading data..."));
 		} else {
 		    
@@ -102,7 +104,6 @@ public class MBTAActivity extends ListActivity
 	super.onPause();
 	m_handler.removeCallbacks(m_updateDisplay);
 	m_handler.removeCallbacks(m_updateDepartures);
-	m_handler = null;
     }
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
