@@ -1,6 +1,18 @@
 
 
-Longer Term:
 Allow lists of "favorites" (e.g. "Home to work", "Work to home", "Busses from Sullivan")
 Allow editing of favorites by showing all busses stopping near a location (picked from map or GPS current location)
 
+
+
+Notes:
+Accessing MBTA real-time data is documented here:
+http://www.eot.state.ma.us/developers/realtime/
+
+--- Cheat sheet --
+
+To get all routes:
+wget -O- http://webservices.nextbus.com/service/publicXMLFeed?command=routeList\&a=mbta
+
+To get all stops for a particular route (e.g. route 747):
+wget -O- http://webservices.nextbus.com/service/publicXMLFeed?command=routeConfig\&a=mbta\&r=701

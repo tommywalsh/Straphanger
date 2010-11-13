@@ -26,4 +26,14 @@ public class Profile
 	p.name = "Home to Work";
 	return p;
     }
+
+    static Profile getWorkToHomeProfile() {
+	Profile p = new Profile();	
+	p.stops.add(new Stop("747","17863"));
+	p.stops.add(new Stop("47","17863"));
+	p.stops.add(new Stop("1","64"));
+	p.name = "Work To Home";
+	return p;
+    }
+
 }

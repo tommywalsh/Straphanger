@@ -2,10 +2,7 @@ package com.github.tommywalsh.mbta;
 
 import android.view.Menu;
 import android.view.SubMenu;
-import android.view.MenuItem;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.HashMap;
 
 // Provides a submenu consisting of "profiles"
@@ -20,8 +17,14 @@ public class ProfilePicker {
 	SubMenu sm = parentMenu.addSubMenu(R.string.load_profile);
 
 	int id = 1000;
-	MenuItem mi = sm.add(Menu.NONE, id, Menu.NONE, "Home To Work");
-	m_idToProfile.put(id, Profile.getHomeToWorkProfile());
+	Profile p = Profile.getHomeToWorkProfile();
+	sm.add(Menu.NONE, id, Menu.NONE, p.name);
+	m_idToProfile.put(id, p);
+
+	id++;
+	p = Profile.getWorkToHomeProfile();
+	sm.add(Menu.NONE, id, Menu.NONE, p.name);
+	m_idToProfile.put(id, p);
     }
 
 
