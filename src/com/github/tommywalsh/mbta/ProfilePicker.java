@@ -17,14 +17,12 @@ public class ProfilePicker {
 	SubMenu sm = parentMenu.addSubMenu(R.string.load_profile);
 
 	int id = 1000;
-	Profile p = Profile.getHomeToWorkProfile();
-	sm.add(Menu.NONE, id, Menu.NONE, p.name);
-	m_idToProfile.put(id, p);
-
-	id++;
-	p = Profile.getWorkToHomeProfile();
-	sm.add(Menu.NONE, id, Menu.NONE, p.name);
-	m_idToProfile.put(id, p);
+	
+	for(Profile p : ProfileProvider.getAllProfiles()) {
+	    sm.add(Menu.NONE, id, Menu.NONE, p.name);
+	    m_idToProfile.put(id, p);	    
+	    id++;
+	}
     }
 
 

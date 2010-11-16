@@ -5,7 +5,6 @@
 
 package com.github.tommywalsh.mbta;
 
-
 public class Stop {
     public String route;
     public String where;
