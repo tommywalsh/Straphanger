@@ -5,22 +5,75 @@
 
 package com.github.tommywalsh.mbta;
 
+import android.content.Context;
+
 import java.util.Vector;
 import java.io.Serializable;
+import java.io.ObjectInputStream;
+import java.io.FileInputStream;
+import java.io.ObjectOutputStream;
+import java.io.FileOutputStream;
 
-public class ProfileProvider implements Serializable {
+public class ProfileProvider
+{
+    static final private String FILE_NAME = "profiles";
 
-    static private Vector<Profile> s_allProfiles = null;
-    
-    static public synchronized Vector<Profile> getAllProfiles() {
-	if (s_allProfiles == null) {
-	    s_allProfiles = new Vector<Profile>();
-	    s_allProfiles.add(getHomeToWorkProfile());
-	    s_allProfiles.add(getWorkToHomeProfile());
-	}
-	return s_allProfiles;
+    Vector<Profile> m_allProfiles = null;
+    private Context m_context;
+
+    ProfileProvider(Context context) {
+	m_context = context;
     }
 
+
+    public Vector<Profile> getAllProfiles() {
+	if (m_allProfiles == null) {
+	    m_allProfiles = new Vector<Profile>();
+
+	    m_allProfiles = loadSavedProfiles(m_context);
+	    if (m_allProfiles.isEmpty()) {
+		loadDefaultProfiles();
+	    }
+	}
+	return m_allProfiles;
+    }
+
+    private void loadDefaultProfiles() {
+	m_allProfiles.add(getHomeToWorkProfile());
+	m_allProfiles.add(getWorkToHomeProfile());
+	saveProfiles(m_context, m_allProfiles);
+    }
+
+    private synchronized static Vector<Profile> loadSavedProfiles(Context context) {	
+	Vector<Profile> emptyVec = new Vector<Profile>();
+	try {
+	    FileInputStream fis = context.openFileInput(FILE_NAME);
+	    ObjectInputStream ois = new ObjectInputStream(fis);
+	    Object obj = ois.readObject();
+	    
+	    // Will warn about unchecked operations:
+	    if (obj.getClass() == emptyVec.getClass()) {
+		return (Vector<Profile>)obj;
+	    }
+	} catch (java.io.FileNotFoundException e) {
+	} catch (java.io.IOException e) {
+	} catch (java.lang.ClassNotFoundException e) {
+	}
+
+	return emptyVec;
+    }
+
+
+    private synchronized static void saveProfiles(Context context, Vector<Profile> profiles) {
+	try {
+	    FileOutputStream fos = context.openFileOutput(FILE_NAME, Context.MODE_PRIVATE);
+	    ObjectOutputStream oos = new ObjectOutputStream(fos);
+	    oos.writeObject(profiles);
+	    fos.close();
+	} catch (java.io.FileNotFoundException e) {
+	} catch (java.io.IOException e) {
+	}
+    }
 
     static private Profile getHomeToWorkProfile() {
 	Profile p = new Profile();	

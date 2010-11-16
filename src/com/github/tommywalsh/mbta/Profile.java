@@ -6,8 +6,9 @@
 package com.github.tommywalsh.mbta;
 
 import java.util.Vector;
+import java.io.Serializable;
 
-public class Profile
+public class Profile implements Serializable
 {
     public Vector<Stop> stops = new Vector<Stop>();
     public String name;   

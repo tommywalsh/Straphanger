@@ -14,8 +14,6 @@ import org.xml.sax.Attributes;
 import java.util.TreeSet;
 import java.io.InputStream;
 
-import android.util.Log;
-
 
 public class MBTAParser {
 
@@ -58,7 +56,7 @@ public class MBTAParser {
 	try {
 	    Xml.parse(is, Xml.Encoding.UTF_8, root.getContentHandler());
 	} catch (Exception e) {
-	    Log.d("kml", e.toString());
+	    android.util.Log.d("mbta", e.toString());
 	}
 	
 	return departures;

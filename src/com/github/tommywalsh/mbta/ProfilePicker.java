@@ -13,12 +13,12 @@ public class ProfilePicker {
     private HashMap<Integer,Profile> m_idToProfile = new HashMap<Integer, Profile>();
     
 
-    ProfilePicker (Menu parentMenu) { 
+    ProfilePicker (Menu parentMenu, ProfileProvider provider) { 
 	SubMenu sm = parentMenu.addSubMenu(R.string.load_profile);
 
 	int id = 1000;
 	
-	for(Profile p : ProfileProvider.getAllProfiles()) {
+	for(Profile p : provider.getAllProfiles()) {
 	    sm.add(Menu.NONE, id, Menu.NONE, p.name);
 	    m_idToProfile.put(id, p);	    
 	    id++;

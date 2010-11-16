@@ -6,15 +6,12 @@
 package com.github.tommywalsh.mbta;
 
 import android.app.ListActivity;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuInflater;
-import android.util.Log;
-
 import java.util.SortedSet;
 
 public class MBTAActivity extends ListActivity
@@ -69,6 +66,7 @@ public class MBTAActivity extends ListActivity
     
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+	m_profileProvider = new ProfileProvider(this);
 	m_aa = new ArrayAdapter<String>(this, R.layout.listitem);
     }
 
@@ -114,12 +112,13 @@ public class MBTAActivity extends ListActivity
     }
 
     @Override public boolean onCreateOptionsMenu(Menu menu) {
-        m_profileMenu = new ProfilePicker(menu);
+        m_profileMenu = new ProfilePicker(menu, m_profileProvider);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
 
+    private ProfileProvider m_profileProvider;
     private ProfilePicker m_profileMenu;
 
     private void changeProfile(Profile p) {

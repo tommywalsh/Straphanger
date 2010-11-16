@@ -5,7 +5,10 @@
 
 package com.github.tommywalsh.mbta;
 
-public class Stop {
+import java.io.Serializable;
+
+public class Stop implements Serializable
+{
     public String route;
     public String where;
     
