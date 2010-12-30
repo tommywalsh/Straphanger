@@ -66,7 +66,7 @@ public class MBTAActivity extends ListActivity
 		    }
 		}
 		setListAdapter(m_aa);
-		m_handler.postDelayed(this, 5000);
+		m_handler.postDelayed(this, 10000);
 	    }
 	};
 
