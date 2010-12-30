@@ -41,12 +41,13 @@ public class ProfileProvider
     private void loadDefaultProfiles() {
 	m_allProfiles.add(getHomeToWorkProfile());
 	m_allProfiles.add(getWorkToHomeProfile());
+	m_allProfiles.add(getRedLineToHomeProfile());
 	saveProfiles(m_context, m_allProfiles);
     }
 
     private synchronized static Vector<Profile> loadSavedProfiles(Context context) {	
 	Vector<Profile> emptyVec = new Vector<Profile>();
-	try {
+	/*	try {
 	    FileInputStream fis = context.openFileInput(FILE_NAME);
 	    ObjectInputStream ois = new ObjectInputStream(fis);
 	    Object obj = ois.readObject();
@@ -59,12 +60,13 @@ public class ProfileProvider
 	} catch (java.io.IOException e) {
 	} catch (java.lang.ClassNotFoundException e) {
 	}
-
+	*/
 	return emptyVec;
     }
 
 
     private synchronized static void saveProfiles(Context context, Vector<Profile> profiles) {
+	/*
 	try {
 	    FileOutputStream fos = context.openFileOutput(FILE_NAME, Context.MODE_PRIVATE);
 	    ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -72,7 +74,7 @@ public class ProfileProvider
 	    fos.close();
 	} catch (java.io.FileNotFoundException e) {
 	} catch (java.io.IOException e) {
-	}
+	}*/
     }
 
     static private Profile getHomeToWorkProfile() {
@@ -96,6 +98,17 @@ public class ProfileProvider
 	p.stops.add(new Stop("1","64"));
 	p.name = "Work To Home";
 	return p;
+    }
+
+    static private Profile getRedLineToHomeProfile() {
+	Profile p = new Profile();	
+	p.stops.add(new Stop("748","2231"));
+	p.stops.add(new Stop("85","2231"));
+	p.stops.add(new Stop("91","1060"));
+	p.stops.add(new Stop("83","1060"));
+	p.stops.add(new Stop("86","20761"));
+	p.name = "Red Line To Home";
+	return p;	
     }
 
 }
