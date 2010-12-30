@@ -32,7 +32,14 @@ public class MBTAActivity extends ListActivity
 		    long now = java.lang.System.currentTimeMillis();
 
 		    for (Departure d : m_departures) {
+
+			// We're only going to refresh every 10 seconds,
+			// so this data will be stale for an average of 5
+			// seconds.  Deduct 5 seconds from the time left
+			// so that we "average out" the error
 			int secondsLeft = (int) ((d.when - now) / 1000);
+			secondsLeft -= 5;
+
 			if (secondsLeft > 0) {
 			    int hours = secondsLeft / 3600;
 			    int minutes = (secondsLeft - hours*3600) / 60;
@@ -59,7 +66,7 @@ public class MBTAActivity extends ListActivity
 		    }
 		}
 		setListAdapter(m_aa);
-		m_handler.postDelayed(this, 500);
+		m_handler.postDelayed(this, 5000);
 	    }
 	};
 
