@@ -75,6 +75,8 @@ public class MBTAActivity extends ListActivity
         super.onCreate(savedInstanceState);
 	m_profileProvider = new ProfileProvider(this);
 	m_aa = new ArrayAdapter<String>(this, R.layout.listitem);
+
+	ProximityTest.doit(this);
     }
 
     public void onResume() {
