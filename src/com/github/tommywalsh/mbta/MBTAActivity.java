@@ -24,9 +24,9 @@ public class MBTAActivity extends ListActivity
 	    public void run() {
 		m_aa.clear();
 		if (m_currentProfile == null) {
-		    m_aa.add(new String ("Please select a profile from the menu"));
+		    m_aa.add(getString(R.string.select_option));
 		} else if (m_departures == null) {
-		    m_aa.add(new String("Downloading data..."));
+		    m_aa.add(getString(R.string.downloading));
 		} else {
 		    
 		    long now = java.lang.System.currentTimeMillis();
