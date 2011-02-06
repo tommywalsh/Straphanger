@@ -41,7 +41,21 @@ public class ProximityTest
 	public double maxLat;
 	public double maxLng;
 	public Vector<StopInfo> stops;
+    }
 
+    private static RouteInfo getRouteFromFile(String filename) 
+    {
+	try {
+	    java.io.File file = new java.io.File(filename);
+	    FileInputStream fis = new FileInputStream(file);
+	    ProximityTest pt = new ProximityTest();
+	    return pt.parse(fis);
+	} catch (java.io.FileNotFoundException e) {
+	    android.util.Log.d("MBTA", e.toString());
+	} catch (java.io.IOException e) {
+	    android.util.Log.d("MBTA", e.toString());
+	}
+	return null;
     }
 
     public RouteInfo parse(InputStream is) {
@@ -149,23 +163,25 @@ public class ProximityTest
     }
 
 
+
+    static Vector<RouteInfo> allRoutes() {
+	Vector<RouteInfo> routes = new Vector<RouteInfo>();
+	routes.addElement(getRouteFromFile("/sdcard/route91.xml"));
+	routes.addElement(getRouteFromFile("/sdcard/route86.xml"));
+	routes.addElement(getRouteFromFile("/sdcard/route87.xml"));
+	return routes;
+    }
 	    
 
     static void doit(Context context)
     {
-	try {
-	    java.io.File file = new java.io.File("/sdcard/route91.xml");
-	    FileInputStream fis = new FileInputStream(file);
-	    ProximityTest pt = new ProximityTest();
-	    RouteInfo ri = pt.parse(fis);
-	    
+	Vector<RouteInfo> rc = allRoutes();
+	for (RouteInfo ri: rc) {
+
 	    // my house
 	    double lat = 42.379159;
 	    double lng = -71.099908;
 	    
-	    StopInfo si = getClosestStop(lat, lng, ri);
-	    android.util.Log.d("MBTA", "Closest stop to home is " + si.title);
-
 	    // Kenmore
 	    double lat2 = 42.348622;
 	    double lng2 = -71.093769;
@@ -180,17 +196,13 @@ public class ProximityTest
 		android.util.Log.d("MBTA", "No stops within a half mile of Kenmore");
 	    }			    
 
-	    StopInfo si4 = getClosestStop(lat, lng, ri, 0.1);
+	    StopInfo si4 = getClosestStop(lat, lng, ri, 0.5);
 	    if (si4 != null) {
 		android.util.Log.d("MBTA", "Closest stop to home is " + si4.title);
 	    } else {
 		android.util.Log.d("MBTA", "No stops close to home");
 	    }			    
 
-	} catch (java.io.FileNotFoundException e) {
-	    android.util.Log.d("MBTA", e.toString());
-	} catch (java.io.IOException e) {
-	    android.util.Log.d("MBTA", e.toString());
 	}
 
     }
