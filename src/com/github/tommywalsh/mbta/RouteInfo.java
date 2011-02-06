@@ -53,18 +53,21 @@ public class RouteInfo {
     private String m_filename;
     private Vector<StopInfo> m_stops = null;
     
-    private RouteInfo(String filename) {
-	m_filename = filename;
-	lightParse();
+    private RouteInfo(String cTag, String cTitle, double cMinLat, double cMaxLat, double cMinLng, double cMaxLng) {
+	tag = cTag;
+	title = cTitle;
+	minLat = cMinLat;
+	maxLat = cMaxLat;
+	minLng = cMinLng;
+	maxLng = cMaxLng;
+	m_filename = "/sdcard/mbta/route" + tag + ".xml";
     }
 
     static private void	initIfNecessary()
     {
 	if (s_allRoutes == null) {	    
 	    s_allRoutes = new TreeMap<String, RouteInfo>();
-	    s_allRoutes.put("91", new RouteInfo("/sdcard/route91.xml"));
-	    s_allRoutes.put("86", new RouteInfo("/sdcard/route86.xml"));
-	    s_allRoutes.put("87", new RouteInfo("/sdcard/route87.xml"));
+	    parseOverview();
 	}
     }
 
@@ -74,38 +77,39 @@ public class RouteInfo {
 	java.io.File file = new java.io.File(m_filename);
 	return new FileInputStream(file);
     }
-    
-    // only parse the headers
-    private void lightParse() {
-	// would it be a better idea to have a "master list" with the "light" information for ALL routes,
-	// then separate files for the "heavy" information?  That would mean no parsing here, but instead
-	// info gets pushed in to the contructor
+
+    private static void parseOverview()
+    {
 	final String NS = "";
 	
 	RootElement root = new RootElement("body");
+
+	s_allRoutes = new TreeMap<String, RouteInfo>();
 	
 	Element route = root.getChild(NS, "route");
 	route.setStartElementListener(new StartElementListener() {
 		public void start(Attributes atts) {
-		    tag = atts.getValue("tag");
-		    title = atts.getValue("title");
-		    minLat = Double.parseDouble(atts.getValue("latMin"));
-		    maxLat = Double.parseDouble(atts.getValue("latMax"));
-		    minLng = Double.parseDouble(atts.getValue("lonMin"));
-		    maxLng = Double.parseDouble(atts.getValue("lonMax"));
+		    String atag = atts.getValue("tag");
+		    String atitle = atts.getValue("title");
+		    double aminLat = Double.parseDouble(atts.getValue("latMin"));
+		    double amaxLat = Double.parseDouble(atts.getValue("latMax"));
+		    double aminLng = Double.parseDouble(atts.getValue("lonMin"));
+		    double amaxLng = Double.parseDouble(atts.getValue("lonMax"));
+		    s_allRoutes.put(atag, new RouteInfo(atag, atitle, aminLat, amaxLat, aminLng, amaxLng));
 		}
 	    });
 	
 	try {
-	    FileInputStream is = getStream();
+	    java.io.File file = new java.io.File("/sdcard/mbta/overview.xml");
+	    FileInputStream is = new FileInputStream(file);
 	    Xml.parse(is, Xml.Encoding.UTF_8, root.getContentHandler());
 	} catch (Exception e) {
 	    android.util.Log.d("mbta", e.toString());
 	}	
+
     }
-
-
-    // parse the whole file, stops and all
+    
+    // actually parse the route file
     private void heavyParse() {
 
 	// Note: this is WRONG!  We need to parse stops for each direction!

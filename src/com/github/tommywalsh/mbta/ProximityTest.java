@@ -90,27 +90,11 @@ public class ProximityTest
 	    double lat = 42.379159;
 	    double lng = -71.099908;
 	    
-	    // Kenmore
-	    double lat2 = 42.348622;
-	    double lng2 = -71.093769;
 
-	    StopInfo si2 = getClosestStop(lat2, lng2, ri);
-	    android.util.Log.d("MBTA", "Closest stop to Kenmore is " + si2.title);
-
-	    StopInfo si3 = getClosestStop(lat2, lng2, ri, 0.5);
-	    if (si3 != null) {
-		android.util.Log.d("MBTA", "Closest stop to Kenmore is " + si3.title);
-	    } else {
-		android.util.Log.d("MBTA", "No stops within a half mile of Kenmore");
-	    }			    
-
-	    StopInfo si4 = getClosestStop(lat, lng, ri, 0.5);
-	    if (si4 != null) {
-		android.util.Log.d("MBTA", "Closest stop to home is " + si4.title);
-	    } else {
-		android.util.Log.d("MBTA", "No stops close to home");
-	    }			    
-
+	    StopInfo si = getClosestStop(lat, lng, ri, 0.5);
+	    if (si != null) {
+		android.util.Log.d("MBTA", "Closest stop to home is " + si.title);
+	    }
 	}
 
     }
