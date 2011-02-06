@@ -30,6 +30,7 @@ build_overview()
     get_all_route_nums | while read routenum
     do
 	cat "data/route${routenum}.xml" | grep '<route' >> data/overview.xml
+	echo "</route>" >> data/overview.xml
     done
     echo '</body>' >> data/overview.xml
     echo "done."
