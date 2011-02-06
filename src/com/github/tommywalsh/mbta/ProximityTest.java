@@ -5,18 +5,9 @@
 
 package com.github.tommywalsh.mbta;
 
-import java.io.FileInputStream;
-import android.sax.RootElement;
-import android.sax.Element;
-import android.sax.StartElementListener;
-import android.util.Xml;
 
 import android.content.Context;
 
-import org.xml.sax.Attributes;
-
-import java.io.InputStream;
-import java.util.Vector;
 
 public class ProximityTest
 {
@@ -25,81 +16,6 @@ public class ProximityTest
     public static final double latsPerMile = 0.0144578;
     public static final double lngsPerMile = 0.019566791;
     public static final double milesPerMeter = 0.000621;
-
-    public class StopInfo {
-	public String tag;
-	public double lat;
-	public double lng;
-	public String title;
-    }
-
-    public class RouteInfo {
-	public String tag;
-	public String title;
-	public double minLat;
-	public double minLng;
-	public double maxLat;
-	public double maxLng;
-	public Vector<StopInfo> stops;
-    }
-
-    private static RouteInfo getRouteFromFile(String filename) 
-    {
-	try {
-	    java.io.File file = new java.io.File(filename);
-	    FileInputStream fis = new FileInputStream(file);
-	    ProximityTest pt = new ProximityTest();
-	    return pt.parse(fis);
-	} catch (java.io.FileNotFoundException e) {
-	    android.util.Log.d("MBTA", e.toString());
-	} catch (java.io.IOException e) {
-	    android.util.Log.d("MBTA", e.toString());
-	}
-	return null;
-    }
-
-    public RouteInfo parse(InputStream is) {
-		
-	final String NS = "";
-
-	final RouteInfo ri = new RouteInfo();
-
-	RootElement root = new RootElement("body");
-
-	Element route = root.getChild(NS, "route");
-	route.setStartElementListener(new StartElementListener() {
-		public void start(Attributes atts) {
-		    ri.tag = atts.getValue("tag");
-		    ri.title = atts.getValue("title");
-		    ri.minLat = Double.parseDouble(atts.getValue("latMin"));
-		    ri.maxLat = Double.parseDouble(atts.getValue("latMax"));
-		    ri.minLng = Double.parseDouble(atts.getValue("lonMin"));
-		    ri.maxLng = Double.parseDouble(atts.getValue("lonMax"));
-		    ri.stops = new Vector<StopInfo>();
-		}
-	    });
-
-	Element stop = route.getChild(NS, "stop");
-	stop.setStartElementListener(new StartElementListener() {
-		public void start(Attributes atts) {
-		    StopInfo si = new StopInfo();
-		    si.tag = atts.getValue("tag");
-		    si.title = atts.getValue("title");
-		    si.lat = Double.parseDouble(atts.getValue("lat"));
-		    si.lng = Double.parseDouble(atts.getValue("lon"));
-		    ri.stops.addElement(si);
-		}
-	    });
-
-	try {
-	    Xml.parse(is, Xml.Encoding.UTF_8, root.getContentHandler());
-	} catch (Exception e) {
-	    android.util.Log.d("mbta", e.toString());
-	}
-	
-	return ri;
-	
-    }
 
     static double distanceBetween(double lat1, double lng1, double lat2, double lng2) 
     {
@@ -119,7 +35,7 @@ public class ProximityTest
     {
 	StopInfoHelper sih = null;
 	
-	for (StopInfo si : ri.stops) {
+	for (StopInfo si : ri.getStops()) {
 	    double thisDistance = distanceBetween(lat, lng, si.lat, si.lng);
 	    if (sih == null || thisDistance < sih.distance) {
 		sih = new StopInfoHelper();
@@ -164,19 +80,11 @@ public class ProximityTest
 
 
 
-    static Vector<RouteInfo> allRoutes() {
-	Vector<RouteInfo> routes = new Vector<RouteInfo>();
-	routes.addElement(getRouteFromFile("/sdcard/route91.xml"));
-	routes.addElement(getRouteFromFile("/sdcard/route86.xml"));
-	routes.addElement(getRouteFromFile("/sdcard/route87.xml"));
-	return routes;
-    }
-	    
 
     static void doit(Context context)
     {
-	Vector<RouteInfo> rc = allRoutes();
-	for (RouteInfo ri: rc) {
+	
+	for (RouteInfo ri: RouteInfo.getAllRoutes()) {
 
 	    // my house
 	    double lat = 42.379159;
