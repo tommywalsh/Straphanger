@@ -10,7 +10,9 @@ import java.io.Serializable;
 public class DeparturePoint implements Serializable
 {
     public String route;
+    public String direction;
     public String where;
+    
     
     public DeparturePoint() {
     }
