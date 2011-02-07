@@ -13,5 +13,12 @@ public class Stop {
     public double lat;
     public double lng;
     public String title;
+    public Stop() {}
+    public Stop (Stop other) {
+        tag = other.tag;
+        lat = other.lat;
+        lng = other.lng;
+        title = other.title;
+    }
 }
 

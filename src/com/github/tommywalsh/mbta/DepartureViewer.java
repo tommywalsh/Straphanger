@@ -45,7 +45,7 @@ public class DepartureViewer extends ListActivity
 			    int minutes = (secondsLeft - hours*3600) / 60;
 			    int seconds = (secondsLeft - hours*3600 - minutes*60);
 			    
-			    String mess = d.route + " to " + d.direction + " stops at " + d.title + " in ";
+			    String mess = d.route.title + " to " + d.direction + " stops at " + d.title + " in ";
 			    if (hours > 0) {
 				mess += (new Integer(hours)).toString() + ":";
 				if (minutes < 10) {

@@ -21,18 +21,23 @@ import android.util.Xml;
 import org.xml.sax.Attributes;
 
 
-public class Route {
+public class Route implements Comparable {
 
     static public Route getRoute(String tag) 
     {
 	initIfNecessary();
-	return s_allRoutes.get(tag);
+        return s_allRoutes.get(tag);
     }
     
     static public Collection<Route> getAllRoutes()
     {
 	initIfNecessary();
 	return s_allRoutes.values();
+    }
+
+    public int compareTo(Object o) {
+        Route other = (Route) o;
+        return title.compareTo(other.title);
     }
 
     public String tag;

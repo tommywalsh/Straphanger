@@ -39,9 +39,9 @@ public class ProfileProvider
     }
 
     private void loadDefaultProfiles() {
-	m_allProfiles.add(getHomeToWorkProfile());
-	m_allProfiles.add(getWorkToHomeProfile());
-	m_allProfiles.add(getRedLineToHomeProfile());
+        m_allProfiles.add(getHomeToWorkProfile());
+        m_allProfiles.add(getWorkToHomeProfile());
+        m_allProfiles.add(getRedLineToHomeProfile());
         m_allProfiles.add(ProximityProfileGenerator.getProximityProfile(42.379159, -71.099908, 0.5));
 
 	saveProfiles(m_context, m_allProfiles);
@@ -81,8 +81,8 @@ public class ProfileProvider
 
     static private Profile getHomeToWorkProfile() {
 	Profile p = new Profile();	
-	p.stops.add(new DeparturePoint("748","2541"));
-	p.stops.add(new DeparturePoint("748","2612"));
+	p.stops.add(new DeparturePoint("747","2531"));
+	p.stops.add(new DeparturePoint("747","2612"));
 	p.stops.add(new DeparturePoint("91","2531"));
 	p.stops.add(new DeparturePoint("91","2612"));
 	p.stops.add(new DeparturePoint("86","25712"));
@@ -104,7 +104,7 @@ public class ProfileProvider
 
     static private Profile getRedLineToHomeProfile() {
 	Profile p = new Profile();	
-	p.stops.add(new DeparturePoint("748","2231"));
+	p.stops.add(new DeparturePoint("747","2231"));
 	p.stops.add(new DeparturePoint("85","2231"));
 	p.stops.add(new DeparturePoint("91","1060"));
 	p.stops.add(new DeparturePoint("83","1060"));

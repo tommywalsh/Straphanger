@@ -29,7 +29,7 @@ public class MBTAParser {
 	Element preds = root.getChild(NS, "predictions");
 	preds.setStartElementListener(new StartElementListener() {
 		public void start(Attributes atts) {
-		    pendingDeparture.route = atts.getValue("routeTitle");
+		    pendingDeparture.route = Route.getRoute(atts.getValue("routeTag"));
 		    pendingDeparture.title = atts.getValue("stopTitle");
 		}
 	    });

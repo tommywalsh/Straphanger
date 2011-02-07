@@ -23,32 +23,12 @@ public class ProximityProfileGenerator
 
 	for (Route ri: Route.getAllRoutes()) {
             for (StopHelper sih : getClosestStop(lat, lng, ri, radius)) {
-                DeparturePoint s = new DeparturePoint();
-                s.route = ri.tag;
-                s.tag = sih.si.tag;
-                p.stops.addElement(s);
+                p.stops.addElement(sih.dp);
             }
         }
 
         return p;
     }
-
-    public static void doit(Context context)
-    {
-	
-	for (Route ri: Route.getAllRoutes()) {
-
-	    // my house
-	    double lat = 42.379159;
-	    double lng = -71.099908;
-	    
-	    for (StopHelper sih : getClosestStop(lat, lng, ri, 0.5)) {
-		android.util.Log.d("MBTA", ri.title + ": " + sih.direction + " stops at " + sih.si.title);
-	    }
-	}
-
-    }
-
 
     // These are approximations that only make sense near Boston
     private static final double latsPerMile = 0.0144578;
@@ -65,9 +45,8 @@ public class ProximityProfileGenerator
     }
 
     static private class StopHelper {
-	public Stop si;
-	public double distance;
-	public String direction;
+        public DeparturePoint dp;
+        public double distance;
     }
 
     private static Vector<StopHelper> getClosestStopHelper(double lat, double lng, Route ri)
@@ -81,8 +60,7 @@ public class ProximityProfileGenerator
 		double thisDistance = distanceBetween(lat, lng, si.lat, si.lng);
 		if (sih == null || thisDistance < sih.distance) {
 		    sih = new StopHelper();
-		    sih.si = si;
-		    sih.direction = dir;
+                    sih.dp = new DeparturePoint(si, ri, dir);
 		    sih.distance = thisDistance;
 		}
 	    }

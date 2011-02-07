@@ -9,14 +9,20 @@ import java.io.Serializable;
 
 public class DeparturePoint extends Stop implements Serializable
 {
-    public String route;
+    public Route route;
     public String direction;
     
     public DeparturePoint() {
     }
     
-    public DeparturePoint(String r, String w) {
-        tag = w;
-	route = r;
+    public DeparturePoint(String routeId, String stopId) {
+        tag = stopId;
+        route = Route.getRoute(routeId);
+    }
+
+    public DeparturePoint(Stop stop, Route rt, String dir) {
+        super(stop);
+        route = rt;
+        direction = dir;
     }
 }
