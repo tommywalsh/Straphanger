@@ -27,7 +27,7 @@ public class ProximityProfileGenerator
                 // Stop/Departure types should be melded with Stop/RouteInfo types
                 DeparturePoint s = new DeparturePoint();
                 s.route = ri.tag;
-                s.where = sih.si.tag;
+                s.tag = sih.si.tag;
                 p.stops.addElement(s);
             }
         }

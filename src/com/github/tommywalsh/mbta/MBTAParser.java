@@ -30,7 +30,7 @@ public class MBTAParser {
 	preds.setStartElementListener(new StartElementListener() {
 		public void start(Attributes atts) {
 		    pendingDeparture.route = atts.getValue("routeTitle");
-		    pendingDeparture.where = atts.getValue("stopTitle");
+		    pendingDeparture.title = atts.getValue("stopTitle");
 		}
 	    });
 
@@ -46,9 +46,9 @@ public class MBTAParser {
 		public void start(Attributes atts) {
 		    Departure d = new Departure();
 		    d.route = pendingDeparture.route;
-		    d.where = pendingDeparture.where;
+		    d.title = pendingDeparture.title;
 		    d.direction = pendingDeparture.direction;
-		    d.when = Long.decode(atts.getValue("epochTime")); // should use epochTime!
+		    d.when = Long.decode(atts.getValue("epochTime"));
 		    departures.add(d);
 		}
 	    });
