@@ -10,15 +10,54 @@ import android.content.Context;
 import java.util.AbstractMap;
 import java.util.Vector;
 
-public class ProximityTest
+public class ProximityProfileGenerator
 {
 
-    // These are approximations that only make sense near Boston
-    public static final double latsPerMile = 0.0144578;
-    public static final double lngsPerMile = 0.019566791;
-    public static final double milesPerMeter = 0.000621;
+    // Given a postion (lat/lng), and a radius (in miles),
+    // returns a profile that the closest DeparturePoints for all
+    // routes that stop within the given radius
+    public static Profile getProximityProfile(double lat, double lng, double radius)
+    {
+        Profile p = new Profile();
+        p.name = "Nearby Busses";
 
-    static double distanceBetween(double lat1, double lng1, double lat2, double lng2) 
+	for (RouteInfo ri: RouteInfo.getAllRoutes()) {
+            for (StopInfoHelper sih : getClosestStop(lat, lng, ri, radius)) {
+                // We should cut this conversion stuff out!
+                // Stop/Departure types should be melded with StopInfo/RouteInfo types
+                Stop s = new Stop();
+                s.route = ri.tag;
+                s.where = sih.si.tag;
+                p.stops.addElement(s);
+            }
+        }
+
+        return p;
+    }
+
+    public static void doit(Context context)
+    {
+	
+	for (RouteInfo ri: RouteInfo.getAllRoutes()) {
+
+	    // my house
+	    double lat = 42.379159;
+	    double lng = -71.099908;
+	    
+	    for (StopInfoHelper sih : getClosestStop(lat, lng, ri, 0.5)) {
+		android.util.Log.d("MBTA", ri.title + ": " + sih.direction + " stops at " + sih.si.title);
+	    }
+	}
+
+    }
+
+
+    // These are approximations that only make sense near Boston
+    private static final double latsPerMile = 0.0144578;
+    private static final double lngsPerMile = 0.019566791;
+    private static final double milesPerMeter = 0.000621;
+
+    private static double distanceBetween(double lat1, double lng1, double lat2, double lng2) 
     {
 	float[] results = {0.0f};
 	android.location.Location.distanceBetween(lat1, lng1,
@@ -33,7 +72,7 @@ public class ProximityTest
 	public String direction;
     }
 
-    static Vector<StopInfoHelper> getClosestStopHelper(double lat, double lng, RouteInfo ri)
+    private static Vector<StopInfoHelper> getClosestStopHelper(double lat, double lng, RouteInfo ri)
     {
 	Vector<StopInfoHelper> stops = new Vector<StopInfoHelper>();
 	AbstractMap<String, Vector<StopInfo>> sm = ri.getStopMap();
@@ -57,13 +96,13 @@ public class ProximityTest
     }
    
 	
-    static Vector<StopInfoHelper> getClosestStops(double lat, double lng, RouteInfo ri)
+    private static Vector<StopInfoHelper> getClosestStops(double lat, double lng, RouteInfo ri)
     {
 	return getClosestStopHelper(lat, lng, ri);
     }
 
     // return null if no stop is within the maximum acceptable distance
-    static Vector<StopInfoHelper> getClosestStop(double lat, double lng, RouteInfo ri, double maxDistance)
+    private static Vector<StopInfoHelper> getClosestStop(double lat, double lng, RouteInfo ri, double maxDistance)
     {
 	double rLat = latsPerMile * maxDistance;
 	double minLat = lat - rLat;
@@ -87,25 +126,6 @@ public class ProximityTest
 	    }
 	}
 	return retval;
-    }
-
-
-
-
-    static void doit(Context context)
-    {
-	
-	for (RouteInfo ri: RouteInfo.getAllRoutes()) {
-
-	    // my house
-	    double lat = 42.379159;
-	    double lng = -71.099908;
-	    
-	    for (StopInfoHelper sih : getClosestStop(lat, lng, ri, 0.5)) {
-		android.util.Log.d("MBTA", ri.title + ": " + sih.direction + " stops at " + sih.si.title);
-	    }
-	}
-
     }
     
 }

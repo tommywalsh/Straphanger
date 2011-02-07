@@ -10,7 +10,5 @@ public class StopInfo {
     public double lat;
     public double lng;
     public String title;
-
-    // should this have a link back to RouteInfo?
 }
 

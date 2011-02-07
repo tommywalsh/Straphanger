@@ -15,7 +15,7 @@
 <!--
     <uses-library android:name="com.google.android.maps" /> -->
     
-    <activity android:name=".MBTAActivity" android:label="MBTA" android:launchMode="singleTask">
+    <activity android:name=".DepartureViewer" android:label="MBTA" android:launchMode="singleTask">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.DEFAULT" />

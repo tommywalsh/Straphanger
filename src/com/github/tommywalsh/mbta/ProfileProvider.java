@@ -42,6 +42,8 @@ public class ProfileProvider
 	m_allProfiles.add(getHomeToWorkProfile());
 	m_allProfiles.add(getWorkToHomeProfile());
 	m_allProfiles.add(getRedLineToHomeProfile());
+        m_allProfiles.add(ProximityProfileGenerator.getProximityProfile(42.379159, -71.099908, 0.5));
+
 	saveProfiles(m_context, m_allProfiles);
     }
 

@@ -14,7 +14,7 @@ import android.view.MenuItem;
 import android.view.MenuInflater;
 import java.util.SortedSet;
 
-public class MBTAActivity extends ListActivity
+public class DepartureViewer extends ListActivity
 {
     private SortedSet<Departure> m_departures = null;
     private Handler m_handler = new Handler();
@@ -75,8 +75,6 @@ public class MBTAActivity extends ListActivity
         super.onCreate(savedInstanceState);
 	m_profileProvider = new ProfileProvider(this);
 	m_aa = new ArrayAdapter<String>(this, R.layout.listitem);
-
-	ProximityTest.doit(this);
     }
 
     public void onResume() {
@@ -94,11 +92,7 @@ public class MBTAActivity extends ListActivity
     private Runnable m_updateDepartures = new Runnable() {
 	    public void run() {
 		if (m_currentProfile != null) {
-		    MBTAParser parser = new MBTAParser();
-		    try {
-			m_departures = parser.parse(MBTADataService.getPredictionStream(m_currentProfile));
-		} catch (java.io.IOException e) {
-		    }
+                    m_departures = DepartureFinder.getDeparturesForProfile(m_currentProfile);
 		    m_handler.postDelayed(this, 30000);
 		}
 	    }
