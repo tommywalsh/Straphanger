@@ -43,10 +43,12 @@ public class RouteInfo {
     public double maxLng;
 
     public AbstractMap<String, Vector<StopInfo>> getStopMap() {
-	if (m_stopMap == null) {
-	    heavyParse();
+        AbstractMap<String, Vector<StopInfo>> stopMap = s_stopMapMap.get(tag);
+        if (stopMap == null) {
+            heavyParse();
+            stopMap = s_stopMapMap.get(tag);
 	}
-	return m_stopMap;
+	return stopMap;
     }
 
 
@@ -54,7 +56,17 @@ public class RouteInfo {
 
     static private TreeMap<String, RouteInfo> s_allRoutes = null;
     private String m_filename;
-    private TreeMap<String,Vector<StopInfo>> m_stopMap = null;
+
+    // We want to make routes cheap to copy.  So, rather than store the stop data in the class
+    // (which would be expensive to copy), we keep a global map of stop data.  This allows us to
+    // avoid generating the stop data until we really need it, and allows us to keep only one copy
+    // of the stop data, while we're free to copy and pass around the rest of the route 
+    // as musch as we want
+    //
+    // Each route has a "stopMap", which maps a direction to an ordered list of stops.
+    // We then keep a global "stopMapMap", which maps each route# to its associated stopMap
+    static private TreeMap<String, TreeMap<String, Vector<StopInfo>>> s_stopMapMap = 
+        new TreeMap<String, TreeMap<String, Vector<StopInfo>>>();
     
     private RouteInfo(String cTag, String cTitle, double cMinLat, double cMaxLat, double cMinLng, double cMaxLng) {
 	tag = cTag;
@@ -115,7 +127,7 @@ public class RouteInfo {
     // actually parse the route file
     private void heavyParse() {
 
-	m_stopMap = new TreeMap<String, Vector<StopInfo>>();
+        final TreeMap<String, Vector<StopInfo>> stopMap = new TreeMap<String, Vector<StopInfo>>();
 
 	final String NS = "";
 	final Vector<StopInfo> currDirStops = new Vector<StopInfo>();
@@ -142,7 +154,7 @@ public class RouteInfo {
 		}
 		public void end() {
 		    Vector<StopInfo> vsi = new Vector<StopInfo>(currDirStops);
-		    m_stopMap.put(dir, vsi);
+		    stopMap.put(dir, vsi);
 		    currDirStops.clear();
 		    Integer size = vsi.size();
 		}
@@ -164,6 +176,8 @@ public class RouteInfo {
 	} catch (Exception e) {
 	    android.util.Log.d("mbta", e.toString());
 	}
+        
+        s_stopMapMap.put(tag, stopMap);
     }
 
 
