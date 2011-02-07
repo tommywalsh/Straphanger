@@ -54,7 +54,6 @@ public class RouteInfo {
 
     static private TreeMap<String, RouteInfo> s_allRoutes = null;
     private String m_filename;
-    private Vector<StopInfo> m_stops = null;
     private TreeMap<String,Vector<StopInfo>> m_stopMap = null;
     
     private RouteInfo(String cTag, String cTitle, double cMinLat, double cMaxLat, double cMinLng, double cMaxLng) {
@@ -116,12 +115,11 @@ public class RouteInfo {
     // actually parse the route file
     private void heavyParse() {
 
-	// Note: this is WRONG!  We need to parse stops for each direction!
-	m_stops = new Vector<StopInfo>();
 	m_stopMap = new TreeMap<String, Vector<StopInfo>>();
 
 	final String NS = "";
 	final Vector<StopInfo> currDirStops = new Vector<StopInfo>();
+	final TreeMap<String, StopInfo> allStops = new TreeMap<String, StopInfo>();
 	
 	RootElement root = new RootElement("body");
 	Element route = root.getChild(NS, "route");
@@ -133,29 +131,30 @@ public class RouteInfo {
 		    si.title = atts.getValue("title");
 		    si.lat = Double.parseDouble(atts.getValue("lat"));
 		    si.lng = Double.parseDouble(atts.getValue("lon"));
-		    m_stops.addElement(si);
+		    allStops.put(si.tag, si);
 		}
 	    });
 	Element direction = route.getChild(NS, "direction");
-	stop.setElementListener(new ElementListener() {
+	direction.setElementListener(new ElementListener() {
 		private String dir;
 		public void start(Attributes atts) {
 		    dir = atts.getValue("title");
 		}
 		public void end() {
-		    m_stopMap.put(dir, currDirStops);
+		    Vector<StopInfo> vsi = new Vector<StopInfo>(currDirStops);
+		    m_stopMap.put(dir, vsi);
 		    currDirStops.clear();
+		    Integer size = vsi.size();
 		}
 	    });
 	Element dirstop = direction.getChild(NS, "stop");
-	stop.setStartElementListener(new StartElementListener() {
+	dirstop.setStartElementListener(new StartElementListener() {
 		public void start(Attributes atts) {
-		    StopInfo si = new StopInfo();
-		    si.tag = atts.getValue("tag");
-		    si.title = atts.getValue("title");
-		    si.lat = Double.parseDouble(atts.getValue("lat"));
-		    si.lng = Double.parseDouble(atts.getValue("lon"));
-		    currDirStops.addElement(si);
+		    String tag = atts.getValue("tag");
+		    StopInfo si = allStops.get(tag);
+		    if (si != null) {
+			currDirStops.addElement(si);
+		    }
 		}
 	    });
 	

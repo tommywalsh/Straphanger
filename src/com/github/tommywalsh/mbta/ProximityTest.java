@@ -30,34 +30,40 @@ public class ProximityTest
     static private class StopInfoHelper {
 	public StopInfo si;
 	public double distance;
+	public String direction;
     }
 
-    static StopInfoHelper getClosestStopHelper(double lat, double lng, RouteInfo ri)
+    static Vector<StopInfoHelper> getClosestStopHelper(double lat, double lng, RouteInfo ri)
     {
-	StopInfoHelper sih = null;
+	Vector<StopInfoHelper> stops = new Vector<StopInfoHelper>();
 	AbstractMap<String, Vector<StopInfo>> sm = ri.getStopMap();
 	for (String dir : sm.keySet()) {
+	    StopInfoHelper sih = null;
+	    
 	    for (StopInfo si : sm.get(dir)) {
 		double thisDistance = distanceBetween(lat, lng, si.lat, si.lng);
 		if (sih == null || thisDistance < sih.distance) {
 		    sih = new StopInfoHelper();
 		    sih.si = si;
+		    sih.direction = dir;
 		    sih.distance = thisDistance;
 		}
 	    }
+	    if (sih != null) {
+		stops.addElement(sih);
+	    }
 	}
-	return sih;
+	return stops;
     }
    
 	
-    static StopInfo getClosestStop(double lat, double lng, RouteInfo ri)
+    static Vector<StopInfoHelper> getClosestStops(double lat, double lng, RouteInfo ri)
     {
-	StopInfoHelper sih = getClosestStopHelper(lat, lng, ri);
-	return sih.si;
+	return getClosestStopHelper(lat, lng, ri);
     }
 
     // return null if no stop is within the maximum acceptable distance
-    static StopInfo getClosestStop(double lat, double lng, RouteInfo ri, double maxDistance)
+    static Vector<StopInfoHelper> getClosestStop(double lat, double lng, RouteInfo ri, double maxDistance)
     {
 	double rLat = latsPerMile * maxDistance;
 	double minLat = lat - rLat;
@@ -71,14 +77,16 @@ public class ProximityTest
 	boolean latOk = !( (ri.maxLat < minLat) || (maxLat < ri.minLat) );
 	boolean lngOk = !( (ri.maxLng < minLng) || (maxLng < ri.minLng) );
 
-	StopInfo si = null;
+	Vector<StopInfoHelper> retval = new Vector<StopInfoHelper>();	
 	if (latOk && lngOk) {
-	    StopInfoHelper sih = getClosestStopHelper(lat, lng, ri);
-	    if (sih != null && sih.distance*0.000621 < maxDistance) {
-		si = sih.si;
+	    Vector<StopInfoHelper> candidates = getClosestStopHelper(lat, lng, ri);
+	    for (StopInfoHelper sih : candidates) {
+		if (sih.distance*0.000621 < maxDistance) {
+		    retval.addElement(sih);
+		}
 	    }
 	}
-	return si;
+	return retval;
     }
 
 
@@ -93,10 +101,8 @@ public class ProximityTest
 	    double lat = 42.379159;
 	    double lng = -71.099908;
 	    
-
-	    StopInfo si = getClosestStop(lat, lng, ri, 0.5);
-	    if (si != null) {
-		android.util.Log.d("MBTA", "Closest stop to home is " + si.title);
+	    for (StopInfoHelper sih : getClosestStop(lat, lng, ri, 0.5)) {
+		android.util.Log.d("MBTA", ri.title + ": " + sih.direction + " stops at " + sih.si.title);
 	    }
 	}
 
