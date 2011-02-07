@@ -21,15 +21,15 @@ import android.util.Xml;
 import org.xml.sax.Attributes;
 
 
-public class RouteInfo {
+public class Route {
 
-    static public RouteInfo getRoute(String tag) 
+    static public Route getRoute(String tag) 
     {
 	initIfNecessary();
 	return s_allRoutes.get(tag);
     }
     
-    static public Collection<RouteInfo> getAllRoutes()
+    static public Collection<Route> getAllRoutes()
     {
 	initIfNecessary();
 	return s_allRoutes.values();
@@ -54,7 +54,7 @@ public class RouteInfo {
 
 
 
-    static private TreeMap<String, RouteInfo> s_allRoutes = null;
+    static private TreeMap<String, Route> s_allRoutes = null;
     private String m_filename;
 
     // We want to make routes cheap to copy.  So, rather than store the stop data in the class
@@ -68,7 +68,7 @@ public class RouteInfo {
     static private TreeMap<String, TreeMap<String, Vector<Stop>>> s_stopMapMap = 
         new TreeMap<String, TreeMap<String, Vector<Stop>>>();
     
-    private RouteInfo(String cTag, String cTitle, double cMinLat, double cMaxLat, double cMinLng, double cMaxLng) {
+    private Route(String cTag, String cTitle, double cMinLat, double cMaxLat, double cMinLng, double cMaxLng) {
 	tag = cTag;
 	title = cTitle;
 	minLat = cMinLat;
@@ -81,7 +81,7 @@ public class RouteInfo {
     static private void	initIfNecessary()
     {
 	if (s_allRoutes == null) {	    
-	    s_allRoutes = new TreeMap<String, RouteInfo>();
+	    s_allRoutes = new TreeMap<String, Route>();
 	    parseOverview();
 	}
     }
@@ -99,7 +99,7 @@ public class RouteInfo {
 	
 	RootElement root = new RootElement("body");
 
-	s_allRoutes = new TreeMap<String, RouteInfo>();
+	s_allRoutes = new TreeMap<String, Route>();
 	
 	Element route = root.getChild(NS, "route");
 	route.setStartElementListener(new StartElementListener() {
@@ -110,7 +110,7 @@ public class RouteInfo {
 		    double amaxLat = Double.parseDouble(atts.getValue("latMax"));
 		    double aminLng = Double.parseDouble(atts.getValue("lonMin"));
 		    double amaxLng = Double.parseDouble(atts.getValue("lonMax"));
-		    s_allRoutes.put(atag, new RouteInfo(atag, atitle, aminLat, amaxLat, aminLng, amaxLng));
+		    s_allRoutes.put(atag, new Route(atag, atitle, aminLat, amaxLat, aminLng, amaxLng));
 		}
 	    });
 	

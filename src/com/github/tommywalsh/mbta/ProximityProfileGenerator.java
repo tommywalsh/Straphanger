@@ -21,10 +21,8 @@ public class ProximityProfileGenerator
         Profile p = new Profile();
         p.name = "Nearby Busses";
 
-	for (RouteInfo ri: RouteInfo.getAllRoutes()) {
+	for (Route ri: Route.getAllRoutes()) {
             for (StopHelper sih : getClosestStop(lat, lng, ri, radius)) {
-                // We should cut this conversion stuff out!
-                // Stop/Departure types should be melded with Stop/RouteInfo types
                 DeparturePoint s = new DeparturePoint();
                 s.route = ri.tag;
                 s.tag = sih.si.tag;
@@ -38,7 +36,7 @@ public class ProximityProfileGenerator
     public static void doit(Context context)
     {
 	
-	for (RouteInfo ri: RouteInfo.getAllRoutes()) {
+	for (Route ri: Route.getAllRoutes()) {
 
 	    // my house
 	    double lat = 42.379159;
@@ -72,7 +70,7 @@ public class ProximityProfileGenerator
 	public String direction;
     }
 
-    private static Vector<StopHelper> getClosestStopHelper(double lat, double lng, RouteInfo ri)
+    private static Vector<StopHelper> getClosestStopHelper(double lat, double lng, Route ri)
     {
 	Vector<StopHelper> stops = new Vector<StopHelper>();
 	AbstractMap<String, Vector<Stop>> sm = ri.getStopMap();
@@ -96,13 +94,13 @@ public class ProximityProfileGenerator
     }
    
 	
-    private static Vector<StopHelper> getClosestStops(double lat, double lng, RouteInfo ri)
+    private static Vector<StopHelper> getClosestStops(double lat, double lng, Route ri)
     {
 	return getClosestStopHelper(lat, lng, ri);
     }
 
     // return null if no stop is within the maximum acceptable distance
-    private static Vector<StopHelper> getClosestStop(double lat, double lng, RouteInfo ri, double maxDistance)
+    private static Vector<StopHelper> getClosestStop(double lat, double lng, Route ri, double maxDistance)
     {
 	double rLat = latsPerMile * maxDistance;
 	double minLat = lat - rLat;
