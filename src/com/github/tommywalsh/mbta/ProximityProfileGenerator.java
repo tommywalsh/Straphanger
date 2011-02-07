@@ -22,9 +22,9 @@ public class ProximityProfileGenerator
         p.name = "Nearby Busses";
 
 	for (RouteInfo ri: RouteInfo.getAllRoutes()) {
-            for (StopInfoHelper sih : getClosestStop(lat, lng, ri, radius)) {
+            for (StopHelper sih : getClosestStop(lat, lng, ri, radius)) {
                 // We should cut this conversion stuff out!
-                // Stop/Departure types should be melded with StopInfo/RouteInfo types
+                // Stop/Departure types should be melded with Stop/RouteInfo types
                 DeparturePoint s = new DeparturePoint();
                 s.route = ri.tag;
                 s.where = sih.si.tag;
@@ -44,7 +44,7 @@ public class ProximityProfileGenerator
 	    double lat = 42.379159;
 	    double lng = -71.099908;
 	    
-	    for (StopInfoHelper sih : getClosestStop(lat, lng, ri, 0.5)) {
+	    for (StopHelper sih : getClosestStop(lat, lng, ri, 0.5)) {
 		android.util.Log.d("MBTA", ri.title + ": " + sih.direction + " stops at " + sih.si.title);
 	    }
 	}
@@ -66,23 +66,23 @@ public class ProximityProfileGenerator
 	return (double)results[0];
     }
 
-    static private class StopInfoHelper {
-	public StopInfo si;
+    static private class StopHelper {
+	public Stop si;
 	public double distance;
 	public String direction;
     }
 
-    private static Vector<StopInfoHelper> getClosestStopHelper(double lat, double lng, RouteInfo ri)
+    private static Vector<StopHelper> getClosestStopHelper(double lat, double lng, RouteInfo ri)
     {
-	Vector<StopInfoHelper> stops = new Vector<StopInfoHelper>();
-	AbstractMap<String, Vector<StopInfo>> sm = ri.getStopMap();
+	Vector<StopHelper> stops = new Vector<StopHelper>();
+	AbstractMap<String, Vector<Stop>> sm = ri.getStopMap();
 	for (String dir : sm.keySet()) {
-	    StopInfoHelper sih = null;
+	    StopHelper sih = null;
 	    
-	    for (StopInfo si : sm.get(dir)) {
+	    for (Stop si : sm.get(dir)) {
 		double thisDistance = distanceBetween(lat, lng, si.lat, si.lng);
 		if (sih == null || thisDistance < sih.distance) {
-		    sih = new StopInfoHelper();
+		    sih = new StopHelper();
 		    sih.si = si;
 		    sih.direction = dir;
 		    sih.distance = thisDistance;
@@ -96,13 +96,13 @@ public class ProximityProfileGenerator
     }
    
 	
-    private static Vector<StopInfoHelper> getClosestStops(double lat, double lng, RouteInfo ri)
+    private static Vector<StopHelper> getClosestStops(double lat, double lng, RouteInfo ri)
     {
 	return getClosestStopHelper(lat, lng, ri);
     }
 
     // return null if no stop is within the maximum acceptable distance
-    private static Vector<StopInfoHelper> getClosestStop(double lat, double lng, RouteInfo ri, double maxDistance)
+    private static Vector<StopHelper> getClosestStop(double lat, double lng, RouteInfo ri, double maxDistance)
     {
 	double rLat = latsPerMile * maxDistance;
 	double minLat = lat - rLat;
@@ -116,10 +116,10 @@ public class ProximityProfileGenerator
 	boolean latOk = !( (ri.maxLat < minLat) || (maxLat < ri.minLat) );
 	boolean lngOk = !( (ri.maxLng < minLng) || (maxLng < ri.minLng) );
 
-	Vector<StopInfoHelper> retval = new Vector<StopInfoHelper>();	
+	Vector<StopHelper> retval = new Vector<StopHelper>();	
 	if (latOk && lngOk) {
-	    Vector<StopInfoHelper> candidates = getClosestStopHelper(lat, lng, ri);
-	    for (StopInfoHelper sih : candidates) {
+	    Vector<StopHelper> candidates = getClosestStopHelper(lat, lng, ri);
+	    for (StopHelper sih : candidates) {
 		if (sih.distance*0.000621 < maxDistance) {
 		    retval.addElement(sih);
 		}

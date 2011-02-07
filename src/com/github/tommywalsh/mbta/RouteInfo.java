@@ -42,8 +42,8 @@ public class RouteInfo {
     public double maxLat;
     public double maxLng;
 
-    public AbstractMap<String, Vector<StopInfo>> getStopMap() {
-        AbstractMap<String, Vector<StopInfo>> stopMap = s_stopMapMap.get(tag);
+    public AbstractMap<String, Vector<Stop>> getStopMap() {
+        AbstractMap<String, Vector<Stop>> stopMap = s_stopMapMap.get(tag);
         if (stopMap == null) {
             heavyParse();
             stopMap = s_stopMapMap.get(tag);
@@ -65,8 +65,8 @@ public class RouteInfo {
     //
     // Each route has a "stopMap", which maps a direction to an ordered list of stops.
     // We then keep a global "stopMapMap", which maps each route# to its associated stopMap
-    static private TreeMap<String, TreeMap<String, Vector<StopInfo>>> s_stopMapMap = 
-        new TreeMap<String, TreeMap<String, Vector<StopInfo>>>();
+    static private TreeMap<String, TreeMap<String, Vector<Stop>>> s_stopMapMap = 
+        new TreeMap<String, TreeMap<String, Vector<Stop>>>();
     
     private RouteInfo(String cTag, String cTitle, double cMinLat, double cMaxLat, double cMinLng, double cMaxLng) {
 	tag = cTag;
@@ -127,18 +127,18 @@ public class RouteInfo {
     // actually parse the route file
     private void heavyParse() {
 
-        final TreeMap<String, Vector<StopInfo>> stopMap = new TreeMap<String, Vector<StopInfo>>();
+        final TreeMap<String, Vector<Stop>> stopMap = new TreeMap<String, Vector<Stop>>();
 
 	final String NS = "";
-	final Vector<StopInfo> currDirStops = new Vector<StopInfo>();
-	final TreeMap<String, StopInfo> allStops = new TreeMap<String, StopInfo>();
+	final Vector<Stop> currDirStops = new Vector<Stop>();
+	final TreeMap<String, Stop> allStops = new TreeMap<String, Stop>();
 	
 	RootElement root = new RootElement("body");
 	Element route = root.getChild(NS, "route");
 	Element stop = route.getChild(NS, "stop");
 	stop.setStartElementListener(new StartElementListener() {
 		public void start(Attributes atts) {
-		    StopInfo si = new StopInfo();
+		    Stop si = new Stop();
 		    si.tag = atts.getValue("tag");
 		    si.title = atts.getValue("title");
 		    si.lat = Double.parseDouble(atts.getValue("lat"));
@@ -153,7 +153,7 @@ public class RouteInfo {
 		    dir = atts.getValue("title");
 		}
 		public void end() {
-		    Vector<StopInfo> vsi = new Vector<StopInfo>(currDirStops);
+		    Vector<Stop> vsi = new Vector<Stop>(currDirStops);
 		    stopMap.put(dir, vsi);
 		    currDirStops.clear();
 		    Integer size = vsi.size();
@@ -163,7 +163,7 @@ public class RouteInfo {
 	dirstop.setStartElementListener(new StartElementListener() {
 		public void start(Attributes atts) {
 		    String tag = atts.getValue("tag");
-		    StopInfo si = allStops.get(tag);
+		    Stop si = allStops.get(tag);
 		    if (si != null) {
 			currDirStops.addElement(si);
 		    }
