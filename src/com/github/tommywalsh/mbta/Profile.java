@@ -10,6 +10,6 @@ import java.io.Serializable;
 
 public class Profile implements Serializable
 {
-    public Vector<Stop> stops = new Vector<Stop>();
+    public Vector<DeparturePoint> stops = new Vector<DeparturePoint>();
     public String name;   
 }

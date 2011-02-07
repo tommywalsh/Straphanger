@@ -7,15 +7,15 @@ package com.github.tommywalsh.mbta;
 
 import java.io.Serializable;
 
-public class Stop implements Serializable
+public class DeparturePoint implements Serializable
 {
     public String route;
     public String where;
     
-    public Stop() {
+    public DeparturePoint() {
     }
-
-    public Stop(String r, String w) {
+    
+    public DeparturePoint(String r, String w) {
 	where = w;
 	route = r;
     }

@@ -25,7 +25,7 @@ public class ProximityProfileGenerator
             for (StopInfoHelper sih : getClosestStop(lat, lng, ri, radius)) {
                 // We should cut this conversion stuff out!
                 // Stop/Departure types should be melded with StopInfo/RouteInfo types
-                Stop s = new Stop();
+                DeparturePoint s = new DeparturePoint();
                 s.route = ri.tag;
                 s.where = sih.si.tag;
                 p.stops.addElement(s);

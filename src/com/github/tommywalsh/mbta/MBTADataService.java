@@ -14,7 +14,7 @@ public class MBTADataService
     private static URL getURLForProfile(Profile p) 
     {
 	String urlString = "http://webservices.nextbus.com/service/publicXMLFeed?command=predictionsForMultiStops&a=mbta";
-	for (Stop s : p.stops) {
+	for (DeparturePoint s : p.stops) {
 	    urlString += "&stops=" + s.route + "|null|" + s.where;
 	}
 	try {

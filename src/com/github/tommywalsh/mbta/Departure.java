@@ -5,10 +5,10 @@
 
 package com.github.tommywalsh.mbta;
 
-public class Departure extends Stop implements Comparable {
+public class Departure extends DeparturePoint implements Comparable {
 
     public long when;
-    public String direction;
+    public String direction;  // direction belongs in DeparturePoint!
 
     public int compareTo(Object o) {
 	Departure other = (Departure) o;
