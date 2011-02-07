@@ -1,0 +1,61 @@
+
+The planned arcitecture will look something like this:
+
+
+----------  Data Types -------------
+
+Stop: a location where one can catch a bus.
+  - MBTA id
+  - latitude and longitude
+  - text description (e.g. "Washington St. at Parker St.")
+
+Route: Description of an MBTA bus route
+  - identifier (e.g. "87")
+  - text description ("Spring Hill - Lechmere")
+  - set of directions ("to Ringe Ave. via Porter", "Central via Porter")
+  - sets of stops (one set of stops per direction)
+
+DeparturePoint: Relation between a stop and (route,direction)
+  (e.g. "At stop 35142, you can catch the 87 to Sullivan")
+
+Profile: A set of related DeparturePoints
+  - text description ("Union Square busses that go to the subway")
+
+Departure: Relation between a DeparturePoint and a time
+  (e.g. "At 3:15, you can catch the 87 to Sullivan from stop 35142")
+
+DepartureSet: Set of related departures
+
+-------------------------------------
+
+
+
+
+
+------- Main Actors ----------
+
+LocationPicker: allows user to select a point on a map (including "my current location")
+ - takes user interaction
+ - provides latitude/longitude pair
+
+ProximityProfileGenerator: finds nearby departure points 
+ - takes lat/long pair and distance threshold
+ - provides a Profile
+
+ProfileEditor: allows user to name and refine a Profile
+ - takes a Profile
+ - takes user interaction
+ - provides a (refined) Profile
+
+DepartureFinder: queries server for departure times
+ - takes a Profile
+ - returns a DepartureSet
+
+DepartureViewer: displays upcoming departures
+ - takes a DepartureSet
+ - shows to user
+
+---------------------------------
+
+
+ 
