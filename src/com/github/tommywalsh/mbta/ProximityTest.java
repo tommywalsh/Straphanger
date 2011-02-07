@@ -7,7 +7,8 @@ package com.github.tommywalsh.mbta;
 
 
 import android.content.Context;
-
+import java.util.AbstractMap;
+import java.util.Vector;
 
 public class ProximityTest
 {
@@ -34,13 +35,15 @@ public class ProximityTest
     static StopInfoHelper getClosestStopHelper(double lat, double lng, RouteInfo ri)
     {
 	StopInfoHelper sih = null;
-	
-	for (StopInfo si : ri.getStops()) {
-	    double thisDistance = distanceBetween(lat, lng, si.lat, si.lng);
-	    if (sih == null || thisDistance < sih.distance) {
-		sih = new StopInfoHelper();
-		sih.si = si;
-		sih.distance = thisDistance;
+	AbstractMap<String, Vector<StopInfo>> sm = ri.getStopMap();
+	for (String dir : sm.keySet()) {
+	    for (StopInfo si : sm.get(dir)) {
+		double thisDistance = distanceBetween(lat, lng, si.lat, si.lng);
+		if (sih == null || thisDistance < sih.distance) {
+		    sih = new StopInfoHelper();
+		    sih.si = si;
+		    sih.distance = thisDistance;
+		}
 	    }
 	}
 	return sih;
