@@ -10,6 +10,7 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.MapController;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.Overlay;
+import com.google.android.maps.MyLocationOverlay;
 
 import android.location.LocationManager;
 import android.location.LocationListener;
@@ -26,24 +27,12 @@ import android.graphics.Point;
 import android.graphics.Paint;
 
 
-// This activity handles the Map application.
-public class LocationPicker extends MapActivity implements LocationListener
+// This activity allows the user to pick a location on a map.
+public class LocationPicker extends MapActivity
 {
 
-    Location m_currentLocation;
-
-    public void onLocationChanged(Location loc) {
-	m_currentLocation = loc;
-        // auto-scroll on first location update, maybe?
-    }
-    public void onProviderDisabled(String provider) {
-    }
-    public void onProviderEnabled(String provider) {
-    }
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-    }
-
-
+    // This is the only class that knows about GeoPoints.
+    // Here are some utility functions to convert to/from lat/long pairs
     private static GeoPoint locationToGeoPoint(Location loc) {
 	return new GeoPoint((int)(loc.getLatitude() * 1E6),
 			    (int)(loc.getLongitude() * 1E6));
@@ -55,6 +44,9 @@ public class LocationPicker extends MapActivity implements LocationListener
     private static double getLongitude(GeoPoint g) {
         return ( (double)(g.getLongitudeE6()) / 1.0E6);
     }
+
+
+
 
 
     // This overlay sits on top of the map, and waits for the user to double-tap the desired location
@@ -96,74 +88,39 @@ public class LocationPicker extends MapActivity implements LocationListener
     }
 
 
+    // This overlay shows user's current location on the map
+    private MyLocationOverlay m_locationIndicatorOverlay = null;
 
-
-    // Draw a little circle at our current position
-    public class LocationIndicator extends Overlay {
-	
-	public boolean draw(Canvas canvas, MapView mapView, boolean shadow, long when) {
-	    super.draw(canvas, mapView, shadow, when);
-	    
-	    if (m_currentLocation != null) {
-		Point screenCoords = new Point();
-
-		Paint paint = new Paint();		
-		mapView.getProjection().toPixels(locationToGeoPoint(m_currentLocation), 
-						 screenCoords);
-		paint.setStrokeWidth(3);
-		if (shadow) {
-		    paint.setARGB(255,0,0,255);
-		    paint.setStyle(Paint.Style.FILL_AND_STROKE);
-		} else {		    
-		    paint.setARGB(255,0,255,0);
-		    paint.setStyle(Paint.Style.STROKE);
-		}
-		canvas.drawCircle(screenCoords.x, screenCoords.y, 10, paint);
-
-	    }
-	    return true;
-	}
-    }
-    
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map);
 	
-	m_locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 	
 	MapView mapview = (MapView) findViewById(R.id.mapView);
 	mapview.setBuiltInZoomControls(true);
-	mapview.getOverlays().add(new LocationIndicator());
 	mapview.getOverlays().add(new LocationSelectionOverlay(this));
 
-	m_controller = mapview.getController();
+        m_locationIndicatorOverlay = new MyLocationOverlay(this, mapview);
+	mapview.getOverlays().add(m_locationIndicatorOverlay);
 
-	m_controller.setZoom(15);
-	m_controller.setCenter(new GeoPoint(42378778, -71095667)); // Union Square
+	MapController controller = mapview.getController();
 
+	controller.setZoom(15);
+	controller.setCenter(new GeoPoint(42355500,-71060500)); // Downtown Crossing
     }
 
-    @Override protected boolean isLocationDisplayed() {
-	return true;
+    @Override protected void onResume() {
+        super.onResume();
+        m_locationIndicatorOverlay.enableMyLocation();
     }
+    
+    @Override protected void onPause() {
+        super.onPause();
+        m_locationIndicatorOverlay.disableMyLocation();
+    }    
 
-    @Override protected boolean isRouteDisplayed() {
-	return false;
+    @Override protected boolean isRouteDisplayed() { 
+        return false;
     }
-
-    @Override protected void onStart() {
-	super.onStart();
-	m_locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 50, this);
-    }
-
-    @Override protected void onStop() {
-	// Conserve battery by not asking for location updates when we're not visible
-	super.onStop();
-	m_locManager.removeUpdates(this);
-    }
-
-    MapController m_controller;
-    LocationManager m_locManager;
-
 }
 
