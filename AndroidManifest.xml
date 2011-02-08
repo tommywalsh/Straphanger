@@ -23,7 +23,7 @@
       </intent-filter>
     </activity>
 
-    <activity android:name=".DepartureViewer" android:label="MBTA" android:launchMode="standard" /
+    <activity android:name=".DepartureViewer" android:label="MBTA" android:launchMode="standard" />
     <activity android:name=".LocationPicker" android:label="Location Picker" android:launchMode="standard" />
     
   </application>
