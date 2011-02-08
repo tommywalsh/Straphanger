@@ -1,4 +1,4 @@
-// Copyright 2010 Tom Walsh
+// Copyright 2010-11 Tom Walsh
 //
 // This program is free software released under version 3
 // of the GPL.  See file gpl.txt for more information.
@@ -26,6 +26,20 @@ public class ProfileProvider
     }
 
 
+    public Vector<String> getProfileNames() {
+        Vector<String> names = new Vector<String>();
+        names.addElement("Home to Work");
+        names.addElement("Work to Home");
+        names.addElement("Red Line to Home");
+	return names;
+    }
+
+    public Profile getProfile(int index) {
+        Vector<Profile> profs = getAllProfiles();
+	android.util.Log.d("mbta", "Got index " + (new Integer(index).toString()));
+        return profs.elementAt(index);
+    }
+
     public Vector<Profile> getAllProfiles() {
 	if (m_allProfiles == null) {
 	    m_allProfiles = new Vector<Profile>();
@@ -42,7 +56,6 @@ public class ProfileProvider
         m_allProfiles.add(getHomeToWorkProfile());
         m_allProfiles.add(getWorkToHomeProfile());
         m_allProfiles.add(getRedLineToHomeProfile());
-        m_allProfiles.add(ProximityProfileGenerator.getProximityProfile(42.379159, -71.099908, 0.5));
 
 	saveProfiles(m_context, m_allProfiles);
     }

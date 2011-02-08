@@ -109,7 +109,7 @@ public class DepartureViewer extends ListActivity
     }
 
     @Override public void onActivityResult(int request, int result, Intent data) {
-	if (request == 1000 && result == RESULT_OK) {
+	if (request == 1050 && result == RESULT_OK) {
 	    double lat = data.getDoubleExtra("com.github.tommywalsh.mbta.Lat", 0.0);
 	    double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0);
 	    Profile p = ProximityProfileGenerator.getProximityProfile(lat, lng, 0.5);
@@ -120,14 +120,10 @@ public class DepartureViewer extends ListActivity
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 	Integer idi = item.getItemId();
-	android.util.Log.d("mbta", "Got menu " + idi.toString());
 	Integer ci = R.id.nearby;
-	android.util.Log.d("mbta", "Compare with " + ci.toString());
 	if (id == R.id.nearby) {
-	    android.util.Log.d("mbta", "YAY!");
-	    startActivityForResult(new Intent(this, LocationPicker.class), 1000);
-
-	} else {
+	    startActivityForResult(new Intent(this, LocationPicker.class), 1050);
+	} else if (id >= 1000) {
 	    Profile p = m_profileMenu.processSelection(id);
 	    changeProfile(p);
 	}
@@ -151,6 +147,3 @@ public class DepartureViewer extends ListActivity
     }
    
 }
-
-
-
