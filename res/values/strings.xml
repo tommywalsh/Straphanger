@@ -3,4 +3,5 @@
   <string name="load_profile">Load Profile</string>
   <string name="select_option">Please select an option from the menu</string>
   <string name="downloading">Downloading...</string>  
+  <string name="nearby_stops">See nearby stops</string>  
 </resources>

@@ -5,17 +5,25 @@
 	  android:versionName="1.0">
 
   <uses-permission android:name="android.permission.INTERNET" />
-<!--  <uses-permission android:name="android.permission.ACCESS_COURSE_LOCATION" />
-  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> -->
+  <uses-permission android:name="android.permission.ACCESS_COURSE_LOCATION" />
+  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
   <uses-sdk android:minSdkVersion="3" />
   
   <application android:label="MBTA">
     
-<!--
-    <uses-library android:name="com.google.android.maps" /> -->
+
+    <uses-library android:name="com.google.android.maps" />
     
     <activity android:name=".DepartureViewer" android:label="MBTA" android:launchMode="singleTask">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+    
+    <activity android:name=".LocationPicker" android:label="Location Picker" android:launchMode="standard">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.DEFAULT" />

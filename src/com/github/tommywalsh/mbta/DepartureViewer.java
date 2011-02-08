@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuInflater;
+import android.content.Intent;
 import java.util.SortedSet;
 
 public class DepartureViewer extends ListActivity
@@ -107,10 +108,31 @@ public class DepartureViewer extends ListActivity
 	m_handler.removeCallbacks(m_updateDepartures);
     }
 
+    @Override public void onActivityResult(int request, int result, Intent data) {
+	if (request == 1000 && result == RESULT_OK) {
+	    int xe6 = data.getIntExtra("com.github.tommywalsh.mbta.Lat", 0);
+	    int ye6 = data.getIntExtra("com.github.tommywalsh.mbta.Lat", 0);
+	    double lat = xe6 / 1.0E6;
+	    double lng = ye6 / 1.0E6;
+	    Profile p = ProximityProfileGenerator.getProximityProfile(lat, lng, 0.5);
+	    changeProfile(p);
+	}
+    }
+
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-	Profile p = m_profileMenu.processSelection(id);
-	changeProfile(p);
+	Integer idi = item.getItemId();
+	android.util.Log.d("mbta", "Got menu " + idi.toString());
+	Integer ci = R.id.nearby;
+	android.util.Log.d("mbta", "Compare with " + ci.toString());
+	if (id == R.id.nearby) {
+	    android.util.Log.d("mbta", "YAY!");
+	    startActivityForResult(new Intent(this, LocationPicker.class), 1000);
+
+	} else {
+	    Profile p = m_profileMenu.processSelection(id);
+	    changeProfile(p);
+	}
 	return true;
     }
 
