@@ -91,22 +91,34 @@ public class LocationPicker extends MapActivity
     // This overlay shows user's current location on the map
     private MyLocationOverlay m_locationIndicatorOverlay = null;
 
+    private MapController m_controller;
+
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map);
 	
 	
 	MapView mapview = (MapView) findViewById(R.id.mapView);
+	m_controller = mapview.getController();
+
 	mapview.setBuiltInZoomControls(true);
 	mapview.getOverlays().add(new LocationSelectionOverlay(this));
 
         m_locationIndicatorOverlay = new MyLocationOverlay(this, mapview);
 	mapview.getOverlays().add(m_locationIndicatorOverlay);
 
-	MapController controller = mapview.getController();
 
-	controller.setZoom(15);
-	controller.setCenter(new GeoPoint(42355500,-71060500)); // Downtown Crossing
+	if(!(m_locationIndicatorOverlay.runOnFirstFix(new AutoScroller()))) {
+	    m_controller.setZoom(16);
+	    m_controller.setCenter(new GeoPoint(42355500,-71060500)); // Downtown Crossing
+	}
+    }
+
+
+    private class AutoScroller implements Runnable {
+	public void run() {
+	    m_controller.animateTo(m_locationIndicatorOverlay.getMyLocation());
+	}
     }
 
     @Override protected void onResume() {
