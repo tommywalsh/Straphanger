@@ -48,6 +48,28 @@ public class LocationPicker extends MapActivity implements LocationListener
 			    (int)(loc.getLongitude() * 1E6));
     }
 
+    private static double getLatitude(GeoPoint g) {
+        return ( (double)(g.getLatitudeE6()) / 1.0E6);
+    }
+    private static double getLongitude(GeoPoint g) {
+        return ( (double)(g.getLongitudeE6()) / 1.0E6);
+    }
+
+
+    public class TapOverlay extends Overlay {
+        @Override public boolean onTap(GeoPoint where, MapView mv) {
+            if (where != null) {
+		Intent i = new Intent();
+		i.putExtra("com.github.tommywalsh.mbta.Lat", getLatitude(where));
+		i.putExtra("com.github.tommywalsh.mbta.Lng", getLongitude(where));
+		setResult(RESULT_OK, i);
+		finish();		
+		return true;
+            } else {
+                return false;
+            }                
+        }
+    }
 
     // Draw a little circle at our current position
     public class LocationIndicator extends Overlay {
@@ -75,29 +97,6 @@ public class LocationPicker extends MapActivity implements LocationListener
 	    return true;
 	}
     }
-
-
-    View.OnTouchListener m_clickListener = new View.OnTouchListener() {
-	    public boolean onTouch(View view, MotionEvent me) {
-		float x = me.getX();
-		float y = me.getY();
-		
-		MapView mv = (MapView)view;
-		GeoPoint where = mv.getProjection().fromPixels((int)x, (int)y);
-
-		
-		Intent i = new Intent();
-		i.putExtra("com.github.tommywalsh.mbta.Lat", where.getLatitudeE6());
-		i.putExtra("com.github.tommywalsh.mbta.Lng", where.getLongitudeE6());
-		setResult(RESULT_OK, i);
-
-		finish();
-		
-		return true;
-	    }
-	};
-
-
     
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,11 +107,11 @@ public class LocationPicker extends MapActivity implements LocationListener
 	MapView mapview = (MapView) findViewById(R.id.mapView);
 	mapview.setBuiltInZoomControls(true);
 	mapview.getOverlays().add(new LocationIndicator());
-	mapview.setOnTouchListener(m_clickListener);
+	mapview.getOverlays().add(new TapOverlay());
 
 	m_controller = mapview.getController();
 
-	m_controller.setZoom(16); // 16 seems best for biking speeds
+	m_controller.setZoom(15);
 	m_controller.setCenter(new GeoPoint(42378778, -71095667)); // Union Square
 
     }

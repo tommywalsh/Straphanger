@@ -110,10 +110,8 @@ public class DepartureViewer extends ListActivity
 
     @Override public void onActivityResult(int request, int result, Intent data) {
 	if (request == 1000 && result == RESULT_OK) {
-	    int xe6 = data.getIntExtra("com.github.tommywalsh.mbta.Lat", 0);
-	    int ye6 = data.getIntExtra("com.github.tommywalsh.mbta.Lat", 0);
-	    double lat = xe6 / 1.0E6;
-	    double lng = ye6 / 1.0E6;
+	    double lat = data.getDoubleExtra("com.github.tommywalsh.mbta.Lat", 0.0);
+	    double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0);
 	    Profile p = ProximityProfileGenerator.getProximityProfile(lat, lng, 0.5);
 	    changeProfile(p);
 	}
