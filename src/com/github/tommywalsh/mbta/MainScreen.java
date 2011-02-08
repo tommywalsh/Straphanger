@@ -6,28 +6,51 @@
 package com.github.tommywalsh.mbta;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.content.Intent;
 import android.content.Context;
+import android.content.DialogInterface;
+
+import java.util.Vector;
 
 public class MainScreen extends Activity
 {
     private static final int s_locationPickerId = 1050;
+    private static final int s_profileDialogId  = 1060;
+    private ProfileProvider m_profProvider;
 
+
+    // What to do when we click on the "stored profiles" button
     private OnClickListener m_profileListener = new OnClickListener() {
 	    public void onClick(View v) {
-                android.util.Log.d("mbta", "Choose profile");
+		showDialog(s_profileDialogId);
 	    }
 	};
 
 
+    // Small dialog to load from a list of stored profiles
+    Dialog getProfilePickerDialog() {
+	String[] buffer = {};
+	Vector<String> profileNames = m_profProvider.getProfileNames();
+	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	builder.setTitle("Pick a profile");
+	builder.setItems(profileNames.toArray(buffer), new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface d, int id) {
+		    viewDeparturesForProfile(m_profProvider.getProfile(id));
+		}
+	    });
+
+	return builder.create();
+    }
+
 
     private OnClickListener m_proximityListener = new OnClickListener() {
 	    public void onClick(View v) {
-                android.util.Log.d("mbta", "Show nearby busses");
                 launchLocationPicker();
 	    }
 	};
@@ -37,7 +60,8 @@ public class MainScreen extends Activity
 
 
 
-
+    // When a sub-activity is finished, this is called, provided we registered for 
+    // result when we launched the sub-activity 
     @Override public void onActivityResult(int request, int result, Intent data) {
         if (result == RESULT_OK) {
             if (request == s_locationPickerId) {
@@ -48,6 +72,17 @@ public class MainScreen extends Activity
             }
         }
     }
+
+    // Called when a dialog is requested
+    public Dialog onCreateDialog(int index) {
+	switch (index) {
+	case s_profileDialogId:
+	    return getProfilePickerDialog();
+	default:
+	    return super.onCreateDialog(index);
+	}
+    } 
+
 
 
 
@@ -62,7 +97,10 @@ public class MainScreen extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_screen);
+
+	m_profProvider = new ProfileProvider(this);
 	
+
         Button profileButton = (Button)findViewById(R.id.saved_profile_button);
         profileButton.setOnClickListener(m_profileListener);
 
