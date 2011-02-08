@@ -1,4 +1,4 @@
-// Copyright 2010 Tom Walsh
+// Copyright 2010-11 Tom Walsh
 //
 // This program is free software released under version 3
 // of the GPL.  See file gpl.txt for more information.
@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.MenuInflater;
 import android.content.Intent;
 import java.util.SortedSet;
+import java.io.Serializable;
 
 public class DepartureViewer extends ListActivity
 {
@@ -76,6 +77,10 @@ public class DepartureViewer extends ListActivity
         super.onCreate(savedInstanceState);
 	m_profileProvider = new ProfileProvider(this);
 	m_aa = new ArrayAdapter<String>(this, R.layout.listitem);
+
+        Intent i = getIntent();
+        Serializable s = i.getSerializableExtra("com.github.tommywalsh.mbta.Profile");
+        changeProfile((Profile)s);
     }
 
     public void onResume() {

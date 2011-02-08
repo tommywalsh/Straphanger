@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 import java.util.Collection;
 import java.io.FileInputStream;
+import java.io.Serializable;
 
 import android.sax.RootElement;
 import android.sax.Element;
@@ -21,7 +22,7 @@ import android.util.Xml;
 import org.xml.sax.Attributes;
 
 
-public class Route implements Comparable {
+public class Route implements Comparable, Serializable {
 
     static public Route getRoute(String tag) 
     {

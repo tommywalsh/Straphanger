@@ -15,21 +15,16 @@
 
     <uses-library android:name="com.google.android.maps" />
     
-    <activity android:name=".DepartureViewer" android:label="MBTA" android:launchMode="singleTask">
+    <activity android:name=".MainScreen" android:label="MBTA" android:launchMode="singleTask" >
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
-    
-    <activity android:name=".LocationPicker" android:label="Location Picker" android:launchMode="standard">
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
-    </activity>
+
+    <activity android:name=".DepartureViewer" android:label="MBTA" android:launchMode="standard" /
+    <activity android:name=".LocationPicker" android:label="Location Picker" android:launchMode="standard" />
     
   </application>
   
