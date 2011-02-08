@@ -9,9 +9,6 @@ import android.app.ListActivity;
 import android.widget.ArrayAdapter;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MenuInflater;
 import android.content.Intent;
 import java.util.SortedSet;
 import java.io.Serializable;
@@ -122,28 +119,7 @@ public class DepartureViewer extends ListActivity
 	}
     }
 
-    @Override public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-	Integer idi = item.getItemId();
-	Integer ci = R.id.nearby;
-	if (id == R.id.nearby) {
-	    startActivityForResult(new Intent(this, LocationPicker.class), 1050);
-	} else if (id >= 1000) {
-	    Profile p = m_profileMenu.processSelection(id);
-	    changeProfile(p);
-	}
-	return true;
-    }
-
-    @Override public boolean onCreateOptionsMenu(Menu menu) {
-        m_profileMenu = new ProfilePicker(menu, m_profileProvider);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-        return true;
-    }
-
     private ProfileProvider m_profileProvider;
-    private ProfilePicker m_profileMenu;
 
     private void changeProfile(Profile p) {
 	m_currentProfile = p;
