@@ -6,6 +6,7 @@
 package com.github.tommywalsh.mbta;
 
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.widget.ArrayAdapter;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,8 +34,8 @@ public class DepartureViewer extends ListActivity
 
     private Runnable m_updateDisplay = new Runnable() {
 	    public void run() {
-		m_aa.clear();
                 if (m_state == State.READY) {
+                    m_aa.clear();
 		    long now = java.lang.System.currentTimeMillis();
                     
 		    for (Departure d : m_departures) {
@@ -70,10 +71,8 @@ public class DepartureViewer extends ListActivity
 			    m_aa.add(mess);
 			}
                     }
-                } else {
-                    m_aa.add(getString(R.string.downloading));
+                    setListAdapter(m_aa);
 		}
-		setListAdapter(m_aa);
 
 		// wait 10 seconds to do this again
 		m_handler.postDelayed(this, 10000);
@@ -108,6 +107,11 @@ public class DepartureViewer extends ListActivity
                     m_departures = DepartureFinder.getDeparturesForProfile(m_currentProfile);
                     
                     m_state = State.READY;
+                    
+                    if (m_downloadingDialog != null) {
+                        m_downloadingDialog.cancel();
+                        m_downloadingDialog = null;
+                    }
 
 		    // Don't ask for data again until 30 seconds have passed...
 		    m_handler.postDelayed(this, 30000);
@@ -120,7 +124,7 @@ public class DepartureViewer extends ListActivity
 	};
 
     private Profile m_currentProfile = null;
-
+    private ProgressDialog m_downloadingDialog = null;
 		
     public void onPause() {
 	super.onPause();
@@ -134,6 +138,7 @@ public class DepartureViewer extends ListActivity
     private void changeProfile(Profile p) {
         m_currentProfile = p;
         m_state = State.WAITING_FOR_DATA;
+        m_downloadingDialog = ProgressDialog.show(this, "", "Downloading.  Please wait...", true);
 	m_handler.removeCallbacks(m_updateDepartures);
 	m_handler.postDelayed(m_updateDepartures, 500);	
     }
