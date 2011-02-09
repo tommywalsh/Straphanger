@@ -65,6 +65,8 @@ public class DepartureViewer extends ListActivity
 		    }
 		}
 		setListAdapter(m_aa);
+
+		// wait 10 seconds to do this again
 		m_handler.postDelayed(this, 10000);
 	    }
 	};
@@ -84,7 +86,7 @@ public class DepartureViewer extends ListActivity
 	super.onResume();
 
 	m_handler.removeCallbacks(m_updateDisplay);
-	m_handler.postDelayed(m_updateDisplay, 10);
+	m_handler.post(m_updateDisplay);
 
 	if (m_currentProfile != null) {
 	    m_handler.removeCallbacks(m_updateDepartures);
@@ -96,7 +98,13 @@ public class DepartureViewer extends ListActivity
 	    public void run() {
 		if (m_currentProfile != null) {
                     m_departures = DepartureFinder.getDeparturesForProfile(m_currentProfile);
+
+		    // Don't ask for data again until 30 seconds have passed...
 		    m_handler.postDelayed(this, 30000);
+
+		    // ... but update the display right now
+		    m_handler.removeCallbacks(m_updateDisplay);
+		    m_handler.post(m_updateDisplay);
 		}
 	    }
 	};
