@@ -6,4 +6,5 @@
   <string name="nearby_stops">See nearby stops</string>  
 
   <string name="profile_in_intent">com.github.tommywalsh.mbta.Profile</string>
+  <string name="download_message">Downloading.  Please wait...</string>
 </resources>

@@ -8,6 +8,7 @@ package com.github.tommywalsh.mbta;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 import android.os.Bundle;
 import android.os.Handler;
 import android.content.Intent;
@@ -47,6 +48,10 @@ public class DepartureViewer extends ListActivity
     private static final int s_dataRequestInterval = 30000;  // How long (in ms) between server requests?
 
 
+
+
+
+
     // When this activity is first created...
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,9 +65,6 @@ public class DepartureViewer extends ListActivity
         Serializable s = i.getSerializableExtra(getString(R.string.profile_in_intent));
         m_profile = (Profile)s;
         assert (m_profile != null);
-
-        m_downloadingDialog = ProgressDialog.show(this, "", "Downloading.  Please wait...", true);
-
     }
 
 
@@ -70,14 +72,9 @@ public class DepartureViewer extends ListActivity
     public void onResume() {
 	super.onResume();
 
-        // ... schedule a request for some new data...
-        assert (m_profile != null);
-        m_handler.removeCallbacks(m_departureUpdater);
-        m_handler.post(m_departureUpdater);
-
-        // ... but update the screen immediately.
-	m_handler.removeCallbacks(m_displayUpdater);
+	// update the screen and send a request for more data to be fulfilled ASAP
         updateDisplay();
+	requestDepartureData();
     }
 
 
@@ -93,21 +90,27 @@ public class DepartureViewer extends ListActivity
 
 
 
+
+
+
+
+
+
     // This Runnable is in charge of updating the display.  This might be called because
     // new data has come in, or it might be just because enough time has passed since our
     // last update that we want to update the times on the screen.
     private Runnable m_displayUpdater = new Runnable() {
 	    public void run() {
-                updateDisplay();
+		updateDisplay();
             }
         };
 
 
-    // Actually update the display.  This can be called from any thread
-    private synchronized void updateDisplay() {
+    // Actually update the display.  This must be called from the GUI thread only.
+    private void updateDisplay() {
         if (m_departures == null) {
             if (m_downloadingDialog == null) {
-                m_downloadingDialog = ProgressDialog.show(this, "", "Downloading.  Please wait...", true);
+                m_downloadingDialog = ProgressDialog.show(this, "", getString(R.string.download_message), true);
             }
         } else {
             if (m_downloadingDialog != null) {
@@ -155,8 +158,13 @@ public class DepartureViewer extends ListActivity
         }
                 
         // do this again in a bit 
+	m_handler.removeCallbacks(m_displayUpdater);
         m_handler.postDelayed(m_displayUpdater, s_refreshInterval);
     }
+
+
+
+
 
 
 
@@ -169,25 +177,32 @@ public class DepartureViewer extends ListActivity
             }
         };
 
-    // Actually request data from the server.  Note that this can take a long time,
-    // so it's not advisable to call this directly from the GUI thread.  Use the
-    // associated runnable unless you've got a good reason
+    // Actually request data from the server.  
     private void requestDepartureData() {
-        assert(m_profile != null);
         
-        // Get the data. (can take a while)
-        m_departures = DepartureFinder.getDeparturesForProfile(m_profile);        
-
-        // Don't ask for data again for a while...
-        m_handler.postDelayed(m_departureUpdater, s_dataRequestInterval);
-
-        // ... but update the screen right away
-        updateDisplay();
+        // Send a request for the data which will be fulfilled later
+        assert(m_profile != null);
+	DepartureFinder.requestDeparturesForProfile(m_profile, new DepartureCallback());
     }
 		
+    // Handle departure information from the server
+    // These callbacks will be run on another thread
+    private class DepartureCallback implements DepartureFinder.Callback {
+	@Override public void onReceived(SortedSet<Departure> departures) {
 
+	    m_departures = departures;
+	    
+	    // refresh the display ASAP on the GUI thread
+	    m_handler.post(m_displayUpdater);
 
-    private void changeProfile(Profile p) {
+	    // ... and ask for more data later (also on the GUI thread)
+	    m_handler.removeCallbacks(m_departureUpdater);
+	    m_handler.postDelayed(m_departureUpdater, s_dataRequestInterval);
+	}
+
+	// Called if server call fails for any reason
+	@Override public void onFailed() {
+	    Toast.makeText(DepartureViewer.this, "Download failed.  Please try again later", Toast.LENGTH_LONG);
+	}
     }
-   
 }
