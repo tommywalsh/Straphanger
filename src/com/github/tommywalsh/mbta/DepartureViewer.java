@@ -125,7 +125,7 @@ public class DepartureViewer extends ListActivity
                 // seconds.  Deduct X/2 seconds from the time left
                 // so that we "average out" the error
                 int secondsLeft = (int) ((d.when - now) / 1000);
-                secondsLeft -= s_refreshInterval;
+                secondsLeft -= s_refreshInterval/2000;
                 
                 if (secondsLeft > 0) {
                     int hours = secondsLeft / 3600;
