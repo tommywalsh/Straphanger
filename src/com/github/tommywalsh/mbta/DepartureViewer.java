@@ -13,8 +13,20 @@ import android.content.Intent;
 import java.util.SortedSet;
 import java.io.Serializable;
 
+
+// This activity is a viewer that displays all the upcoming departures for a particular profile
+// It's sorted on screen based on how soon the departure will happen
+//
+// This activity does not produce anything, save for pixels on a screen.  So, if you
+// want to activate it, only use startActivity() and not startActivityForResult().
+
 public class DepartureViewer extends ListActivity
 {
+
+    private enum State { UNINITIALIZED, WAITING_FOR_DATA, READY};
+    private State m_state = State.UNINITIALIZED;
+
+
     private SortedSet<Departure> m_departures = null;
     private Handler m_handler = new Handler();
     private ArrayAdapter<String> m_aa = null;
@@ -22,16 +34,11 @@ public class DepartureViewer extends ListActivity
     private Runnable m_updateDisplay = new Runnable() {
 	    public void run() {
 		m_aa.clear();
-		if (m_currentProfile == null) {
-		    m_aa.add(getString(R.string.select_option));
-		} else if (m_departures == null) {
-		    m_aa.add(getString(R.string.downloading));
-		} else {
-		    
+                if (m_state == State.READY) {
 		    long now = java.lang.System.currentTimeMillis();
-
+                    
 		    for (Departure d : m_departures) {
-
+                        
 			// We're only going to refresh every 10 seconds,
 			// so this data will be stale for an average of 5
 			// seconds.  Deduct 5 seconds from the time left
@@ -62,7 +69,9 @@ public class DepartureViewer extends ListActivity
 			    
 			    m_aa.add(mess);
 			}
-		    }
+                    }
+                } else {
+                    m_aa.add(getString(R.string.downloading));
 		}
 		setListAdapter(m_aa);
 
@@ -74,7 +83,6 @@ public class DepartureViewer extends ListActivity
     
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-	m_profileProvider = new ProfileProvider(this);
 	m_aa = new ArrayAdapter<String>(this, R.layout.listitem);
 
         Intent i = getIntent();
@@ -98,6 +106,8 @@ public class DepartureViewer extends ListActivity
 	    public void run() {
 		if (m_currentProfile != null) {
                     m_departures = DepartureFinder.getDeparturesForProfile(m_currentProfile);
+                    
+                    m_state = State.READY;
 
 		    // Don't ask for data again until 30 seconds have passed...
 		    m_handler.postDelayed(this, 30000);
@@ -118,19 +128,12 @@ public class DepartureViewer extends ListActivity
 	m_handler.removeCallbacks(m_updateDepartures);
     }
 
-    @Override public void onActivityResult(int request, int result, Intent data) {
-	if (request == 1050 && result == RESULT_OK) {
-	    double lat = data.getDoubleExtra("com.github.tommywalsh.mbta.Lat", 0.0);
-	    double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0);
-	    Profile p = ProximityProfileGenerator.getProximityProfile(lat, lng, 0.5);
-	    changeProfile(p);
-	}
-    }
 
-    private ProfileProvider m_profileProvider;
+
 
     private void changeProfile(Profile p) {
-	m_currentProfile = p;
+        m_currentProfile = p;
+        m_state = State.WAITING_FOR_DATA;
 	m_handler.removeCallbacks(m_updateDepartures);
 	m_handler.postDelayed(m_updateDepartures, 500);	
     }
