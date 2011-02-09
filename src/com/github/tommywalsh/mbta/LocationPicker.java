@@ -67,8 +67,18 @@ public class LocationPicker extends MapActivity
         public class DoubleTapListener extends GestureDetector.SimpleOnGestureListener {
             public boolean onDoubleTap(MotionEvent e) {
                 Intent i = new Intent();
-                i.putExtra("com.github.tommywalsh.mbta.Lat", getLatitude(m_tapLoc));
-                i.putExtra("com.github.tommywalsh.mbta.Lng", getLongitude(m_tapLoc));
+		GeoPoint tapLocation = m_tapLoc;
+		
+		// Unfortunately, if you double-tap on the position indicator, the 
+		// press event is "stolen" from us, and so m_tapLoc is not valid
+		// Workaround that here by assuming an invalid m_tapLoc
+		// means a tap on the currentposition indicator
+		if (tapLocation == null) {
+		    tapLocation = m_locationIndicatorOverlay.getMyLocation();
+		}
+
+                i.putExtra("com.github.tommywalsh.mbta.Lat", getLatitude(tapLocation));
+                i.putExtra("com.github.tommywalsh.mbta.Lng", getLongitude(tapLocation));
                 setResult(RESULT_OK, i);
                 finish();
                 return true;
