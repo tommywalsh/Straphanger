@@ -20,18 +20,85 @@ import java.io.Serializable;
 //
 // This activity does not produce anything, save for pixels on a screen.  So, if you
 // want to activate it, only use startActivity() and not startActivityForResult().
+//
+// The activity REQUIRES a profile in order to work.  So, when you activate it, you MUST
+// store the desired profile in the Intent you use to start this activity.  Like this:
+//
+//      Intent i = new Intent(this, DepartureViewer.class);
+//      i.putExtra("com.github.tommywalsh.mbta.Profile", p);
+//      startActivity(i);
+
 
 public class DepartureViewer extends ListActivity
 {
 
+    // Viewer can be in the following states
     private enum State { UNINITIALIZED, WAITING_FOR_DATA, READY};
     private State m_state = State.UNINITIALIZED;
 
 
-    private SortedSet<Departure> m_departures = null;
-    private Handler m_handler = new Handler();
-    private ArrayAdapter<String> m_aa = null;
+    // Here's the data this class holds on to
+    private SortedSet<Departure> m_departures = null;   // when are the busses leaving?
+    private Profile m_currentProfile = null;            // which busses do we care about?
 
+    // Scheduler that allows us to update the screen, and send periodic requests for new data
+    private Handler m_handler = new Handler();
+
+
+    // UI elements
+    private ArrayAdapter<String> m_aa = null;   // Adapter to convert plain list of strings to ListView items
+    private ProgressDialog m_downloadingDialog = null;  // Dialog to tell user whassup when we're waiting for data
+
+
+
+    // When this activity is first created...
+    @Override public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // ... set up our array adapter...
+	m_aa = new ArrayAdapter<String>(this, R.layout.listitem);
+
+        // ... unpack the profile of interesting busses that has been sent to us...
+        Intent i = getIntent();
+        Serializable s = i.getSerializableExtra("com.github.tommywalsh.mbta.Profile");
+        assert (s != null);
+
+        // ... and start to work on that new profile.
+        changeProfile((Profile)s);
+    }
+
+
+    // When this activity comes to the foreground...
+    public void onResume() {
+	super.onResume();
+
+        // ... update the screen immediately...
+	m_handler.removeCallbacks(m_updateDisplay);
+	m_handler.post(m_updateDisplay);
+
+        // ... and send out a request for some new data, if we need some
+	if (m_currentProfile != null) {
+	    m_handler.removeCallbacks(m_updateDepartures);
+	    m_handler.post(m_updateDepartures);
+	}
+    }
+
+
+    // When this activity leaves the foreground...
+    public void onPause() {
+	super.onPause();
+
+        // ... there's no need to waste time refreshing the screen or asking for new data
+	m_handler.removeCallbacks(m_updateDisplay);
+	m_handler.removeCallbacks(m_updateDepartures);
+    }
+
+
+
+
+    // This Runnable is in charge of updating the display.  This might be called because
+    // new data has come in, or it might be just because enough time has passed since our
+    // last update that we want to update the times on the screen.
     private Runnable m_updateDisplay = new Runnable() {
 	    public void run() {
                 if (m_state == State.READY) {
@@ -79,28 +146,10 @@ public class DepartureViewer extends ListActivity
 	    }
 	};
 
-    
-    @Override public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-	m_aa = new ArrayAdapter<String>(this, R.layout.listitem);
 
-        Intent i = getIntent();
-        Serializable s = i.getSerializableExtra("com.github.tommywalsh.mbta.Profile");
-        changeProfile((Profile)s);
-    }
-
-    public void onResume() {
-	super.onResume();
-
-	m_handler.removeCallbacks(m_updateDisplay);
-	m_handler.post(m_updateDisplay);
-
-	if (m_currentProfile != null) {
-	    m_handler.removeCallbacks(m_updateDepartures);
-	    m_handler.postDelayed(m_updateDepartures, 500);
-	}
-    }
-
+    // This Runnable is in charge of getting data from the server.  This might be called
+    // because we don't have any data yet, or maybe just because it's been a while since
+    // we got data and we want to have fresher estimates on arrival times.
     private Runnable m_updateDepartures = new Runnable() {
 	    public void run() {
 		if (m_currentProfile != null) {
@@ -123,16 +172,7 @@ public class DepartureViewer extends ListActivity
 	    }
 	};
 
-    private Profile m_currentProfile = null;
-    private ProgressDialog m_downloadingDialog = null;
 		
-    public void onPause() {
-	super.onPause();
-	m_handler.removeCallbacks(m_updateDisplay);
-	m_handler.removeCallbacks(m_updateDepartures);
-    }
-
-
 
 
     private void changeProfile(Profile p) {
