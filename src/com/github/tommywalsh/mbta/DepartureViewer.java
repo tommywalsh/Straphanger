@@ -39,16 +39,18 @@ public class DepartureViewer extends ListActivity
 
     // Here's the data this class holds on to
     private SortedSet<Departure> m_departures = null;   // when are the busses leaving?
-    private Profile m_currentProfile = null;            // which busses do we care about?
+    private Profile m_profile = null;                   // which busses do we care about?
 
     // Scheduler that allows us to update the screen, and send periodic requests for new data
     private Handler m_handler = new Handler();
-
 
     // UI elements
     private ArrayAdapter<String> m_aa = null;   // Adapter to convert plain list of strings to ListView items
     private ProgressDialog m_downloadingDialog = null;  // Dialog to tell user whassup when we're waiting for data
 
+    // "Magic numbers"
+    private static final int s_refreshInterval     = 10000;  // How long (in ms) between screen refreshes?
+    private static final int s_dataRequestInterval = 30000;  // How long (in ms) between server requests?
 
 
     // When this activity is first created...
@@ -60,11 +62,12 @@ public class DepartureViewer extends ListActivity
 
         // ... unpack the profile of interesting busses that has been sent to us...
         Intent i = getIntent();
-        Serializable s = i.getSerializableExtra("com.github.tommywalsh.mbta.Profile");
-        assert (s != null);
+        Serializable s = i.getSerializableExtra(getString(R.string.profile_in_intent));
+        Profile p = (Profile)s;
+        assert (p != null);
 
         // ... and start to work on that new profile.
-        changeProfile((Profile)s);
+        changeProfile(p);
     }
 
 
@@ -77,10 +80,9 @@ public class DepartureViewer extends ListActivity
 	m_handler.post(m_displayUpdater);
 
         // ... and send out a request for some new data, if we need some
-	if (m_currentProfile != null) {
-	    m_handler.removeCallbacks(m_departureUpdater);
-	    m_handler.post(m_departureUpdater);
-	}
+        assert (m_profile != null);
+        m_handler.removeCallbacks(m_departureUpdater);
+        m_handler.post(m_departureUpdater);
     }
 
 
@@ -104,7 +106,7 @@ public class DepartureViewer extends ListActivity
                 updateDisplay();
                 
                 // wait 10 seconds to do this again
-                m_handler.postDelayed(this, 10000);
+                m_handler.postDelayed(this, s_refreshInterval);
             }
         };
 
@@ -117,12 +119,12 @@ public class DepartureViewer extends ListActivity
             
             for (Departure d : m_departures) {
                 
-                // We're only going to refresh every 10 seconds,
-                // so this data will be stale for an average of 5
-                // seconds.  Deduct 5 seconds from the time left
+                // We're only going to refresh every so often -- say X seconds,
+                // so this data will be stale for an average of X/2
+                // seconds.  Deduct X/2 seconds from the time left
                 // so that we "average out" the error
                 int secondsLeft = (int) ((d.when - now) / 1000);
-                secondsLeft -= 5;
+                secondsLeft -= s_refreshInterval;
                 
                 if (secondsLeft > 0) {
                     int hours = secondsLeft / 3600;
@@ -162,7 +164,7 @@ public class DepartureViewer extends ListActivity
                 requestDepartureData();
 
                 // Don't ask for data again until 30 seconds have passed...
-                m_handler.postDelayed(this, 30000);
+                m_handler.postDelayed(this, s_dataRequestInterval);
                 
                 // ... but update the display right now
                 m_handler.removeCallbacks(m_displayUpdater);
@@ -174,27 +176,23 @@ public class DepartureViewer extends ListActivity
     // so it's not advisable to call this directly from the GUI thread.  Use the
     // associated runnable unless you've got a good reason
     private void requestDepartureData() {
-        if (m_currentProfile != null) {
-            m_departures = DepartureFinder.getDeparturesForProfile(m_currentProfile);
-            
-            m_state = State.READY;
-            
-            if (m_downloadingDialog != null) {
-                m_downloadingDialog.cancel();
-                m_downloadingDialog = null;
-            }
-            
+        assert(m_profile != null);
+        m_departures = DepartureFinder.getDeparturesForProfile(m_profile);
+        
+        m_state = State.READY;
+        
+        if (m_downloadingDialog != null) {
+            m_downloadingDialog.cancel();
+            m_downloadingDialog = null;
         }
     }
 		
 
 
     private void changeProfile(Profile p) {
-        m_currentProfile = p;
+        m_profile = p;
         m_state = State.WAITING_FOR_DATA;
         m_downloadingDialog = ProgressDialog.show(this, "", "Downloading.  Please wait...", true);
-	m_handler.removeCallbacks(m_departureUpdater);
-	m_handler.postDelayed(m_departureUpdater, 500);	
     }
    
 }
