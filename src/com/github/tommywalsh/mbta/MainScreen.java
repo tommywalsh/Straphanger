@@ -88,7 +88,7 @@ public class MainScreen extends Activity
 
     private void viewDeparturesForProfile(Profile p) {
         Intent i = new Intent(this, DepartureViewer.class);
-        i.putExtra("com.github.tommywalsh.mbta.Profile", p);
+        i.putExtra(getString(R.string.profile_in_intent), p);
         startActivity(i);        
     }
 
