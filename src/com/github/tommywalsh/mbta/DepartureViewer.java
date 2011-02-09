@@ -73,13 +73,13 @@ public class DepartureViewer extends ListActivity
 	super.onResume();
 
         // ... update the screen immediately...
-	m_handler.removeCallbacks(m_updateDisplay);
-	m_handler.post(m_updateDisplay);
+	m_handler.removeCallbacks(m_displayUpdater);
+	m_handler.post(m_displayUpdater);
 
         // ... and send out a request for some new data, if we need some
 	if (m_currentProfile != null) {
-	    m_handler.removeCallbacks(m_updateDepartures);
-	    m_handler.post(m_updateDepartures);
+	    m_handler.removeCallbacks(m_departureUpdater);
+	    m_handler.post(m_departureUpdater);
 	}
     }
 
@@ -89,8 +89,8 @@ public class DepartureViewer extends ListActivity
 	super.onPause();
 
         // ... there's no need to waste time refreshing the screen or asking for new data
-	m_handler.removeCallbacks(m_updateDisplay);
-	m_handler.removeCallbacks(m_updateDepartures);
+	m_handler.removeCallbacks(m_displayUpdater);
+	m_handler.removeCallbacks(m_departureUpdater);
     }
 
 
@@ -99,79 +99,93 @@ public class DepartureViewer extends ListActivity
     // This Runnable is in charge of updating the display.  This might be called because
     // new data has come in, or it might be just because enough time has passed since our
     // last update that we want to update the times on the screen.
-    private Runnable m_updateDisplay = new Runnable() {
+    private Runnable m_displayUpdater = new Runnable() {
 	    public void run() {
-                if (m_state == State.READY) {
-                    m_aa.clear();
-		    long now = java.lang.System.currentTimeMillis();
+                updateDisplay();
+                
+                // wait 10 seconds to do this again
+                m_handler.postDelayed(this, 10000);
+            }
+        };
+
+
+    // Actually update the display.  This can be called from any thread
+    private synchronized void updateDisplay() {
+        if (m_state == State.READY) {
+            m_aa.clear();
+            long now = java.lang.System.currentTimeMillis();
+            
+            for (Departure d : m_departures) {
+                
+                // We're only going to refresh every 10 seconds,
+                // so this data will be stale for an average of 5
+                // seconds.  Deduct 5 seconds from the time left
+                // so that we "average out" the error
+                int secondsLeft = (int) ((d.when - now) / 1000);
+                secondsLeft -= 5;
+                
+                if (secondsLeft > 0) {
+                    int hours = secondsLeft / 3600;
+                    int minutes = (secondsLeft - hours*3600) / 60;
+                    int seconds = (secondsLeft - hours*3600 - minutes*60);
                     
-		    for (Departure d : m_departures) {
-                        
-			// We're only going to refresh every 10 seconds,
-			// so this data will be stale for an average of 5
-			// seconds.  Deduct 5 seconds from the time left
-			// so that we "average out" the error
-			int secondsLeft = (int) ((d.when - now) / 1000);
-			secondsLeft -= 5;
-
-			if (secondsLeft > 0) {
-			    int hours = secondsLeft / 3600;
-			    int minutes = (secondsLeft - hours*3600) / 60;
-			    int seconds = (secondsLeft - hours*3600 - minutes*60);
-			    
-			    String mess = d.route.title + " to " + d.direction + " stops at " + d.title + " in ";
-			    if (hours > 0) {
-				mess += (new Integer(hours)).toString() + ":";
-				if (minutes < 10) {
-				    mess += "0";
-				}
-			    } 
-			    if (hours > 0 || minutes > 0) {
-				mess += (new Integer(minutes)).toString();
-			    }
-			    mess += ":";
-			    if (seconds < 10) {
-				mess += "0";
-			    }
-			    mess += (new Integer(seconds)).toString();
-			    
-			    m_aa.add(mess);
-			}
+                    String mess = d.route.title + " to " + d.direction + " stops at " + d.title + " in ";
+                    if (hours > 0) {
+                        mess += (new Integer(hours)).toString() + ":";
+                        if (minutes < 10) {
+                            mess += "0";
+                        }
+                    } 
+                    if (hours > 0 || minutes > 0) {
+                        mess += (new Integer(minutes)).toString();
                     }
-                    setListAdapter(m_aa);
-		}
+                    mess += ":";
+                    if (seconds < 10) {
+                        mess += "0";
+                    }
+                    mess += (new Integer(seconds)).toString();
+                    
+                    m_aa.add(mess);
+                }
+            }
+            setListAdapter(m_aa);
+        }
+    }
 
-		// wait 10 seconds to do this again
-		m_handler.postDelayed(this, 10000);
-	    }
-	};
 
 
-    // This Runnable is in charge of getting data from the server.  This might be called
+    // This Runnable is in charge of requesting data from the server.  This might be called
     // because we don't have any data yet, or maybe just because it's been a while since
     // we got data and we want to have fresher estimates on arrival times.
-    private Runnable m_updateDepartures = new Runnable() {
+    private Runnable m_departureUpdater = new Runnable() {
 	    public void run() {
-		if (m_currentProfile != null) {
-                    m_departures = DepartureFinder.getDeparturesForProfile(m_currentProfile);
-                    
-                    m_state = State.READY;
-                    
-                    if (m_downloadingDialog != null) {
-                        m_downloadingDialog.cancel();
-                        m_downloadingDialog = null;
-                    }
+                requestDepartureData();
 
-		    // Don't ask for data again until 30 seconds have passed...
-		    m_handler.postDelayed(this, 30000);
+                // Don't ask for data again until 30 seconds have passed...
+                m_handler.postDelayed(this, 30000);
+                
+                // ... but update the display right now
+                m_handler.removeCallbacks(m_displayUpdater);
+                m_handler.post(m_displayUpdater);
+            }
+        };
 
-		    // ... but update the display right now
-		    m_handler.removeCallbacks(m_updateDisplay);
-		    m_handler.post(m_updateDisplay);
-		}
-	    }
-	};
-
+    // Actually request data from the server.  Note that this can take a long time,
+    // so it's not advisable to call this directly from the GUI thread.  Use the
+    // associated runnable unless you've got a good reason
+    private void requestDepartureData() {
+        if (m_currentProfile != null) {
+            m_departures = DepartureFinder.getDeparturesForProfile(m_currentProfile);
+            
+            m_state = State.READY;
+            
+            if (m_downloadingDialog != null) {
+                m_downloadingDialog.cancel();
+                m_downloadingDialog = null;
+            }
+            
+        }
+    }
 		
 
 
@@ -179,8 +193,8 @@ public class DepartureViewer extends ListActivity
         m_currentProfile = p;
         m_state = State.WAITING_FOR_DATA;
         m_downloadingDialog = ProgressDialog.show(this, "", "Downloading.  Please wait...", true);
-	m_handler.removeCallbacks(m_updateDepartures);
-	m_handler.postDelayed(m_updateDepartures, 500);	
+	m_handler.removeCallbacks(m_departureUpdater);
+	m_handler.postDelayed(m_departureUpdater, 500);	
     }
    
 }
