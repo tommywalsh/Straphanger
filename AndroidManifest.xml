@@ -12,13 +12,17 @@
   
   <application 
      android:label="Straphanger" 
-     android:theme="@android:style/Theme.NoTitleBar"
      >
     
 
     <uses-library android:name="com.google.android.maps" />
     
-    <activity android:name=".MainScreen" android:label="MBTA" android:launchMode="singleTask" >
+    <activity android:name=".Straphanger" 
+	      android:label="Straphanger" 
+	      android:launchMode="singleTask"      
+	      android:theme="@android:style/Theme.NoTitleBar"
+	      >
+
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.DEFAULT" />
@@ -26,7 +30,7 @@
       </intent-filter>
     </activity>
 
-    <activity android:name=".DepartureViewer" android:label="MBTA" android:launchMode="standard" />
+    <activity android:name=".DepartureViewer" android:label="Upcoming Departures" android:launchMode="standard" />
     <activity android:name=".LocationPicker" android:label="Location Picker" android:launchMode="standard" />
     
   </application>

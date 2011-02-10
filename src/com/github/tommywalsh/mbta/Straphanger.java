@@ -18,7 +18,7 @@ import android.content.DialogInterface;
 
 import java.util.Vector;
 
-public class MainScreen extends Activity
+public class Straphanger extends Activity
 {
     private static final int s_locationPickerId = 1050;
     private static final int s_profileDialogId  = 1060;
