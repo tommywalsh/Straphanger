@@ -19,5 +19,19 @@
      android:text="Nearby Busses"
      />
 
+  <TextView
+     android:id="@+id/towZone"
+     android:layout_width="wrap_content" 
+     android:layout_height="wrap_content"      
+     android:layout_centerHorizontal="true"
+     android:layout_alignParentBottom="true"
+     android:layout_marginBottom="25px"
+     android:gravity="center"
+     android:textSize="20sp"
+     android:textColor="#ffffff"
+     android:text="TOW ZONE"
+     />
+
+
 </RelativeLayout>
 
