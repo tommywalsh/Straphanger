@@ -6,20 +6,16 @@
 		>
 
   <Button
+     style="@style/BusStopButton"
      android:id="@+id/saved_profile_button"
-     android:layout_width="179px" 
-     android:layout_height="wrap_content" 
-     android:layout_centerHorizontal="true" 
      android:layout_marginTop="100px"
      android:text="Load Profile"
      />
 
   <Button
+     style="@style/BusStopButton"
      android:id="@+id/proximity_button"
-     android:layout_width="179px" 
-     android:layout_height="wrap_content" 
      android:layout_below="@id/saved_profile_button"
-     android:layout_centerHorizontal="true" 
      android:text="Nearby Busses"
      />
 
