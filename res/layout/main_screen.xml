@@ -26,6 +26,13 @@
      android:text="Create New Profile"
      />
 
+  <Button
+     style="@style/BusStopButton"
+     android:id="@+id/edit_profile_button"
+     android:layout_below="@id/new_profile_button"
+     android:text="Edit Existing Profile"
+     />
+
   <TextView
      android:id="@+id/towZone"
      android:layout_width="wrap_content" 

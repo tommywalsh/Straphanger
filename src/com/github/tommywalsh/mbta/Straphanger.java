@@ -23,11 +23,23 @@ public class Straphanger extends Activity
     private static final int s_locationPickerId = 1050;
     private static final int s_profileDialogId  = 1060;
     private ProfileProvider m_profProvider;
+    private enum ProfileAction {LOAD, EDIT};
+    ProfileAction m_nextProfileAction;;
+            
 
 
     // What to do when we click on the "stored profiles" button
     private OnClickListener m_profileListener = new OnClickListener() {
 	    public void onClick(View v) {
+                Button button = (Button)v;
+                assert(button != null);
+                if (button == m_loadProfileButton) {
+                    m_nextProfileAction = ProfileAction.LOAD;
+                } else {
+                    assert (button == m_editProfileButton);
+                    m_nextProfileAction = ProfileAction.EDIT;
+                }
+
 		showDialog(s_profileDialogId);
 	    }
 	};
@@ -41,7 +53,15 @@ public class Straphanger extends Activity
 	builder.setTitle("Pick a profile");
 	builder.setItems(profileNames.toArray(buffer), new DialogInterface.OnClickListener() {
 		public void onClick(DialogInterface d, int id) {
-		    viewDeparturesForProfile(m_profProvider.getProfile(id));
+                    Profile p = m_profProvider.getProfile(id);
+                    switch (m_nextProfileAction) {
+                      case LOAD:
+                        viewDeparturesForProfile(p);
+                        break;
+                      case EDIT:
+                        launchEditor(p);
+                        break;
+                    }
 		}
 	    });
 
@@ -65,12 +85,14 @@ public class Straphanger extends Activity
     private OnClickListener m_newProfileListener = new OnClickListener() {
 	    public void onClick(View v) {
                 android.util.Log.d("mbta", "clicked");
-                launchEditorWithNewProfile();
+                launchEditor(null);
 	    }
 	};
-    private void launchEditorWithNewProfile() {
+    private void launchEditor(Profile p) {
         Intent i = new Intent(this, ProfileEditor.class);
-        //        i.putExtra(getString(R.string.profile_in_intent), p);
+        if (p != null) {
+            i.putExtra(getString(R.string.profile_in_intent), p);
+        }
         startActivity(i);        
     }
 
@@ -92,9 +114,9 @@ public class Straphanger extends Activity
     // Called when a dialog is requested
     public Dialog onCreateDialog(int index) {
 	switch (index) {
-	case s_profileDialogId:
+          case s_profileDialogId:
 	    return getProfilePickerDialog();
-	default:
+          default:
 	    return super.onCreateDialog(index);
 	}
     } 
@@ -117,13 +139,21 @@ public class Straphanger extends Activity
 	m_profProvider = new ProfileProvider(this);
 	
 
-        Button profileButton = (Button)findViewById(R.id.saved_profile_button);
-        profileButton.setOnClickListener(m_profileListener);
+        m_loadProfileButton = (Button)findViewById(R.id.saved_profile_button);
+        m_loadProfileButton.setOnClickListener(m_profileListener);
 
         Button proximityButton = (Button)findViewById(R.id.proximity_button);
         proximityButton.setOnClickListener(m_proximityListener);
-
+        
         Button newProfileButton = (Button)findViewById(R.id.new_profile_button);
         newProfileButton.setOnClickListener(m_newProfileListener);
+        
+        m_editProfileButton = (Button)findViewById(R.id.edit_profile_button);
+        m_editProfileButton.setOnClickListener(m_profileListener);
+        
     }   
+
+    Button m_loadProfileButton;
+    Button m_editProfileButton;
+
 }
