@@ -60,6 +60,22 @@ public class Straphanger extends Activity
 
 
 
+
+
+    private OnClickListener m_newProfileListener = new OnClickListener() {
+	    public void onClick(View v) {
+                android.util.Log.d("mbta", "clicked");
+                launchEditorWithNewProfile();
+	    }
+	};
+    private void launchEditorWithNewProfile() {
+        Intent i = new Intent(this, ProfileEditor.class);
+        //        i.putExtra(getString(R.string.profile_in_intent), p);
+        startActivity(i);        
+    }
+
+
+
     // When a sub-activity is finished, this is called, provided we registered for 
     // result when we launched the sub-activity 
     @Override public void onActivityResult(int request, int result, Intent data) {
@@ -106,5 +122,8 @@ public class Straphanger extends Activity
 
         Button proximityButton = (Button)findViewById(R.id.proximity_button);
         proximityButton.setOnClickListener(m_proximityListener);
+
+        Button newProfileButton = (Button)findViewById(R.id.new_profile_button);
+        newProfileButton.setOnClickListener(m_newProfileListener);
     }   
 }

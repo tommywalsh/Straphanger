@@ -32,6 +32,7 @@
 
     <activity android:name=".DepartureViewer" android:label="Upcoming Departures" android:launchMode="standard" />
     <activity android:name=".LocationPicker" android:label="Location Picker" android:launchMode="standard" />
+    <activity android:name=".ProfileEditor" android:label="Profile Editor" android:launchMode="standard" />
     
   </application>
   

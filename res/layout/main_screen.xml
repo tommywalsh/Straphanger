@@ -19,6 +19,13 @@
      android:text="Nearby Busses"
      />
 
+  <Button
+     style="@style/BusStopButton"
+     android:id="@+id/new_profile_button"
+     android:layout_below="@id/proximity_button"
+     android:text="Create New Profile"
+     />
+
   <TextView
      android:id="@+id/towZone"
      android:layout_width="wrap_content" 
