@@ -2,23 +2,24 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	 	android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
+		android:background="@drawable/bus_stop"
 		>
 
   <Button
      android:id="@+id/saved_profile_button"
-     android:layout_width="wrap_content" 
+     android:layout_width="179px" 
      android:layout_height="wrap_content" 
-     android:layout_alignParentRight="true" 
+     android:layout_centerHorizontal="true" 
+     android:layout_marginTop="100px"
      android:text="Load Profile"
      />
 
   <Button
      android:id="@+id/proximity_button"
-     android:layout_width="wrap_content" 
+     android:layout_width="179px" 
      android:layout_height="wrap_content" 
-     android:layout_alignParentRight="true" 
      android:layout_below="@id/saved_profile_button"
-     android:layout_alignLeft="@id/saved_profile_button"
+     android:layout_centerHorizontal="true" 
      android:text="Nearby Busses"
      />
 
