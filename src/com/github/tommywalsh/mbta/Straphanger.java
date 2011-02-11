@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.content.Intent;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteDatabase;
 
 import java.util.Vector;
 
@@ -98,6 +100,9 @@ public class Straphanger extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_screen);
 
+	MBTADBOpenHelper openHelper = new MBTADBOpenHelper(getApplicationContext());
+	SQLiteDatabase db = openHelper.getReadableDatabase();
+
 	m_profProvider = new ProfileProvider(this);
 	
 
@@ -107,4 +112,5 @@ public class Straphanger extends Activity
         Button proximityButton = (Button)findViewById(R.id.proximity_button);
         proximityButton.setOnClickListener(m_proximityListener);
     }   
+
 }
