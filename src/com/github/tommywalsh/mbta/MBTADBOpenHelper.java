@@ -27,7 +27,7 @@ public class MBTADBOpenHelper extends SQLiteOpenHelper
 	db.execSQL(createTable(PROFILE_NAME, PROFILE_SCHEMA));
 	db.execSQL(createTable(PROFILE_POINTS_NAME, PROFILE_POINTS_SCHEMA));
 
-	insertRoutes(db);
+	//	insertRoutes(db);
     }
 
     @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

@@ -13,6 +13,7 @@ import android.sax.StartElementListener;
 import android.util.Xml;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.ContentValues;
 import android.os.AsyncTask;
 
 import org.xml.sax.Attributes;
@@ -34,7 +35,7 @@ public class DatabaseBuilder
     public DatabaseBuilder(Context appContext) 
     {
 	MBTADBOpenHelper openHelper = new MBTADBOpenHelper(appContext);
-	SQLiteDatabase db = openHelper.getWritableDatabase();
+	m_db = openHelper.getWritableDatabase();
     }
 
     // Returns immediately, but opens progress dialog on the given context
@@ -50,20 +51,64 @@ public class DatabaseBuilder
     {
 	public RebuilderTask(Context ctx) {
 	    m_ctx = ctx;
+	    m_dialogs = 0;
 	}
 	private Context m_ctx;
 	private ProgressDialog m_dlg;
+	private int m_dialogs; // how many dialogs have we created?
 
 	@Override protected void onPreExecute() {
 	    m_dlg = ProgressDialog.show(m_ctx, "", "Loading Route List", true);
+	    m_dialogs = 1;
 	}
 
 	@Override protected void onPostExecute(java.lang.Void v) {
 	    m_dlg.cancel();
 	}
 
+	@Override protected void onProgressUpdate(Integer... val) {
+	    if (m_dialogs == 1) {
+		// Make a new dialog now that we know the number of routes
+		m_dlg.cancel();
+		m_dlg = new ProgressDialog(m_ctx);
+		m_dlg.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		m_dlg.setMessage("Loading Route Files");
+		m_dlg.setCancelable(false);
+		m_dlg.setMax(val[0]);
+		m_dlg.show();
+		m_dialogs = 2;
+	    } else {
+		assert (m_dialogs == 2);
+		m_dlg.setProgress(val[0]);
+	    }
+	}
+
 	@Override protected Void doInBackground(java.lang.Void... v) {
+	    m_db.delete("route", null, null);
+
 	    Vector<String> routeList = parseRouteList();
+	    publishProgress(routeList.size());
+	    int numProcessed = 0;
+	    for (String tag : routeList) {
+		try {
+		    Thread.sleep(2000);
+		} catch (Exception e) {
+		}
+		
+		// add the route data
+		RouteInfoHelper rih = parseRoute(tag);
+		ContentValues routeData = rih.routeData;
+		routeData.putNull("id");
+		m_db.insert("route", null, routeData);
+		/*
+		TreeMap<String, ContentValues
+		for (ContentValues stopData : rih.stopData) {
+		    m_db.select("stop", {"id", "stop"}, "
+		    }*/
+
+		numProcessed++;
+		publishProgress(numProcessed);
+	    }
 	    return null;
 	}
     }
@@ -71,14 +116,28 @@ public class DatabaseBuilder
     private SQLiteDatabase m_db;
 
 
-
-    public static void rebuild() {
-	
-	// should delete crap here
-	parseRouteList();
+    private static class RouteInfoHelper
+    {
+	public ContentValues routeData = new ContentValues();
+	public Vector<ContentValues> stopData = new Vector<ContentValues>();
+	public class SubRouteHelper {
+	    String direction = new String();
+	    Vector<String> orderedStopTags = new Vector<String>();
+	};
+	public Vector<SubRouteHelper> subRouteData = new Vector<SubRouteHelper>();
     }
 
-    
+    private static RouteInfoHelper parseRoute(String routeTag)
+    {
+	final RouteInfoHelper rh = new RouteInfoHelper();
+	try {
+	    Xml.parse(getStream(getRouteURL(routeTag)), Xml.Encoding.UTF_8, getRouteHandler(rh));
+	} catch (Exception e) {
+	    android.util.Log.d("mbta", "Failure to parse route " + routeTag);
+	    android.util.Log.d("mbta", "Exception: " + e.toString());
+	}
+	return rh;
+    }
     private static Vector<String> parseRouteList() 
     {
 	Vector<String> tags = null;
@@ -113,16 +172,59 @@ public class DatabaseBuilder
 	return root.getContentHandler();
     }
     
-    private static URL getRouteListURL()
+    private static ContentHandler getRouteHandler(final RouteInfoHelper routeInfo)
     {
-	URL url;
+	final String NS = "";
+	
+	RootElement root = new RootElement("body");
+	
+	Element route = root.getChild(NS, "route");
+	route.setStartElementListener(new StartElementListener() {
+		public void start(Attributes atts) {
+		    routeInfo.routeData.put("tag", atts.getValue("tag"));
+		    routeInfo.routeData.put("title", atts.getValue("title"));
+		    routeInfo.routeData.put("minLat", Double.parseDouble(atts.getValue("latMin")));
+		    routeInfo.routeData.put("maxLat", Double.parseDouble(atts.getValue("latMax")));
+		    routeInfo.routeData.put("minLng", Double.parseDouble(atts.getValue("lonMin")));
+		    routeInfo.routeData.put("maxLng", Double.parseDouble(atts.getValue("lonMax")));
+		}
+	    });
+	/*
+	Element allStop = route.getChild(NS, "stop");
+	allStop.setStartElementListener(new StartElementListener() {
+		public void start(Attributes atts) {
+		    ContentValues cv = new ContentValues();
+		    cv.put("tag", atts.getValue("tag"));
+		    cv.put("title", atts.getValue("title"));
+		    cv.put("lat", atts.getValue("lat"));
+		    cv.put("lng", atts.getValue("lon"));
+		    routeInfo.stopData.addElement(cv);
+		}
+		});*/
+
+	return root.getContentHandler();
+    }
+
+
+
+    private static URL urlFromString(String str)
+    {
+	Log.d("mbta", "String is " + str);
 	try {
-	    url = new URL("http://webservices.nextbus.com/service/publicXMLFeed?command=routeList&a=mbta");
+	    return new URL(str);
 	} catch (java.net.MalformedURLException e) {
 	    Log.d("mbta", "Malformed route list URL");
-	    url = null;
+	    return null;
 	}
-	return url;
+    }
+    
+    private static URL getRouteListURL()
+    {
+	return urlFromString("http://webservices.nextbus.com/service/publicXMLFeed?command=routeList&a=mbta");
+    }
+
+    private static URL getRouteURL(String routeTag) {
+	return urlFromString("http://webservices.nextbus.com/service/publicXMLFeed?command=routeConfig&a=mbta&r=" + routeTag);
     }
 
     private static InputStream getStream(URL url) throws java.io.IOException {
