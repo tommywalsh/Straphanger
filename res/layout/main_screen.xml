@@ -32,6 +32,13 @@
      android:text="TOW ZONE"
      />
 
+  <Button
+     style="@style/BusStopButton"
+     android:id="@+id/database_button"
+     android:layout_above="@id/towZone"
+     android:text="Regenerate Database"
+     />
+
 
 </RelativeLayout>
 

@@ -51,6 +51,13 @@ public class Straphanger extends Activity
     }
 
 
+    private OnClickListener m_databaseListener = new OnClickListener() {
+	    public void onClick(View v) {
+		DatabaseBuilder.rebuild();
+	    }
+	};
+
+
     private OnClickListener m_proximityListener = new OnClickListener() {
 	    public void onClick(View v) {
                 launchLocationPicker();
@@ -95,13 +102,17 @@ public class Straphanger extends Activity
     }
 
 
+    private DatabaseBuilder m_dbBuilder;
+
     @Override public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_screen);
 
-	MBTADBOpenHelper openHelper = new MBTADBOpenHelper(getApplicationContext());
-	SQLiteDatabase db = openHelper.getReadableDatabase();
+	//	m_dbBuilder = new DatabaseBuilder(getApplicationContext());
+
+	//	MBTADBOpenHelper openHelper = new MBTADBOpenHelper(getApplicationContext());
+	//SQLiteDatabase db = openHelper.getReadableDatabase();
 
 	m_profProvider = new ProfileProvider(this);
 	
@@ -111,6 +122,9 @@ public class Straphanger extends Activity
 
         Button proximityButton = (Button)findViewById(R.id.proximity_button);
         proximityButton.setOnClickListener(m_proximityListener);
+
+	Button databaseButton = (Button)findViewById(R.id.database_button);
+	databaseButton.setOnClickListener(m_databaseListener);
     }   
 
 }
