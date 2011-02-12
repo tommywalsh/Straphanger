@@ -20,6 +20,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 
 import java.util.Vector;
+import java.util.TreeMap;
 import java.io.InputStream;
 import java.net.URL;
 
@@ -98,13 +99,12 @@ public class DatabaseBuilder
 		// add the route data
 		RouteInfoHelper rih = parseRoute(tag);
 		ContentValues routeData = rih.routeData;
-		routeData.putNull("id");
 		m_db.insert("route", null, routeData);
-		/*
-		TreeMap<String, ContentValues
+
+		// and the stop data
 		for (ContentValues stopData : rih.stopData) {
-		    m_db.select("stop", {"id", "stop"}, "
-		    }*/
+		    m_db.insert("stop", null, stopData);
+		}
 
 		numProcessed++;
 		publishProgress(numProcessed);
@@ -189,18 +189,19 @@ public class DatabaseBuilder
 		    routeInfo.routeData.put("maxLng", Double.parseDouble(atts.getValue("lonMax")));
 		}
 	    });
-	/*
+	
 	Element allStop = route.getChild(NS, "stop");
 	allStop.setStartElementListener(new StartElementListener() {
 		public void start(Attributes atts) {
 		    ContentValues cv = new ContentValues();
-		    cv.put("tag", atts.getValue("tag"));
+		    String tag = atts.getValue("tag");
+		    cv.put("tag", tag);
 		    cv.put("title", atts.getValue("title"));
 		    cv.put("lat", atts.getValue("lat"));
 		    cv.put("lng", atts.getValue("lon"));
 		    routeInfo.stopData.addElement(cv);
 		}
-		});*/
+	    });
 
 	return root.getContentHandler();
     }
