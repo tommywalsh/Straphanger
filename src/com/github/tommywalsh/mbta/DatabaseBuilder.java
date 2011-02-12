@@ -11,6 +11,9 @@ import android.sax.RootElement;
 import android.sax.Element;
 import android.sax.StartElementListener;
 import android.util.Xml;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.AsyncTask;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -19,13 +22,57 @@ import java.util.Vector;
 import java.io.InputStream;
 import java.net.URL;
 
+import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteDatabase;
+
 
 
 public class DatabaseBuilder
 {
+    // Must pass in the application context here, so that 
+    // database may be shared with entire application
+    public DatabaseBuilder(Context appContext) 
+    {
+	MBTADBOpenHelper openHelper = new MBTADBOpenHelper(appContext);
+	SQLiteDatabase db = openHelper.getWritableDatabase();
+    }
+
+    // Returns immediately, but opens progress dialog on the given context
+    public void spawnRebuildTask(Context ctx) 
+    {
+	new RebuilderTask(ctx).execute();
+    }
+
+
+
+    // This task handles the progress dialog and calls into code that really rebuilds
+    private class RebuilderTask extends AsyncTask<Void,Integer,Void>
+    {
+	public RebuilderTask(Context ctx) {
+	    m_ctx = ctx;
+	}
+	private Context m_ctx;
+	private ProgressDialog m_dlg;
+
+	@Override protected void onPreExecute() {
+	    m_dlg = ProgressDialog.show(m_ctx, "", "Loading Route List", true);
+	}
+
+	@Override protected void onPostExecute(java.lang.Void v) {
+	    m_dlg.cancel();
+	}
+
+	@Override protected Void doInBackground(java.lang.Void... v) {
+	    Vector<String> routeList = parseRouteList();
+	    return null;
+	}
+    }
+
+    private SQLiteDatabase m_db;
+
+
+
     public static void rebuild() {
-	//	MBTADBOpenHelper openHelper = new MBTADBOpenHelper(getApplicationContext());
-	//SQLiteDatabase db = openHelper.getWritableDatabase();
 	
 	// should delete crap here
 	parseRouteList();

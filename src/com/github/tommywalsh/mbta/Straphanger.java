@@ -53,7 +53,7 @@ public class Straphanger extends Activity
 
     private OnClickListener m_databaseListener = new OnClickListener() {
 	    public void onClick(View v) {
-		DatabaseBuilder.rebuild();
+		m_dbBuilder.spawnRebuildTask(Straphanger.this);
 	    }
 	};
 
@@ -109,7 +109,7 @@ public class Straphanger extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_screen);
 
-	//	m_dbBuilder = new DatabaseBuilder(getApplicationContext());
+	m_dbBuilder = new DatabaseBuilder(getApplicationContext());
 
 	//	MBTADBOpenHelper openHelper = new MBTADBOpenHelper(getApplicationContext());
 	//SQLiteDatabase db = openHelper.getReadableDatabase();
