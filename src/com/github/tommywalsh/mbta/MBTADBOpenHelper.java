@@ -71,7 +71,7 @@ public class MBTADBOpenHelper extends SQLiteOpenHelper
 
     private static final String DEPARTURE_POINT_NAME = "departure_point";
     private static final String DEPARTURE_POINT_SCHEMA = 
-	"(id INTEGER PRIMARY KEY, subroute TEXT, stop TEXT," +
+	"(id INTEGER PRIMARY KEY, stopNum INTEGER, subroute TEXT, stop TEXT," +
 	" FOREIGN KEY(subroute) REFERENCES subroute(tag)," +
 	" FOREIGN KEY(stop) REFERENCES stop(tag) )";
 

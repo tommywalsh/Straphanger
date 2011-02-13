@@ -86,6 +86,9 @@ public class DatabaseBuilder
 
 	@Override protected Void doInBackground(java.lang.Void... v) {
 	    m_db.delete("route", null, null);
+	    m_db.delete("stop", null, null);
+	    m_db.delete("subroute", null, null);
+	    m_db.delete("departure_point", null, null);
 
 	    Vector<String> routeList = parseRouteList();
 	    publishProgress(routeList.size());
@@ -106,6 +109,17 @@ public class DatabaseBuilder
 		    m_db.insert("stop", null, stopData);
 		}
 
+		// and the subroute data...
+		for(int i = 0; i < rih.subRouteData.size(); i++) {
+		    ContentValues subRouteData = rih.subRouteData.elementAt(i);
+		    m_db.insert("subroute", null, subRouteData);
+
+		    // ...including the stops
+		    for (ContentValues subRouteStops : rih.subRouteStops.elementAt(i)) {
+			m_db.insert("departure_point", null, subRouteStops);
+		    }
+		}
+
 		numProcessed++;
 		publishProgress(numProcessed);
 	    }
@@ -120,11 +134,10 @@ public class DatabaseBuilder
     {
 	public ContentValues routeData = new ContentValues();
 	public Vector<ContentValues> stopData = new Vector<ContentValues>();
-	public class SubRouteHelper {
-	    String direction = new String();
-	    Vector<String> orderedStopTags = new Vector<String>();
-	};
-	public Vector<SubRouteHelper> subRouteData = new Vector<SubRouteHelper>();
+	
+	// these next two are associate by index
+	public Vector<ContentValues> subRouteData = new Vector<ContentValues>();
+	public Vector<Vector<ContentValues>> subRouteStops = new Vector<Vector<ContentValues>>();
     }
 
     private static RouteInfoHelper parseRoute(String routeTag)
@@ -200,6 +213,42 @@ public class DatabaseBuilder
 		    cv.put("lat", atts.getValue("lat"));
 		    cv.put("lng", atts.getValue("lon"));
 		    routeInfo.stopData.addElement(cv);
+		}
+	    });
+
+	Element direction = route.getChild(NS, "direction");
+	direction.setStartElementListener(new StartElementListener() {
+		public void start(Attributes atts) {
+		    ContentValues cv = new ContentValues();
+		    cv.put("tag", atts.getValue("tag"));
+		    cv.put("title", atts.getValue("title"));
+		    cv.put("route", routeInfo.routeData.getAsString("tag"));
+		    routeInfo.subRouteData.addElement(cv);
+
+		    // elements will be filled in by the next listener
+		    routeInfo.subRouteStops.addElement(new Vector<ContentValues>());
+		}
+	    });
+
+	
+	Element directionStop = direction.getChild(NS, "stop");
+	directionStop.setStartElementListener(new StartElementListener() {
+		int index;
+		public void start(Attributes atts) {
+		    ContentValues cv = new ContentValues();
+		    
+		    // Are we at the start of a new route?
+		    if (routeInfo.subRouteStops.lastElement().isEmpty()) {
+			index = 1;
+		    } else {
+			index++;
+		    }
+
+		    cv.putNull("id");
+		    cv.put("stopNum", index);
+		    cv.put("subroute", routeInfo.subRouteData.lastElement().getAsString("tag"));
+		    cv.put("stop", atts.getValue("tag"));
+		    routeInfo.subRouteStops.lastElement().addElement(cv);
 		}
 	    });
 
