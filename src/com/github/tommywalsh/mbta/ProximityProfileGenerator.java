@@ -7,11 +7,71 @@ package com.github.tommywalsh.mbta;
 
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import java.util.AbstractMap;
 import java.util.Vector;
 
 public class ProximityProfileGenerator
 {
+
+    public static void new_getProximityProfile(SQLiteDatabase db, double lat, double lng, double radius)
+    {
+	final double rLat = latsPerMile * radius;
+	final double rLng = lngsPerMile * radius;
+
+        Double minLat = new Double(lat - rLat);
+        Double maxLat = new Double(lat + rLat);
+        Double minLng = new Double(lng - rLng);
+        Double maxLng = new Double(lng + rLng);
+
+        Profile p = new Profile();
+        p.name = "Nearby Busses";
+
+
+        String sql = "SELECT lat,lng,title,subroute FROM departure_point,stop " +
+            " WHERE stop.tag = departure_point.stop " +
+            " AND lat < " + maxLat.toString() +
+            " AND lat > " + minLat.toString() +
+            " AND lng < " + maxLng.toString() +
+            " AND lng > " + minLng.toString() + 
+            " ORDER BY subroute";
+
+        Cursor cursor = db.rawQuery(sql, null);
+        cursor.moveToFirst();
+        String currentSubRoute = null;
+        String currentTitle = new String();
+        double currentDistance = 0.0;
+        while (!cursor.isAfterLast()) {
+            double newLat = Double.parseDouble(cursor.getString(0));
+            double newLng = Double.parseDouble(cursor.getString(1));
+            double newDistance = distanceBetween(newLat, newLng, lat, lng);
+            String newSubRoute = cursor.getString(3);
+            
+            if (newSubRoute.equals(currentSubRoute)) {
+                // This is not the first stop we've seen on this route
+                if (newDistance < currentDistance) {
+                    // This point is closer that the other ones on this route
+                    currentDistance = newDistance;
+                    currentTitle = cursor.getString(2);
+                }
+                // otherwise throw this point away
+            } else {
+                // This is the first point on a new route
+                if (currentSubRoute != null) {
+                    // commit the old one here
+                    android.util.Log.d("mbta", currentTitle + " on route " + currentSubRoute);
+                }
+                currentSubRoute = newSubRoute;
+                currentDistance = newDistance;
+                currentTitle = cursor.getString(2);
+            }
+                
+            cursor.moveToNext();
+        }
+        
+
+    }
 
     // Given a postion (lat/lng), and a radius (in miles),
     // returns a profile that the closest DeparturePoints for all

@@ -76,6 +76,7 @@ public class Straphanger extends Activity
             if (request == s_locationPickerId) {
                 double lat = data.getDoubleExtra("com.github.tommywalsh.mbta.Lat", 0.0);
                 double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0);
+                ProximityProfileGenerator.new_getProximityProfile(m_db, lat, lng, 0.5);
                 Profile p = ProximityProfileGenerator.getProximityProfile(lat, lng, 0.5);
                 viewDeparturesForProfile(p);
             }
@@ -103,6 +104,7 @@ public class Straphanger extends Activity
 
 
     private DatabaseBuilder m_dbBuilder;
+    private SQLiteDatabase m_db;
 
     @Override public void onCreate(Bundle savedInstanceState) 
     {
@@ -111,8 +113,8 @@ public class Straphanger extends Activity
 
 	m_dbBuilder = new DatabaseBuilder(getApplicationContext());
 
-	//	MBTADBOpenHelper openHelper = new MBTADBOpenHelper(getApplicationContext());
-	//SQLiteDatabase db = openHelper.getReadableDatabase();
+        MBTADBOpenHelper openHelper = new MBTADBOpenHelper(getApplicationContext());
+	m_db = openHelper.getReadableDatabase();
 
 	m_profProvider = new ProfileProvider(this);
 	
