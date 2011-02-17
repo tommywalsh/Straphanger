@@ -85,11 +85,34 @@ public class DatabaseBuilder
 	}
 
 	@Override protected Void doInBackground(java.lang.Void... v) {
-	    m_db.delete("route", null, null);
-	    m_db.delete("stop", null, null);
+
+            m_db.beginTransaction();
+
+            m_db.delete("route", null, null);
+            m_db.delete("stop", null, null);
 	    m_db.delete("subroute", null, null);
 	    m_db.delete("departure_point", null, null);
 
+
+            // For now, hard-code the profiles
+            // TODO: get rid of this once we have a profile editor
+	    m_db.delete("profile", null, null);
+	    m_db.delete("profile_point", null, null);
+            ContentValues profileData = new ContentValues();
+            profileData.put("id", 0);
+            profileData.put("name", "Home to Subway");
+            m_db.insert("profile", null, profileData);
+            profileData = new ContentValues();
+            profileData.put("id", 1);
+            profileData.put("name", "Red Line to Home");
+            m_db.insert("profile", null, profileData);
+            profileData = new ContentValues();
+            profileData.put("id", 2);
+            profileData.put("name", "MPHS to Home");
+            m_db.insert("profile", null, profileData);
+
+
+            
 	    Vector<String> routeList = parseRouteList();
 	    publishProgress(routeList.size());
 	    int numProcessed = 0;
@@ -122,7 +145,87 @@ public class DatabaseBuilder
 
 		numProcessed++;
 		publishProgress(numProcessed);
-	    }
+            }
+
+
+
+            // These numbers are based on an already-existing database
+            // already loaded with route data
+            // TODO: get rid of this once we have a profile editor
+
+            profileData = new ContentValues();
+            profileData.put("profile", 0);
+            profileData.put("point", 20476);
+            m_db.insert("profile_point", null, profileData);
+            profileData = new ContentValues();
+            profileData.put("profile", 0);
+            profileData.put("point", 20485);
+            m_db.insert("profile_point", null, profileData);
+            profileData = new ContentValues();
+            profileData.put("profile", 0);
+            profileData.put("point", 7852);
+            m_db.insert("profile_point", null, profileData);
+            profileData = new ContentValues();
+            profileData.put("profile", 0);
+            profileData.put("point", 7871);
+            m_db.insert("profile_point", null, profileData);
+            profileData = new ContentValues();
+            profileData.put("profile", 0);
+            profileData.put("point", 7558);
+            m_db.insert("profile_point", null, profileData);
+            profileData = new ContentValues();
+            profileData.put("profile", 0);
+            profileData.put("point", 7519);
+            m_db.insert("profile_point", null, profileData);
+            profileData = new ContentValues();
+            profileData.put("profile", 0);
+            profileData.put("point", 7448);
+            m_db.insert("profile_point", null, profileData);
+            profileData = new ContentValues();
+            profileData.put("profile", 0);
+            profileData.put("point", 7428);
+            m_db.insert("profile_point", null, profileData);
+
+
+            profileData = new ContentValues();
+            profileData.put("profile", 1);
+            profileData.put("point", 37);
+            m_db.insert("profile_point", null, profileData);
+            profileData = new ContentValues();
+            profileData.put("profile", 1);
+            profileData.put("point", 4263);
+            m_db.insert("profile_point", null, profileData);
+            profileData = new ContentValues();
+            profileData.put("profile", 1);
+            profileData.put("point", 20461);
+            m_db.insert("profile_point", null, profileData);
+
+
+            profileData = new ContentValues();
+            profileData.put("profile", 2);
+            profileData.put("point", 20473);
+            m_db.insert("profile_point", null, profileData);
+            profileData = new ContentValues();
+            profileData.put("profile", 2);
+            profileData.put("point", 7420);
+            m_db.insert("profile_point", null, profileData);
+            profileData = new ContentValues();
+            profileData.put("profile", 2);
+            profileData.put("point", 7338);
+            m_db.insert("profile_point", null, profileData);
+            profileData = new ContentValues();
+            profileData.put("profile", 2);
+            profileData.put("point", 7841);
+            m_db.insert("profile_point", null, profileData);
+            profileData = new ContentValues();
+            profileData.put("profile", 2);
+            profileData.put("point", 7512);
+            m_db.insert("profile_point", null, profileData);
+
+
+            m_db.setTransactionSuccessful();
+            m_db.endTransaction();
+
 	    return null;
 	}
     }
