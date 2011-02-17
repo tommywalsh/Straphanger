@@ -9,11 +9,13 @@ import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.content.Intent;
 import java.util.SortedSet;
 import java.io.Serializable;
+import java.util.Vector;
 
 
 // This activity is a viewer that displays all the upcoming departures for a particular profile
@@ -35,6 +37,7 @@ public class DepartureViewer extends ListActivity
     // Here's the data this class holds on to
     private SortedSet<Departure> m_departures = null;   // when are the busses leaving?
     private Profile m_profile = null;                   // which busses do we care about?
+    private Vector<Integer> m_departurePoints = null;    // which busses at which stops do we care about?
 
     // Scheduler that allows us to update the screen, and send periodic requests for new data
     private Handler m_handler = new Handler();
@@ -60,11 +63,16 @@ public class DepartureViewer extends ListActivity
 	m_aa = new ArrayAdapter<String>(this, R.layout.listitem);
         m_departures = null;
 
+
         // ... unpack the profile of interesting busses that has been sent to us...
         Intent i = getIntent();
-        Serializable s = i.getSerializableExtra(getString(R.string.profile_in_intent));
-        m_profile = (Profile)s;
-        assert (m_profile != null);
+	Serializable s2 = i.getSerializableExtra(getString(R.string.new_profile_in_intent));
+
+	int[] dp = (int[])s2;
+	m_departurePoints = new Vector<Integer>(dp.length);
+	for (int ix = 0; ix < dp.length; ix++) {
+	    m_departurePoints.addElement(dp[ix]);
+	}
     }
 
 
@@ -181,8 +189,12 @@ public class DepartureViewer extends ListActivity
     private void requestDepartureData() {
         
         // Send a request for the data which will be fulfilled later
-        assert(m_profile != null);
-	DepartureFinder.requestDeparturesForProfile(m_profile, new DepartureCallback());
+	if (m_departurePoints != null) {
+	    DepartureFinder.requestPredictionsForDeparturePoints(getApplicationContext(), m_departurePoints, new DepartureCallback());
+	} else {	    
+	    assert(m_profile != null);
+	    DepartureFinder.requestDeparturesForProfile(m_profile, new DepartureCallback());
+	}
     }
 		
     // Handle departure information from the server

@@ -36,7 +36,6 @@ public class ProfileProvider
 
     public Profile getProfile(int index) {
         Vector<Profile> profs = getAllProfiles();
-	android.util.Log.d("mbta", "Got index " + (new Integer(index).toString()));
         return profs.elementAt(index);
     }
 

@@ -14,8 +14,7 @@ import java.util.Vector;
 
 public class ProximityProfileGenerator
 {
-
-    public static void new_getProximityProfile(SQLiteDatabase db, double lat, double lng, double radius)
+    public static Vector<Integer> new_getProximityProfile(SQLiteDatabase db, double lat, double lng, double radius)
     {
 	final double rLat = latsPerMile * radius;
 	final double rLng = lngsPerMile * radius;
@@ -29,7 +28,7 @@ public class ProximityProfileGenerator
         p.name = "Nearby Busses";
 
 
-        String sql = "SELECT lat,lng,title,subroute FROM departure_point,stop " +
+        String sql = "SELECT lat,lng,subroute,departure_point.id FROM departure_point,stop " +
             " WHERE stop.tag = departure_point.stop " +
             " AND lat < " + maxLat.toString() +
             " AND lat > " + minLat.toString() +
@@ -40,37 +39,50 @@ public class ProximityProfileGenerator
         Cursor cursor = db.rawQuery(sql, null);
         cursor.moveToFirst();
         String currentSubRoute = null;
-        String currentTitle = new String();
         double currentDistance = 0.0;
+	int currentDeparturePoint = -1;
+	Vector<Integer> departurePoints = new Vector<Integer>();
+
         while (!cursor.isAfterLast()) {
             double newLat = Double.parseDouble(cursor.getString(0));
             double newLng = Double.parseDouble(cursor.getString(1));
+            String newSubRoute = cursor.getString(2);
+	    int newDeparturePoint = cursor.getInt(3);
+
             double newDistance = distanceBetween(newLat, newLng, lat, lng);
-            String newSubRoute = cursor.getString(3);
+
             
             if (newSubRoute.equals(currentSubRoute)) {
                 // This is not the first stop we've seen on this route
+
+		// If it's closer that all the others we've seen...
                 if (newDistance < currentDistance) {
-                    // This point is closer that the other ones on this route
+                    // ... then remember it...
                     currentDistance = newDistance;
-                    currentTitle = cursor.getString(2);
+		    currentDeparturePoint = newDeparturePoint;
                 }
-                // otherwise throw this point away
+                // ... otherwise throw it away
+
             } else {
                 // This is the first point on a new route
+
+		// If this is not the first new route...
                 if (currentSubRoute != null) {
-                    // commit the old one here
-                    android.util.Log.d("mbta", currentTitle + " on route " + currentSubRoute);
+
+                    // ... then store the closest point from the previous route
+		    departurePoints.addElement(currentDeparturePoint);
                 }
                 currentSubRoute = newSubRoute;
                 currentDistance = newDistance;
-                currentTitle = cursor.getString(2);
+		currentDeparturePoint = newDeparturePoint;
             }
-                
             cursor.moveToNext();
         }
-        
 
+	// Don't forget to store the closest point from the final route
+	departurePoints.addElement(currentDeparturePoint);
+
+	return departurePoints;
     }
 
     // Given a postion (lat/lng), and a radius (in miles),

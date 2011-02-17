@@ -159,9 +159,6 @@ public class DatabaseBuilder
 	    Xml.parse(getStream(getRouteListURL()), Xml.Encoding.UTF_8, getRouteListHandler(routeTags));
 	    tags = routeTags;
 
-	    for (String tag : tags) {
-		Log.d("mbta", tag);
-	    }
 	} catch (Exception e) {
 	    android.util.Log.d("mbta", "Failure to parse route list");
 	    android.util.Log.d("mbta", "Exception: " + e.toString());
@@ -259,7 +256,6 @@ public class DatabaseBuilder
 
     private static URL urlFromString(String str)
     {
-	Log.d("mbta", "String is " + str);
 	try {
 	    return new URL(str);
 	} catch (java.net.MalformedURLException e) {

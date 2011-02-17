@@ -9,12 +9,15 @@ import android.sax.RootElement;
 import android.sax.Element;
 import android.sax.StartElementListener;
 import android.util.Xml;
-
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.Cursor;
 import org.xml.sax.Attributes;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.TreeSet;
+import java.util.Vector;
 import java.lang.Thread;
 import java.io.InputStream;
 import java.net.URL;
@@ -60,7 +63,24 @@ public class DepartureFinder
 	requesterThread.start();
     }
 
-
+    static public void requestPredictionsForDeparturePoints(Context appContext, Vector<Integer> departurePoints, Callback callback)
+    {
+	final Context c = appContext;
+	final Vector<Integer> dp = departurePoints;
+	final Callback cb = callback;
+	Thread requesterThread = new Thread() {
+		@Override public void run() {
+		    try {
+			SortedSet<Departure> departures = parse(getPredictionStream(c,dp));
+			cb.onReceived(departures);
+		    } catch (java.io.IOException e) {
+			android.util.Log.d("MBTA", e.toString());
+			cb.onFailed();
+		    }
+		}
+	    };
+	requesterThread.start();	
+    }
 
     // This function should be run on its own thread.  It will establish a connection with the server,
     // and parse the data into usable objects "on the fly".  It may take a long time to complete.
@@ -126,8 +146,53 @@ public class DepartureFinder
 
     }
 
+    private static URL getPredictionURLForDeparturePoints(Context appContext, Vector<Integer> departurePoints) 
+    {
+        MBTADBOpenHelper openHelper = new MBTADBOpenHelper(appContext);
+	SQLiteDatabase db = openHelper.getReadableDatabase();
+
+	String query = "SELECT stop.tag,subroute.route,departure_point.id " +
+	    " FROM stop,subroute,departure_point " +
+	    " WHERE stop.tag = departure_point.stop " +
+	    " AND subroute.tag = departure_point.subroute " +
+	    " AND departure_point.id IN ( ";
+
+	boolean comma = false;
+	for (Integer pt : departurePoints) {
+	    if (comma) {
+		query += ",";
+	    } else {
+		comma = true;
+	    }
+	    query += pt.toString();
+	}
+	query += ")";
+
+        Cursor cursor = db.rawQuery(query, null);
+        cursor.moveToFirst();
+	String urlString = "http://webservices.nextbus.com/service/publicXMLFeed?command=predictionsForMultiStops&a=mbta";
+        while (!cursor.isAfterLast()) {
+	    // I think this null is a bug.  We should be matching on direction, too, probably.
+	    urlString += "&stops=" + cursor.getString(1) + "|null|" + cursor.getString(0);
+	    cursor.moveToNext();
+	}
+	
+	try {
+	    return new URL(urlString);
+	} catch (java.net.MalformedURLException e) {
+	    return null;
+	}
+
+    }
+
+
     private static InputStream getPredictionStream(Profile p) throws java.io.IOException {
 	URL url = getPredictionURLForProfile(p);
+	return url.openStream();
+    }
+
+    private static InputStream getPredictionStream(Context appContext, Vector<Integer> departurePoints) throws java.io.IOException {
+	URL url = getPredictionURLForDeparturePoints(appContext, departurePoints);
 	return url.openStream();
     }
 
