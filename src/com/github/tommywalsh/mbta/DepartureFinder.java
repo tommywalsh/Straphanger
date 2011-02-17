@@ -45,24 +45,6 @@ public class DepartureFinder
 
     // Send a request for data to the server.
     // Some time later the passed-in callback will be executed on a different thread.
-    static public void requestDeparturesForProfile(Profile profile, Callback callback)
-    {
-	final Profile p = profile;
-	final Callback cb = callback;
-	Thread requesterThread = new Thread() {
-		@Override public void run() {
-		    try {
-			SortedSet<Departure> departures = parse(getPredictionStream(p));
-			cb.onReceived(departures);
-		    } catch (java.io.IOException e) {
-			android.util.Log.d("MBTA", e.toString());
-			cb.onFailed();
-		    }
-		}
-	    };
-	requesterThread.start();
-    }
-
     static public void requestPredictionsForDeparturePoints(Context appContext, Vector<Integer> departurePoints, Callback callback)
     {
 	final Context c = appContext;
@@ -129,23 +111,6 @@ public class DepartureFinder
 	
     }
     
-
-
-    // Helper functions
-    private static URL getPredictionURLForProfile(Profile p) 
-    {
-	String urlString = "http://webservices.nextbus.com/service/publicXMLFeed?command=predictionsForMultiStops&a=mbta";
-	for (DeparturePoint s : p.stops) {
-	    urlString += "&stops=" + s.route.tag + "|null|" + s.tag;
-	}
-	try {
-	    return new URL(urlString);
-	} catch (java.net.MalformedURLException e) {
-	    return null;
-	}
-
-    }
-
     private static URL getPredictionURLForDeparturePoints(Context appContext, Vector<Integer> departurePoints) 
     {
         MBTADBOpenHelper openHelper = new MBTADBOpenHelper(appContext);
@@ -183,12 +148,6 @@ public class DepartureFinder
 	    return null;
 	}
 
-    }
-
-
-    private static InputStream getPredictionStream(Profile p) throws java.io.IOException {
-	URL url = getPredictionURLForProfile(p);
-	return url.openStream();
     }
 
     private static InputStream getPredictionStream(Context appContext, Vector<Integer> departurePoints) throws java.io.IOException {

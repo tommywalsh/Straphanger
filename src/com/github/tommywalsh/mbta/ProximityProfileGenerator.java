@@ -27,10 +27,6 @@ public class ProximityProfileGenerator
         Double minLng = new Double(lng - rLng);
         Double maxLng = new Double(lng + rLng);
 
-        Profile p = new Profile();
-        p.name = "Nearby Busses";
-
-
         String sql = "SELECT lat,lng,subroute,departure_point.id FROM departure_point,stop " +
             " WHERE stop.tag = departure_point.stop " +
             " AND lat < " + maxLat.toString() +

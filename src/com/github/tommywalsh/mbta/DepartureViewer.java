@@ -24,11 +24,11 @@ import java.util.Vector;
 // This activity does not produce anything, save for pixels on a screen.  So, if you
 // want to activate it, only use startActivity() and not startActivityForResult().
 //
-// The activity REQUIRES a profile in order to work.  So, when you activate it, you MUST
-// store the desired profile in the Intent you use to start this activity.  Like this:
+// The activity REQUIRES an array of departure points in order to work.  So, when you activate it, you MUST
+// store them in the Intent you use to start this activity.  Like this:
 //
 //      Intent i = new Intent(this, DepartureViewer.class);
-//      i.putExtra("com.github.tommywalsh.mbta.Profile", p);
+//	i.putExtra(getString(R.string.departures_in_intent), myDeparturePointArray);
 //      startActivity(i);
 
 
@@ -36,7 +36,6 @@ public class DepartureViewer extends ListActivity
 {
     // Here's the data this class holds on to
     private SortedSet<Departure> m_departures = null;   // when are the busses leaving?
-    private Profile m_profile = null;                   // which busses do we care about?
     private Vector<Integer> m_departurePoints = null;    // which busses at which stops do we care about?
 
     // Scheduler that allows us to update the screen, and send periodic requests for new data
@@ -67,21 +66,14 @@ public class DepartureViewer extends ListActivity
         // ... unpack the profile of interesting busses that has been sent to us...
         Intent i = getIntent();
 
-        // Try the old format first...
-        Serializable s = i.getSerializableExtra(getString(R.string.profile_in_intent));
-        if (s != null) {
-            m_profile = (Profile)s;
-        } else {
-            //.. otherwise the new one
-            Serializable s2 = i.getSerializableExtra(getString(R.string.departures_in_intent));
-            assert(s2 != null);
-            int[] dp = (int[])s2;
+        Serializable s = i.getSerializableExtra(getString(R.string.departures_in_intent));
+        assert(s != null);
+        int[] dp = (int[])s;
 
-            // TODO: can we just keep the array instead of making a vector?
-            m_departurePoints = new Vector<Integer>(dp.length);
-            for (int ix = 0; ix < dp.length; ix++) {
-                m_departurePoints.addElement(dp[ix]);
-            }
+        // TODO: can we just keep the array instead of making a vector?
+        m_departurePoints = new Vector<Integer>(dp.length);
+        for (int ix = 0; ix < dp.length; ix++) {
+            m_departurePoints.addElement(dp[ix]);
         }
     }
 
@@ -201,9 +193,6 @@ public class DepartureViewer extends ListActivity
         // Send a request for the data which will be fulfilled later
 	if (m_departurePoints != null) {
 	    DepartureFinder.requestPredictionsForDeparturePoints(getApplicationContext(), m_departurePoints, new DepartureCallback());
-	} else {	    
-	    assert(m_profile != null);
-	    DepartureFinder.requestDeparturesForProfile(m_profile, new DepartureCallback());
 	}
     }
 		
