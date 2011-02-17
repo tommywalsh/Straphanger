@@ -66,13 +66,23 @@ public class DepartureViewer extends ListActivity
 
         // ... unpack the profile of interesting busses that has been sent to us...
         Intent i = getIntent();
-	Serializable s2 = i.getSerializableExtra(getString(R.string.new_profile_in_intent));
 
-	int[] dp = (int[])s2;
-	m_departurePoints = new Vector<Integer>(dp.length);
-	for (int ix = 0; ix < dp.length; ix++) {
-	    m_departurePoints.addElement(dp[ix]);
-	}
+        // Try the old format first...
+        Serializable s = i.getSerializableExtra(getString(R.string.profile_in_intent));
+        if (s != null) {
+            m_profile = (Profile)s;
+        } else {
+            //.. otherwise the new one
+            Serializable s2 = i.getSerializableExtra(getString(R.string.departures_in_intent));
+            assert(s2 != null);
+            int[] dp = (int[])s2;
+
+            // TODO: can we just keep the array instead of making a vector?
+            m_departurePoints = new Vector<Integer>(dp.length);
+            for (int ix = 0; ix < dp.length; ix++) {
+                m_departurePoints.addElement(dp[ix]);
+            }
+        }
     }
 
 

@@ -76,10 +76,8 @@ public class Straphanger extends Activity
             if (request == s_locationPickerId) {
                 double lat = data.getDoubleExtra("com.github.tommywalsh.mbta.Lat", 0.0);
                 double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0);
-                Vector<Integer> departurePoints = ProximityProfileGenerator.new_getProximityProfile(m_db, lat, lng, 0.5);
+                Vector<Integer> departurePoints = ProximityProfileGenerator.getProximityProfile(m_db, lat, lng, 0.5);
 		viewDepartures(departurePoints);
-		//                Profile p = ProximityProfileGenerator.getProximityProfile(lat, lng, 0.5);
-                //viewDeparturesForProfile(p);
             }
         }
     }
@@ -112,7 +110,7 @@ public class Straphanger extends Activity
 	    Integer i = new Integer(transitArray[ix]);
 	}
 	Intent i = new Intent(this, DepartureViewer.class);
-	i.putExtra(getString(R.string.new_profile_in_intent), transitArray);
+	i.putExtra(getString(R.string.departures_in_intent), transitArray);
 	startActivity(i);        
     }
 

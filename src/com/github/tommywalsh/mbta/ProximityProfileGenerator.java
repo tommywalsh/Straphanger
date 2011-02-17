@@ -14,7 +14,10 @@ import java.util.Vector;
 
 public class ProximityProfileGenerator
 {
-    public static Vector<Integer> new_getProximityProfile(SQLiteDatabase db, double lat, double lng, double radius)
+    // Given a postion (lat/lng), and a radius (in miles),
+    // returns a profile that the closest DeparturePoints for all
+    // routes that stop within the given radius
+    public static Vector<Integer> getProximityProfile(SQLiteDatabase db, double lat, double lng, double radius)
     {
 	final double rLat = latsPerMile * radius;
 	final double rLng = lngsPerMile * radius;
@@ -85,22 +88,6 @@ public class ProximityProfileGenerator
 	return departurePoints;
     }
 
-    // Given a postion (lat/lng), and a radius (in miles),
-    // returns a profile that the closest DeparturePoints for all
-    // routes that stop within the given radius
-    public static Profile getProximityProfile(double lat, double lng, double radius)
-    {
-        Profile p = new Profile();
-        p.name = "Nearby Busses";
-
-	for (Route ri: Route.getAllRoutes()) {
-            for (StopHelper sih : getClosestStop(lat, lng, ri, radius)) {
-                p.stops.addElement(sih.dp);
-            }
-        }
-
-        return p;
-    }
 
     // These are approximations that only make sense near Boston
     private static final double latsPerMile = 0.0144578;
