@@ -6,7 +6,8 @@
 package com.github.tommywalsh.mbta;
 
 import android.content.Context;
-
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import java.util.Vector;
 import java.io.Serializable;
 import java.io.ObjectInputStream;
@@ -26,12 +27,37 @@ public class ProfileProvider
     }
 
 
-    public Vector<String> getProfileNames() {
-        Vector<String> names = new Vector<String>();
-        names.addElement("Home to Work");
-        names.addElement("Work to Home");
-        names.addElement("Red Line to Home");
-	return names;
+    public Vector<NewProfile> getProfiles() {
+        MBTADBOpenHelper openHelper = new MBTADBOpenHelper(m_context.getApplicationContext());
+	SQLiteDatabase db = openHelper.getReadableDatabase();
+        String query = "SELECT id,name FROM profile"; // TODO: make this a pre-compiled query
+        Cursor cursor = db.rawQuery(query,null);
+        cursor.moveToFirst();
+        Vector<NewProfile> profiles = new Vector<NewProfile>();
+        while (!(cursor.isAfterLast())) {
+            NewProfile profile = new NewProfile();
+            profile.id = cursor.getInt(0);
+            profile.name = cursor.getString(1);
+            profiles.addElement(profile);
+            cursor.moveToNext();
+        }
+        return profiles;
+    }
+
+
+    public Vector<Integer> getDeparturePointsInProfile(int profileId) {
+        MBTADBOpenHelper openHelper = new MBTADBOpenHelper(m_context.getApplicationContext());
+	SQLiteDatabase db = openHelper.getReadableDatabase();
+        Integer pid = new Integer(profileId);
+        String query = "SELECT point FROM profile_point WHERE profile = " + pid.toString();
+        Vector<Integer> departurePoints = new Vector<Integer>();
+        Cursor cursor = db.rawQuery(query,null);
+        cursor.moveToFirst();
+        while(!(cursor.isAfterLast())) {
+            departurePoints.addElement(new Integer(cursor.getInt(0)));
+            cursor.moveToNext();
+        }
+        return departurePoints;
     }
 
     public Profile getProfile(int index) {

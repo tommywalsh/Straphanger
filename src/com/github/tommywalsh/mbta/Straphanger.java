@@ -37,19 +37,27 @@ public class Straphanger extends Activity
 
     // Small dialog to load from a list of stored profiles
     Dialog getProfilePickerDialog() {
-	String[] buffer = {};
-	Vector<String> profileNames = m_profProvider.getProfileNames();
+        Vector<NewProfile> profiles = m_profProvider.getProfiles();
+        final int size = profiles.size();
+	final String[] names = new String[size];
+        final int[] ids = new int[size];
+        for (int i = 0; i < size; i++) {
+            NewProfile p = profiles.elementAt(i);
+            names[i] = p.name;
+            android.util.Log.d("mbta", p.name);
+            ids[i] = p.id;
+        }
+        
 	AlertDialog.Builder builder = new AlertDialog.Builder(this);
 	builder.setTitle("Pick a profile");
-	builder.setItems(profileNames.toArray(buffer), new DialogInterface.OnClickListener() {
+	builder.setItems(names, new DialogInterface.OnClickListener() {                
 		public void onClick(DialogInterface d, int id) {
-		    viewDeparturesForProfile(m_profProvider.getProfile(id));
+		    viewDepartures(m_profProvider.getDeparturePointsInProfile(ids[id]));
 		}
 	    });
 
 	return builder.create();
     }
-
 
     private OnClickListener m_databaseListener = new OnClickListener() {
 	    public void onClick(View v) {
