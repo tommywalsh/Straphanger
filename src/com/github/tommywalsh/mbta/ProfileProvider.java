@@ -23,17 +23,16 @@ public class ProfileProvider
 	m_context = context;
     }
 
+    // TODO: why not just pass cursor out?
     public Vector<Profile> getProfiles() {
-        MBTADBOpenHelper openHelper = new MBTADBOpenHelper(m_context.getApplicationContext());
-	SQLiteDatabase db = openHelper.getReadableDatabase();
-        String query = "SELECT id,name FROM profile"; // TODO: make this a pre-compiled query
-        Cursor cursor = db.rawQuery(query,null);
-        cursor.moveToFirst();
+	Database db = new Database(m_context);
+	Database.ProfileCursorWrapper cursor = db.getProfiles();
+	cursor.moveToFirst();
         Vector<Profile> profiles = new Vector<Profile>();
         while (!(cursor.isAfterLast())) {
             Profile profile = new Profile();
-            profile.id = cursor.getInt(0);
-            profile.name = cursor.getString(1);
+            profile.id = cursor.getProfileId();
+            profile.name = cursor.getProfileName();
             profiles.addElement(profile);
             cursor.moveToNext();
         }
@@ -41,13 +40,11 @@ public class ProfileProvider
     }
 
 
+    // TODO: why not just pass cursor out?
     public Vector<Integer> getDeparturePointsInProfile(int profileId) {
-        MBTADBOpenHelper openHelper = new MBTADBOpenHelper(m_context.getApplicationContext());
-	SQLiteDatabase db = openHelper.getReadableDatabase();
-        Integer pid = new Integer(profileId);
-        String query = "SELECT point FROM profile_point WHERE profile = " + pid.toString();
+	Database db = new Database(m_context);
+	Database.DeparturePointCursorWrapper cursor = db.getDeparturePointsInProfile(profileId);
         Vector<Integer> departurePoints = new Vector<Integer>();
-        Cursor cursor = db.rawQuery(query,null);
         cursor.moveToFirst();
         while(!(cursor.isAfterLast())) {
             departurePoints.addElement(new Integer(cursor.getInt(0)));

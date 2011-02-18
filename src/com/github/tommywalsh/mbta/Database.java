@@ -112,5 +112,54 @@ public class Database
 	return new NearbyDeparturePointCursorWrapper(cursor);
     }
 
+
+
+
+
+
+    public class ProfileCursorWrapper extends CursorWrapper
+    {
+	public ProfileCursorWrapper(Cursor cursor) {
+	    super(cursor);
+	}
+	public String getProfileName() {
+	    return getString(1);
+	}
+	public int getProfileId() {
+	    return getInt(0);
+	}
+    }
+
+
+
+    public ProfileCursorWrapper getProfiles()
+    {
+	// TODO: Make this a precompiled sql statement
+	String sql = "SELECT id,name FROM profile"; // TODO: make this a pre-c
+        Cursor cursor = m_db.rawQuery(sql, null);
+	return new ProfileCursorWrapper(cursor);
+    }
+
+
+
+
+    public class DeparturePointCursorWrapper extends CursorWrapper
+    {
+	public DeparturePointCursorWrapper(Cursor cursor) {
+	    super(cursor);
+	}
+	public int getDeparturePointId() {
+	    return getInt(0);
+	}
+    }
+
+
+    public DeparturePointCursorWrapper getDeparturePointsInProfile(int profileId)
+    {
+	String query = "SELECT point FROM profile_point WHERE profile = " + Integer.toString(profileId);
+        Cursor cursor = m_db.rawQuery(query, null);
+	return new DeparturePointCursorWrapper(cursor);
+    }
+
 }
 
