@@ -35,7 +35,7 @@ import java.util.Vector;
 public class DepartureViewer extends ListActivity
 {
     // Here's the data this class holds on to
-    private SortedSet<Departure> m_departures = null;   // when are the busses leaving?
+    private SortedSet<Prediction> m_predictions = null;   // when are the busses leaving?
     private Vector<Integer> m_departurePoints = null;    // which busses at which stops do we care about?
 
     // Scheduler that allows us to update the screen, and send periodic requests for new data
@@ -60,8 +60,7 @@ public class DepartureViewer extends ListActivity
 
         // ... set up our array adapter...
 	m_aa = new ArrayAdapter<String>(this, R.layout.listitem);
-        m_departures = null;
-
+	m_predictions = null;
 
         // ... unpack the profile of interesting busses that has been sent to us...
         Intent i = getIntent();
@@ -118,7 +117,7 @@ public class DepartureViewer extends ListActivity
 
     // Actually update the display.  This must be called from the GUI thread only.
     private void updateDisplay() {
-        if (m_departures == null) {
+        if (m_predictions == null) {
             if (m_downloadingDialog == null) {
                 m_downloadingDialog = ProgressDialog.show(this, "", getString(R.string.download_message), true);
             }
@@ -131,13 +130,13 @@ public class DepartureViewer extends ListActivity
             m_aa.clear();
             long now = java.lang.System.currentTimeMillis();
             
-            for (Departure d : m_departures) {
+            for (Prediction p : m_predictions) {
                 
                 // We're only going to refresh every so often -- say X seconds,
                 // so this data will be stale for an average of X/2
                 // seconds.  Deduct X/2 seconds from the time left
                 // so that we "average out" the error
-                int secondsLeft = (int) ((d.when - now) / 1000);
+                int secondsLeft = (int) ((p.when - now) / 1000);
                 secondsLeft -= s_refreshInterval/2000;
                 
                 if (secondsLeft > 0) {
@@ -145,7 +144,7 @@ public class DepartureViewer extends ListActivity
                     int minutes = (secondsLeft - hours*3600) / 60;
                     int seconds = (secondsLeft - hours*3600 - minutes*60);
                     
-                    String mess = d.route.title + " to " + d.direction + " stops at " + d.title + " in ";
+                    String mess = p.routeTitle + " to " + p.routeDirection + " stops at " + p.stopTitle + " in ";
                     if (hours > 0) {
                         mess += (new Integer(hours)).toString() + ":";
                         if (minutes < 10) {
@@ -199,9 +198,9 @@ public class DepartureViewer extends ListActivity
     // Handle departure information from the server
     // These callbacks will be run on another thread
     private class DepartureCallback implements DepartureFinder.Callback {
-	@Override public void onReceived(SortedSet<Departure> departures) {
+	@Override public void onReceived(SortedSet<Prediction> predictions) {
 
-	    m_departures = departures;
+	    m_predictions = predictions;
 	    
 	    // refresh the display ASAP on the GUI thread
 	    m_handler.post(m_displayUpdater);

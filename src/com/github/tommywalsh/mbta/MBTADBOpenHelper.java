@@ -26,33 +26,10 @@ public class MBTADBOpenHelper extends SQLiteOpenHelper
 	db.execSQL(createTable(DEPARTURE_POINT_NAME, DEPARTURE_POINT_SCHEMA));
 	db.execSQL(createTable(PROFILE_NAME, PROFILE_SCHEMA));
 	db.execSQL(createTable(PROFILE_POINTS_NAME, PROFILE_POINTS_SCHEMA));
-
-	//	insertRoutes(db);
     }
 
     @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     }
-
-    private void insertRoute(SQLiteDatabase db, Route route) 
-    {
-	ContentValues cv = new ContentValues();
-	cv.putNull("id");
-	cv.put("tag", route.tag);
-	cv.put("title", route.title);
-	cv.put("minLat", route.minLat);
-	cv.put("maxLat", route.maxLat);
-	cv.put("minLng", route.minLng);
-	cv.put("maxLng", route.maxLng);
-	db.insert(ROUTE_NAME, null, cv);
-    }
-
-    private void insertRoutes(SQLiteDatabase db) 
-    {
-	for(Route route : Route.getAllRoutes()) {
-	    insertRoute(db, route);
-	}
-    }
-
 
     private static final String DATABASE_NAME = "straphanger";
     private static final int DATABASE_VERSION = 1;

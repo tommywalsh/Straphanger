@@ -36,7 +36,7 @@ public class DepartureFinder
 
 	// Called if and when server responds with departures
 	// Note that the set may be empty if there are no upcoming departures
-	public void onReceived(SortedSet<Departure> departures);
+	public void onReceived(SortedSet<Prediction> departures);
 
 	// Called if server call fails for any reason
 	public void onFailed();
@@ -53,7 +53,7 @@ public class DepartureFinder
 	Thread requesterThread = new Thread() {
 		@Override public void run() {
 		    try {
-			SortedSet<Departure> departures = parse(getPredictionStream(c,dp));
+			SortedSet<Prediction> departures = parse(getPredictionStream(c,dp));
 			cb.onReceived(departures);
 		    } catch (java.io.IOException e) {
 			android.util.Log.d("MBTA", e.toString());
@@ -66,38 +66,38 @@ public class DepartureFinder
 
     // This function should be run on its own thread.  It will establish a connection with the server,
     // and parse the data into usable objects "on the fly".  It may take a long time to complete.
-    static private TreeSet<Departure> parse(InputStream is) 
+    static private TreeSet<Prediction> parse(InputStream is) 
     {	
 	final String NS = "";
-	final TreeSet<Departure> departures = new TreeSet<Departure>();
-	final Departure pendingDeparture = new Departure();
+	final TreeSet<Prediction> predictions = new TreeSet<Prediction>();
+	final Prediction pendingPrediction = new Prediction();
 	
 	RootElement root = new RootElement("body");
 	
 	Element preds = root.getChild(NS, "predictions");
 	preds.setStartElementListener(new StartElementListener() {
 		public void start(Attributes atts) {
-		    pendingDeparture.route = Route.getRoute(atts.getValue("routeTag"));
-		    pendingDeparture.title = atts.getValue("stopTitle");
+		    pendingPrediction.routeTitle = atts.getValue("routeTitle");
+		    pendingPrediction.stopTitle = atts.getValue("stopTitle");
 		}
 	    });
 	
 	Element dir = preds.getChild(NS, "direction");
 	dir.setStartElementListener(new StartElementListener() {
 		public void start(Attributes atts) {
-		    pendingDeparture.direction = atts.getValue("title");
+		    pendingPrediction.routeDirection = atts.getValue("title");
 		}
 	    });
 	
 	Element pred = dir.getChild(NS, "prediction");
 	pred.setStartElementListener(new StartElementListener() {
 		public void start(Attributes atts) {
-		    Departure d = new Departure();
-		    d.route = pendingDeparture.route;
-		    d.title = pendingDeparture.title;
-		    d.direction = pendingDeparture.direction;
-		    d.when = Long.decode(atts.getValue("epochTime"));
-		    departures.add(d);
+		    Prediction p = new Prediction();
+		    p.routeTitle = pendingPrediction.routeTitle;
+		    p.stopTitle = pendingPrediction.stopTitle;
+		    p.routeDirection = pendingPrediction.routeDirection;
+		    p.when = Long.decode(atts.getValue("epochTime"));
+		    predictions.add(p);
 		}
 	    });
 	
@@ -107,7 +107,7 @@ public class DepartureFinder
 	    android.util.Log.d("mbta", e.toString());
 	}
 	
-	return departures;
+	return predictions;
 	
     }
     
