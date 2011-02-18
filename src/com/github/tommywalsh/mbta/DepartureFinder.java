@@ -117,7 +117,7 @@ public class DepartureFinder
         cursor.moveToFirst();
 	String urlString = "http://webservices.nextbus.com/service/publicXMLFeed?command=predictionsForMultiStops&a=mbta";
         while (!cursor.isAfterLast()) {
-	    urlString += "&stops=" + cursor.getString(1) + "|null|" + cursor.getString(0);
+	    urlString += "&stops=" + cursor.getRouteTag() + "|null|" + cursor.getStopTag();
 	    cursor.moveToNext();
 	}
 	
