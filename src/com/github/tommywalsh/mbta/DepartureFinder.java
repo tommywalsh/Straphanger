@@ -10,8 +10,6 @@ import android.sax.Element;
 import android.sax.StartElementListener;
 import android.util.Xml;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.Cursor;
 import org.xml.sax.Attributes;
 
 import java.util.SortedSet;
@@ -113,31 +111,12 @@ public class DepartureFinder
     
     private static URL getPredictionURLForDeparturePoints(Context appContext, Vector<Integer> departurePoints) 
     {
-        MBTADBOpenHelper openHelper = new MBTADBOpenHelper(appContext);
-	SQLiteDatabase db = openHelper.getReadableDatabase();
+	Database db = new Database(appContext);
 
-	String query = "SELECT stop.tag,subroute.route,departure_point.id " +
-	    " FROM stop,subroute,departure_point " +
-	    " WHERE stop.tag = departure_point.stop " +
-	    " AND subroute.tag = departure_point.subroute " +
-	    " AND departure_point.id IN ( ";
-
-	boolean comma = false;
-	for (Integer pt : departurePoints) {
-	    if (comma) {
-		query += ",";
-	    } else {
-		comma = true;
-	    }
-	    query += pt.toString();
-	}
-	query += ")";
-
-        Cursor cursor = db.rawQuery(query, null);
+	Database.RouteStopCursorWrapper cursor = db.getRoutesAndStopsForDeparturePoints(departurePoints);
         cursor.moveToFirst();
 	String urlString = "http://webservices.nextbus.com/service/publicXMLFeed?command=predictionsForMultiStops&a=mbta";
         while (!cursor.isAfterLast()) {
-	    // I think this null is a bug.  We should be matching on direction, too, probably.
 	    urlString += "&stops=" + cursor.getString(1) + "|null|" + cursor.getString(0);
 	    cursor.moveToNext();
 	}
