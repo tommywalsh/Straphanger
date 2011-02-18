@@ -37,15 +37,18 @@ public class Straphanger extends Activity
 
     // Small dialog to load from a list of stored profiles
     Dialog getProfilePickerDialog() {
-        Vector<Profile> profiles = m_profProvider.getProfiles();
-        final int size = profiles.size();
+        Database db = new Database(this);
+        Database.ProfileCursorWrapper cursor = db.getProfiles();
+        
+        final int size = cursor.getCount();
 	final String[] names = new String[size];
         final int[] ids = new int[size];
-        for (int i = 0; i < size; i++) {
-            Profile p = profiles.elementAt(i);
-            names[i] = p.name;
-            android.util.Log.d("mbta", p.name);
-            ids[i] = p.id;
+
+        cursor.moveToFirst();
+        for (int i = 0; i < size & !(cursor.isAfterLast()); i++) {
+            names[i] = cursor.getProfileName();
+            ids[i] = cursor.getProfileId();
+            cursor.moveToNext();
         }
         
 	AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -84,7 +87,7 @@ public class Straphanger extends Activity
             if (request == s_locationPickerId) {
                 double lat = data.getDoubleExtra("com.github.tommywalsh.mbta.Lat", 0.0);
                 double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0);
-                Vector<Integer> departurePoints = ProximityProfileGenerator.getProximityProfile(m_db, lat, lng, 0.5);
+                Vector<Integer> departurePoints = ProximityProfileGenerator.getProximityProfile(this, lat, lng, 0.5);
 		viewDepartures(departurePoints);
             }
         }
