@@ -1,33 +1,33 @@
 
 The planned arcitecture will look something like this:
 
+--------- Database -----------
+Route: describes one complete MBTA bus route with all variations.  (e.g. the 86)
+- tag: MBTA's unique ID for the route
+- title: Displayable name (usually just the same as the tag, except for special busses like the silver line)
 
-----------  Data Types -------------
+Stop: describes a single bus stop somewhere in the system (e.g. the one in front of El Potro in Union Square)
+- tag: MBTA's unique ID for the stop
+- title: Displayable name (e.g. "30 Prospect Street")
+- lat/lng: Physical location of the stop
 
-Stop: a location where one can catch a bus.
-  - MBTA id
-  - latitude and longitude
-  - text description (e.g. "Washington St. at Parker St.")
+Subroute: describes a single direction or variation of a route (e.g. "86 to Sullivan via Harvard")
+- tag: MBTA's unique ID for the subroute (they call it a "direction")
+- route: ID of the route
+- title: Displayable title (e.g. "to Central")
 
-Route: Description of an MBTA bus route
-  - identifier (e.g. "87")
-  - text description ("Spring Hill - Lechmere")
-  - set of directions ("to Ringe Ave. via Porter", "Central via Porter")
-  - sets of stops (one set of stops per direction)
+Departure_point: associates a series of stops with a subroute
+- id: internal unique ID
+- stopNum: tells how far along the subroute this stop is (e.g. the fifteenth stop on the subroute)
+- subroute: tag for the subroute
+- stop: tag for the stop
 
-DeparturePoint: Relation between a stop and (route,direction)
-  (e.g. "At stop 35142, you can catch the 87 to Sullivan")
+Profile: Describes a user-saved set of interesting bus departures
+- id: internal unique ID
+- name: Displayable description of profile (e.g. "Home to Subway")
 
-Profile: A set of related DeparturePoints
-  - text description ("Union Square busses that go to the subway")
-
-Departure: Relation between a DeparturePoint and a time
-  (e.g. "At 3:15, you can catch the 87 to Sullivan from stop 35142")
-
-DepartureSet: Set of related departures
-
--------------------------------------
-
+Profile_point: Association between departure_points with profiles
+-------------------------------
 
 
 
@@ -35,24 +35,23 @@ DepartureSet: Set of related departures
 ------- Main Actors ----------
 
 LocationPicker: allows user to select a point on a map (including "my current location")
- - takes user interaction
  - provides latitude/longitude pair
 
 ProximityProfileGenerator: finds nearby departure points 
  - takes lat/long pair and distance threshold
- - provides a Profile
+ - provides a list of departure point IDs
 
-ProfileEditor: allows user to name and refine a Profile
+ProfileEditor (future): allows user to name and refine a Profile
  - takes a Profile
  - takes user interaction
  - provides a (refined) Profile
 
 DepartureFinder: queries server for departure times
- - takes a Profile
- - returns a DepartureSet
+ - takes a list of departure points
+ - provides descriptions of which busses will be leaving from where at what times
 
 DepartureViewer: displays upcoming departures
- - takes a DepartureSet
+ - takes descriptions from DepartureFinder
  - shows to user
 
 ---------------------------------
