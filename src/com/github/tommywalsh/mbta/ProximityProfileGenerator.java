@@ -7,9 +7,6 @@ package com.github.tommywalsh.mbta;
 
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import java.util.AbstractMap;
 import java.util.Vector;
 
 public class ProximityProfileGenerator

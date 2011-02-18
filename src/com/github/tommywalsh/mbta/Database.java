@@ -11,6 +11,20 @@ import android.database.CursorWrapper;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.Vector;
+
+
+
+// This class acts as a wrapper for the database.  Callers don't need to 
+// worry about setting up any SQL on their end.  Typical use is like this:
+//
+// Database my_db = new Database(mycontext);
+// SpecializedCursor cursor = my_db.getStuffIWant();
+// cursor.moveToFront();
+// while (!(cursor.isAfterEnd())) {
+//     doSomethingWithValue(cursor.getSpecificValue());
+//     cursor.moveToNext();
+// }
+//
 public class Database
 {
     private SQLiteDatabase m_db;

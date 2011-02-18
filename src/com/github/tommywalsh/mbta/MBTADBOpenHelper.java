@@ -10,6 +10,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.content.Context;
 import android.content.ContentValues;
 
+// This class is called automatically by the SQL database when necessary
+// Its job is to set up the tables for the DB.  Note that this class
+// does not load the DB with data.  See DatabaseBuilder for that.
 public class MBTADBOpenHelper extends SQLiteOpenHelper
 {
     MBTADBOpenHelper(Context context) {

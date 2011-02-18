@@ -14,7 +14,6 @@ import org.xml.sax.Attributes;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.TreeSet;
 import java.util.Vector;
 import java.lang.Thread;
 import java.io.InputStream;

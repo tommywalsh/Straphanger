@@ -6,15 +6,15 @@
 package com.github.tommywalsh.mbta;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import java.util.Vector;
-import java.io.Serializable;
-import java.io.ObjectInputStream;
-import java.io.FileInputStream;
-import java.io.ObjectOutputStream;
-import java.io.FileOutputStream;
 
+// This class may be eliminatable in the future.  Right now, it's sole purpose
+// is to provide a list of departure points in a particular profile.  This
+// data needs to be used in the same way as the data returned from 
+// ProximityProfileGenerator.  Should that class be modified to insert its
+// info into the database, or should we change to an interface that both
+// data sources can provide, then this class can be eliminated, and callers
+// can go straight to the database.
 public class ProfileProvider
 {
     private Context m_context;

@@ -5,6 +5,8 @@
 
 package com.github.tommywalsh.mbta;
 
+
+// Information to pass to a user about which bus leaves when from where to where
 public class Prediction implements Comparable {
     public long when;
     public String stopTitle;

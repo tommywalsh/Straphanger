@@ -28,7 +28,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase;
 
 
-
+// This class's job is to rebuild the database from scratch
+// It throws away whatever DB exists already, and downloads
+// anew from the server.  Takes a long time.
 public class DatabaseBuilder
 {
     // Must pass in the application context here, so that 
