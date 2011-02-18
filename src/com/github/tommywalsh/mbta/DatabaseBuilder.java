@@ -88,11 +88,11 @@ public class DatabaseBuilder
 
             m_db.beginTransaction();
 
-            m_db.delete("route", null, null);
+	    m_db.delete("route", null, null);
             m_db.delete("stop", null, null);
 	    m_db.delete("subroute", null, null);
 	    m_db.delete("departure_point", null, null);
-
+	    
 
             // For now, hard-code the profiles
             // TODO: get rid of this once we have a profile editor
@@ -103,16 +103,15 @@ public class DatabaseBuilder
             profileData.put("name", "Home to Subway");
             m_db.insert("profile", null, profileData);
             profileData = new ContentValues();
-            profileData.put("id", 1);
+            profileData.put("id", 2);
             profileData.put("name", "Red Line to Home");
             m_db.insert("profile", null, profileData);
             profileData = new ContentValues();
-            profileData.put("id", 2);
+            profileData.put("id", 1);
             profileData.put("name", "MPHS to Home");
             m_db.insert("profile", null, profileData);
 
-
-            
+	    
 	    Vector<String> routeList = parseRouteList();
 	    publishProgress(routeList.size());
 	    int numProcessed = 0;
@@ -146,7 +145,6 @@ public class DatabaseBuilder
 		numProcessed++;
 		publishProgress(numProcessed);
             }
-
 
 
             // These numbers are based on an already-existing database
