@@ -9,12 +9,12 @@ import android.sax.RootElement;
 import android.sax.Element;
 import android.sax.StartElementListener;
 import android.util.Xml;
-
+import android.content.Context;
 import org.xml.sax.Attributes;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.TreeSet;
+import java.util.Vector;
 import java.lang.Thread;
 import java.io.InputStream;
 import java.net.URL;
@@ -33,7 +33,7 @@ public class DepartureFinder
 
 	// Called if and when server responds with departures
 	// Note that the set may be empty if there are no upcoming departures
-	public void onReceived(SortedSet<Departure> departures);
+	public void onReceived(SortedSet<Prediction> departures);
 
 	// Called if server call fails for any reason
 	public void onFailed();
@@ -42,14 +42,15 @@ public class DepartureFinder
 
     // Send a request for data to the server.
     // Some time later the passed-in callback will be executed on a different thread.
-    static public void requestDeparturesForProfile(Profile profile, Callback callback)
+    static public void requestPredictionsForDeparturePoints(Context appContext, Vector<Integer> departurePoints, Callback callback)
     {
-	final Profile p = profile;
+	final Context c = appContext;
+	final Vector<Integer> dp = departurePoints;
 	final Callback cb = callback;
 	Thread requesterThread = new Thread() {
 		@Override public void run() {
 		    try {
-			SortedSet<Departure> departures = parse(getPredictionStream(p));
+			SortedSet<Prediction> departures = parse(getPredictionStream(c,dp));
 			cb.onReceived(departures);
 		    } catch (java.io.IOException e) {
 			android.util.Log.d("MBTA", e.toString());
@@ -57,45 +58,43 @@ public class DepartureFinder
 		    }
 		}
 	    };
-	requesterThread.start();
+	requesterThread.start();	
     }
-
-
 
     // This function should be run on its own thread.  It will establish a connection with the server,
     // and parse the data into usable objects "on the fly".  It may take a long time to complete.
-    static private TreeSet<Departure> parse(InputStream is) 
+    static private TreeSet<Prediction> parse(InputStream is) 
     {	
 	final String NS = "";
-	final TreeSet<Departure> departures = new TreeSet<Departure>();
-	final Departure pendingDeparture = new Departure();
+	final TreeSet<Prediction> predictions = new TreeSet<Prediction>();
+	final Prediction pendingPrediction = new Prediction();
 	
 	RootElement root = new RootElement("body");
 	
 	Element preds = root.getChild(NS, "predictions");
 	preds.setStartElementListener(new StartElementListener() {
 		public void start(Attributes atts) {
-		    pendingDeparture.route = Route.getRoute(atts.getValue("routeTag"));
-		    pendingDeparture.title = atts.getValue("stopTitle");
+		    pendingPrediction.routeTitle = atts.getValue("routeTitle");
+		    pendingPrediction.stopTitle = atts.getValue("stopTitle");
 		}
 	    });
 	
 	Element dir = preds.getChild(NS, "direction");
 	dir.setStartElementListener(new StartElementListener() {
 		public void start(Attributes atts) {
-		    pendingDeparture.direction = atts.getValue("title");
+		    pendingPrediction.routeDirection = atts.getValue("title");
 		}
 	    });
 	
 	Element pred = dir.getChild(NS, "prediction");
 	pred.setStartElementListener(new StartElementListener() {
 		public void start(Attributes atts) {
-		    Departure d = new Departure();
-		    d.route = pendingDeparture.route;
-		    d.title = pendingDeparture.title;
-		    d.direction = pendingDeparture.direction;
-		    d.when = Long.decode(atts.getValue("epochTime"));
-		    departures.add(d);
+		    Prediction p = new Prediction();
+		    p.routeTitle = pendingPrediction.routeTitle;
+		    p.stopTitle = pendingPrediction.stopTitle;
+		    p.routeDirection = pendingPrediction.routeDirection;
+		    p.when = Long.decode(atts.getValue("epochTime"));
+		    predictions.add(p);
 		}
 	    });
 	
@@ -105,19 +104,22 @@ public class DepartureFinder
 	    android.util.Log.d("mbta", e.toString());
 	}
 	
-	return departures;
+	return predictions;
 	
     }
     
-
-
-    // Helper functions
-    private static URL getPredictionURLForProfile(Profile p) 
+    private static URL getPredictionURLForDeparturePoints(Context appContext, Vector<Integer> departurePoints) 
     {
+	Database db = new Database(appContext);
+
+	Database.RouteStopCursorWrapper cursor = db.getRoutesAndStopsForDeparturePoints(departurePoints);
+        cursor.moveToFirst();
 	String urlString = "http://webservices.nextbus.com/service/publicXMLFeed?command=predictionsForMultiStops&a=mbta";
-	for (DeparturePoint s : p.stops) {
-	    urlString += "&stops=" + s.route.tag + "|null|" + s.tag;
+        while (!cursor.isAfterLast()) {
+	    urlString += "&stops=" + cursor.getRouteTag() + "|null|" + cursor.getStopTag();
+	    cursor.moveToNext();
 	}
+	
 	try {
 	    return new URL(urlString);
 	} catch (java.net.MalformedURLException e) {
@@ -126,8 +128,8 @@ public class DepartureFinder
 
     }
 
-    private static InputStream getPredictionStream(Profile p) throws java.io.IOException {
-	URL url = getPredictionURLForProfile(p);
+    private static InputStream getPredictionStream(Context appContext, Vector<Integer> departurePoints) throws java.io.IOException {
+	URL url = getPredictionURLForDeparturePoints(appContext, departurePoints);
 	return url.openStream();
     }
 

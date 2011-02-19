@@ -27,9 +27,8 @@ public class ProfileEditor extends ListActivity
         super.onCreate(savedInstanceState);
 
         Intent i = getIntent();
-        Serializable s = i.getSerializableExtra(getString(R.string.profile_in_intent));
-        Profile profile = (Profile)s;
-        if (profile == null) {
+        int profileId = i.getIntExtra(getString(R.string.profile_in_intent), -1);
+        if (profileId == -1) {
             android.util.Log.d("mbta", "no profile, edit new");
         } else {
             android.util.Log.d("mbta", "got a profile, edit existing");
