@@ -14,8 +14,13 @@ import java.util.Vector;
 
 
 
-// This class acts as a wrapper for the database.  Callers don't need to 
-// worry about setting up any SQL on their end.  Typical use is like this:
+// This class acts as a wrapper for the database.  The class is mainly
+// organized in pairs of getters and cursor wrappers.  You call the 
+// getter you're interested in, and receive a specialized cursor wrapper
+// that provides the data you're looking for.
+//
+// Callers don't need to worry about setting up any SQL on their end.  
+// Typical use is like this:
 //
 // Database my_db = new Database(mycontext);
 // SpecializedCursor cursor = my_db.getStuffIWant();
@@ -173,6 +178,38 @@ public class Database
 	String query = "SELECT point FROM profile_point WHERE profile = " + Integer.toString(profileId);
         Cursor cursor = m_db.rawQuery(query, null);
 	return new DeparturePointCursorWrapper(cursor);
+    }
+
+
+
+    public class ProfileInfoCursorWrapper extends CursorWrapper
+    {
+	public ProfileInfoCursorWrapper(Cursor cursor) {
+	    super(cursor);
+	}
+        public String getRouteTitle() {
+            return getString(0);
+        }
+        public String getSubrouteTitle() {
+            return getString(1);
+        }
+        public String getStopTitle() {
+            return getString(2);
+        }
+    }
+
+
+    public ProfileInfoCursorWrapper getProfileInfo(int profileId)
+    {
+	String query = "SELECT route.title, subroute.title, stop.title " +
+            " FROM stop,subroute,route,departure_point,profile_point " +
+            " WHERE stop.tag = departure_point.stop " +
+            " AND route.tag = subroute.route " +
+            " AND subroute.tag = departure_point.subroute " +
+            " AND departure_point.id = profile_point.point " +
+            " AND profile_point.profile = " + Integer.toString(profileId);
+        Cursor cursor = m_db.rawQuery(query, null);
+	return new ProfileInfoCursorWrapper(cursor);
     }
 
 }
