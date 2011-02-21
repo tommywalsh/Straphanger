@@ -11,13 +11,15 @@ import android.content.Intent;
 import android.content.Context;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.TextView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
 
 import java.io.Serializable;
-
+import java.util.Vector;
 
 // This is an on-screen editor that lets users edit profiles
 //   You may pass a profile in the Intent you use to spawn the activity
@@ -40,8 +42,11 @@ public class ProfileEditor extends ListActivity
         int profileId = i.getIntExtra(getString(R.string.profile_in_intent), -1);
 
 
+        Button addToProfileButton = (Button)findViewById(R.id.add_to_profile);
+        addToProfileButton.setOnClickListener(m_addToProfileListener);
+
         Database db = new Database(this);
-        setListAdapter(new ProfileCursorAdapter(db.getProfileInfo(profileId)));
+        setListAdapter(new ProfileInfoAdapter(db.getProfileInfo(profileId)));
     }
 
 
@@ -57,8 +62,17 @@ public class ProfileEditor extends ListActivity
 
 
 
+    
+    private OnClickListener m_addToProfileListener = new OnClickListener() {
+	    public void onClick(View v) {
+                android.util.Log.d("mbta", "add to profile");
+	    }
+	};
 
-    private class ProfileCursorAdapter extends BaseAdapter 
+
+
+
+    private class ProfileInfoAdapter extends BaseAdapter 
     {
         public class Info 
         {
@@ -67,23 +81,32 @@ public class ProfileEditor extends ListActivity
             String route;
         }
 
-        private Database.ProfileInfoCursorWrapper m_cursor;
-        public ProfileCursorAdapter(Database.ProfileInfoCursorWrapper cursor) {
-            m_cursor = cursor;
+        private Vector<Info> m_profileInfo = new Vector<Info>();
+        public ProfileInfoAdapter(Database.ProfileInfoCursorWrapper cursor) {
+            // We could just keep a handle to the cursor, and only extract data when we need to.
+            // BUT!  We know we're going to need to access it all anyhow, and converting to a 
+            // vector here allows us to add and remove stuff during the editing session quickly,
+            // and without worrying about overlapping cursors, and pending DB transactions, etc.
+            cursor.moveToFirst();
+            while (!(cursor.isAfterLast())) {
+                Info i = new Info();
+                i.stop = cursor.getStopTitle();
+                i.route = cursor.getRouteTitle();
+                i.subroute = cursor.getSubrouteTitle();
+                m_profileInfo.addElement(i);
+                cursor.moveToNext();
+            }
+
         }
 
         public int getCount() {
-            return m_cursor.getCount();
+            return m_profileInfo.size();
         }
         
         public Object getItem(int position) {
-            Info i = new Info();
-            m_cursor.moveToPosition(position);
-            i.stop = m_cursor.getStopTitle();
-            i.route = m_cursor.getRouteTitle();
-            i.subroute = m_cursor.getSubrouteTitle();
-            return i;
+            return m_profileInfo.elementAt(position);
         }
+
         public long getItemId(int position) {
             return position;
         }
@@ -94,16 +117,16 @@ public class ProfileEditor extends ListActivity
                 convertView = inflater.inflate(R.layout.profile_entry, null);
             }
 
-            m_cursor.moveToPosition(position);
+            Info thisInfo = m_profileInfo.elementAt(position);
             
             TextView routeWidget = (TextView) convertView.findViewById(R.id.route_title);
-            routeWidget.setText(m_cursor.getRouteTitle());
+            routeWidget.setText(thisInfo.route);
 
             TextView subrouteWidget = (TextView) convertView.findViewById(R.id.subroute_title);
-            subrouteWidget.setText(m_cursor.getSubrouteTitle());
+            subrouteWidget.setText(thisInfo.subroute);
 
             TextView stopWidget = (TextView) convertView.findViewById(R.id.stop_title);
-            stopWidget.setText(m_cursor.getStopTitle());
+            stopWidget.setText(thisInfo.stop);
                 
             return convertView;
         }

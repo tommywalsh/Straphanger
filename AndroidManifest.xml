@@ -12,6 +12,7 @@
   
   <application 
      android:label="Straphanger" 
+     android:theme="@android:style/Theme.NoTitleBar"
      >
     
 
@@ -20,7 +21,6 @@
     <activity android:name=".Straphanger" 
 	      android:label="Straphanger" 
 	      android:launchMode="singleTask"      
-	      android:theme="@android:style/Theme.NoTitleBar"
 	      >
 
       <intent-filter>

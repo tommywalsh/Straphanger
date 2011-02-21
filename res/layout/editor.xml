@@ -3,17 +3,34 @@
               android:orientation="vertical" 
               android:layout_width="fill_parent"
               android:layout_height="fill_parent">
-  
+
+<!--
+  <TextView android:id="@+id/profile_name"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Untitled Profile"
+            android:gravity="center"
+            />
+  -->
+
   <ListView android:id="@+id/android:list" 
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent" 
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
             />
 
   <TextView android:id="@id/android:empty"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_weight="10"
+            android:layout_height="wrap_content"
             android:background="#ff0000"
             android:text="No stops in this profile" 
             />
+
+  <Button android:id="@+id/add_to_profile"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:text="Add Busses to Profile"
+          />
 
 </LinearLayout>
