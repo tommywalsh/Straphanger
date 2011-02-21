@@ -38,6 +38,10 @@ public class Database
         MBTADBOpenHelper openHelper = new MBTADBOpenHelper(context.getApplicationContext());
 	m_db = openHelper.getReadableDatabase();
     }
+    void close() {
+        m_db.close();
+    }
+
 
 
 

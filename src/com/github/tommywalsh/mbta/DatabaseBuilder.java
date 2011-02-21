@@ -35,10 +35,8 @@ public class DatabaseBuilder
 {
     // Must pass in the application context here, so that 
     // database may be shared with entire application
-    public DatabaseBuilder(Context appContext) 
+    public DatabaseBuilder()
     {
-	MBTADBOpenHelper openHelper = new MBTADBOpenHelper(appContext);
-	m_db = openHelper.getWritableDatabase();
     }
 
     // Returns immediately, but opens progress dialog on the given context
@@ -87,6 +85,9 @@ public class DatabaseBuilder
 	}
 
 	@Override protected Void doInBackground(java.lang.Void... v) {
+            
+            MBTADBOpenHelper openHelper = new MBTADBOpenHelper(m_ctx);
+            SQLiteDatabase m_db = openHelper.getWritableDatabase();
 
             m_db.beginTransaction();
 
@@ -136,9 +137,6 @@ public class DatabaseBuilder
 	    return null;
 	}
     }
-
-    private SQLiteDatabase m_db;
-
 
     private static class RouteInfoHelper
     {

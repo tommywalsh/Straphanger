@@ -15,8 +15,6 @@ import android.widget.Button;
 import android.content.Intent;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteDatabase;
 
 import java.util.Vector;
 
@@ -44,9 +42,11 @@ public class Straphanger extends Activity
                 for (int i = 0; i < size & !(cursor.isAfterLast()); i++) {
                     names[i] = cursor.getProfileName();
                     ids[i] = cursor.getProfileId();
-                    cursor.moveToNext();
+                    cursor.moveToNext();                    
                 }
-        
+                cursor.close();
+                db.close();
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(Straphanger.this);
                 builder.setTitle("Pick a profile");
 
@@ -138,18 +138,13 @@ public class Straphanger extends Activity
 
 
     private DatabaseBuilder m_dbBuilder;
-    private SQLiteDatabase m_db;
 
     @Override public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_screen);
 
-	m_dbBuilder = new DatabaseBuilder(getApplicationContext());
-
-        MBTADBOpenHelper openHelper = new MBTADBOpenHelper(getApplicationContext());
-	m_db = openHelper.getReadableDatabase();
-
+	m_dbBuilder = new DatabaseBuilder();
 	m_profProvider = new ProfileProvider(this);
 	
 

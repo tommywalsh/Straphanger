@@ -119,7 +119,9 @@ public class DepartureFinder
 	    urlString += "&stops=" + cursor.getRouteTag() + "|null|" + cursor.getStopTag();
 	    cursor.moveToNext();
 	}
-	
+        cursor.close();
+        db.close();
+        
 	try {
 	    return new URL(urlString);
 	} catch (java.net.MalformedURLException e) {

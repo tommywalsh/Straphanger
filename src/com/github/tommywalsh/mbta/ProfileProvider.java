@@ -33,6 +33,8 @@ public class ProfileProvider
             departurePoints.addElement(new Integer(cursor.getInt(0)));
             cursor.moveToNext();
         }
+        cursor.close();
+        db.close();
         return departurePoints;
     }
 

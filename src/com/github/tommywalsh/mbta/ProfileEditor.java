@@ -64,27 +64,43 @@ public class ProfileEditor extends ListActivity
         Button deleteProfileButton = (Button)findViewById(R.id.delete_profile);
         deleteProfileButton.setOnClickListener(m_deleteProfileListener);
 
-        m_db = new Database(this);
-        Database.DeparturePointCursorWrapper cursor = m_db.getDeparturePointsInProfile(m_profileId);
+
+    }
+
+
+    private Database getDB() {
+        if (m_db == null) {
+            m_db = new Database(this);
+        }
+        return m_db;
+    }
+    private void closeDB() {
+        if (m_db != null) {
+            m_db.close();
+            m_db = null;
+        }
+    }
+
+    
+    @Override protected void onResume() {
+        super.onResume();
+
+        Database db = getDB();
+        Database.DeparturePointCursorWrapper cursor = db.getDeparturePointsInProfile(m_profileId);
         cursor.moveToFirst();
         while(!(cursor.isAfterLast())) {
             m_departures.addElement(cursor.getDeparturePointId());
             cursor.moveToNext();
         }
+        cursor.close();
 
         m_checkMap = new boolean[m_departures.size()];
         setListAdapter(new ProfileInfoAdapter(m_db.getProfileInfo(m_departures)));
     }
-
-
-
-    
-    @Override protected void onResume() {
-        super.onResume();
-    }
     
     @Override protected void onPause() {
         super.onPause();
+        closeDB();
     }
 
 
@@ -111,7 +127,7 @@ public class ProfileEditor extends ListActivity
                 builder.setNegativeButton("Cancel", null);
                 builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            m_db.saveProfile(m_profileId, tv.getText().toString(), m_departures);
+                            getDB().saveProfile(m_profileId, tv.getText().toString(), m_departures);
                             finish();
                         }
                     });
@@ -131,7 +147,7 @@ public class ProfileEditor extends ListActivity
                 builder.setNegativeButton("OMFG! Noooo!", null);
                 builder.setPositiveButton("Yes!  GTFO!", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            m_db.deleteProfile(m_profileId);
+                            getDB().deleteProfile(m_profileId);
                             finish();
                         }
                     });
@@ -150,7 +166,7 @@ public class ProfileEditor extends ListActivity
                 }
                 m_departures = newDepartures;
                 m_checkMap = new boolean[m_departures.size()];
-                setListAdapter(new ProfileInfoAdapter(m_db.getProfileInfo(m_departures)));
+                setListAdapter(new ProfileInfoAdapter(getDB().getProfileInfo(m_departures)));
 	    }
 	};
 
@@ -163,7 +179,7 @@ public class ProfileEditor extends ListActivity
                 Vector<Integer> newDeparturePoints = ProximityProfileGenerator.getProximityProfile(this, lat, lng, 0.25);
                 m_departures.addAll(newDeparturePoints);
                 m_checkMap = new boolean[m_departures.size()];
-                setListAdapter(new ProfileInfoAdapter(m_db.getProfileInfo(m_departures)));
+                setListAdapter(new ProfileInfoAdapter(getDB().getProfileInfo(m_departures)));
             }
         }
     }
@@ -198,6 +214,7 @@ public class ProfileEditor extends ListActivity
                 m_departures.addElement(cursor.getDepartureId());
                 cursor.moveToNext();
             }
+            cursor.close();
             m_checkMap = new boolean[m_departures.size()];
         }
 

@@ -60,6 +60,8 @@ public class ProximityProfileGenerator
             }
             cursor.moveToNext();
         }
+        cursor.close();
+        db.close();
 
 	// Don't forget to store the closest point from the final route
 	departurePoints.addElement(currentDeparturePoint);
