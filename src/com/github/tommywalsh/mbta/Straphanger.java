@@ -25,9 +25,6 @@ public class Straphanger extends Activity
     private static final int s_locationPickerId = 1050;
     private static final int s_profileDialogId  = 1060;
     private ProfileProvider m_profProvider;
-    private enum ProfileAction {LOAD, EDIT};
-    ProfileAction m_nextProfileAction;;
-            
 
 
     // What to do when we click on the "stored profiles" button
@@ -35,51 +32,47 @@ public class Straphanger extends Activity
 	    public void onClick(View v) {
                 Button button = (Button)v;
                 assert(button != null);
+                
+                Database db = new Database(Straphanger.this);
+                Database.ProfileCursorWrapper cursor = db.getProfiles();
+        
+                final int size = cursor.getCount();
+                final String[] names = new String[size];
+                final int[] ids = new int[size];
+                
+                cursor.moveToFirst();
+                for (int i = 0; i < size & !(cursor.isAfterLast()); i++) {
+                    names[i] = cursor.getProfileName();
+                    ids[i] = cursor.getProfileId();
+                    cursor.moveToNext();
+                }
+        
+                AlertDialog.Builder builder = new AlertDialog.Builder(Straphanger.this);
+                builder.setTitle("Pick a profile");
+
                 if (button == m_loadProfileButton) {
-                    m_nextProfileAction = ProfileAction.LOAD;
+                    builder.setItems(names, new DialogInterface.OnClickListener() {                
+                            public void onClick(DialogInterface d, int id) {
+                                viewDepartures(m_profProvider.getDeparturePointsInProfile(ids[id]));
+                            }
+                        });
                 } else {
-                    assert (button == m_editProfileButton);
-                    m_nextProfileAction = ProfileAction.EDIT;
+                    assert(button == m_editProfileButton);
+                    builder.setItems(names, new DialogInterface.OnClickListener() {                
+                            public void onClick(DialogInterface d, int id) {
+                                launchEditor(ids[id]);
+                            }
+                        });
                 }
 
-		showDialog(s_profileDialogId);
+                AlertDialog dlg = builder.create();
+                dlg.setOwnerActivity(Straphanger.this);
+                dlg.show();
 	    }
 	};
 
 
-    // Small dialog to load from a list of stored profiles
-    Dialog getProfilePickerDialog() {
-        Database db = new Database(this);
-        Database.ProfileCursorWrapper cursor = db.getProfiles();
-        
-        final int size = cursor.getCount();
-	final String[] names = new String[size];
-        final int[] ids = new int[size];
-
-        cursor.moveToFirst();
-        for (int i = 0; i < size & !(cursor.isAfterLast()); i++) {
-            names[i] = cursor.getProfileName();
-            ids[i] = cursor.getProfileId();
-            cursor.moveToNext();
-        }
-        
-	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-	builder.setTitle("Pick a profile");
-	builder.setItems(names, new DialogInterface.OnClickListener() {                
-		public void onClick(DialogInterface d, int id) {
-                    switch (m_nextProfileAction) {
-                      case LOAD:
-                        viewDepartures(m_profProvider.getDeparturePointsInProfile(ids[id]));
-                        break;
-                      case EDIT:
-                        launchEditor(ids[id]);
-                        break;
-                    }
-		}
-	    });
-
-	return builder.create();
-    }
+    
 
     private OnClickListener m_databaseListener = new OnClickListener() {
 	    public void onClick(View v) {
@@ -129,16 +122,6 @@ public class Straphanger extends Activity
             }
         }
     }
-
-    // Called when a dialog is requested
-    public Dialog onCreateDialog(int index) {
-	switch (index) {
-          case s_profileDialogId:
-	    return getProfilePickerDialog();
-          default:
-	    return super.onCreateDialog(index);
-	}
-    } 
 
 
     private void viewDepartures(Vector<Integer> dp) {

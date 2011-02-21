@@ -112,6 +112,7 @@ public class ProfileEditor extends ListActivity
                 builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             m_db.saveProfile(m_profileId, tv.getText().toString(), m_departures);
+                            finish();
                         }
                     });
                 builder.show();
@@ -131,6 +132,7 @@ public class ProfileEditor extends ListActivity
                 builder.setPositiveButton("Yes!  GTFO!", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             m_db.deleteProfile(m_profileId);
+                            finish();
                         }
                     });
                 builder.show();
