@@ -61,6 +61,9 @@ public class ProfileEditor extends ListActivity
         Button saveProfileButton = (Button)findViewById(R.id.save_profile);
         saveProfileButton.setOnClickListener(m_saveProfileListener);
 
+        Button deleteProfileButton = (Button)findViewById(R.id.delete_profile);
+        deleteProfileButton.setOnClickListener(m_deleteProfileListener);
+
         m_db = new Database(this);
         Database.DeparturePointCursorWrapper cursor = m_db.getDeparturePointsInProfile(m_profileId);
         cursor.moveToFirst();
@@ -102,6 +105,7 @@ public class ProfileEditor extends ListActivity
                 AlertDialog.Builder builder = new AlertDialog.Builder(ProfileEditor.this);
                 builder.setTitle("Profile Name");
                 builder.setCancelable(true);
+                // TODO: Store name!
                 tv.setText("Foo");
                 builder.setView(tv);
                 builder.setNegativeButton("Cancel", null);
@@ -113,6 +117,26 @@ public class ProfileEditor extends ListActivity
                 builder.show();
             }
         };
+
+
+    private OnClickListener m_deleteProfileListener = new OnClickListener() {
+	    public void onClick(View v) {
+                TextView tv = new TextView(ProfileEditor.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(ProfileEditor.this);
+                builder.setCancelable(true);
+                builder.setTitle("Delete Profile?");
+                tv.setText("For realz???");
+                builder.setView(tv);
+                builder.setNegativeButton("OMFG! Noooo!", null);
+                builder.setPositiveButton("Yes!  GTFO!", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            m_db.deleteProfile(m_profileId);
+                        }
+                    });
+                builder.show();
+            }
+        };
+
 
     private OnClickListener m_deleteFromProfileListener = new OnClickListener() {
 	    public void onClick(View v) {

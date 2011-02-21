@@ -249,8 +249,13 @@ public class Database
             cv.put("profile", rowId);
             cv.put("point", i);
             m_db.insert("profile_point", null, cv);
-        }
-       
+        }       
+    }
+
+    public void deleteProfile(int profileId)
+    {
+        m_db.delete("profile", "id = " + profileId, null);
+        m_db.delete("profile_point", "profile = " + profileId, null);
     }
 }
 

@@ -41,8 +41,17 @@
               android:text="Delete Selected"
               />
 
+
+    </TableRow>
+
+    <TableRow>
+
       <Button android:id="@+id/save_profile"
               android:text="Save Profile"
+              />
+      
+      <Button android:id="@+id/delete_profile"
+              android:text="Delete Profile"
               />
 
     </TableRow>
