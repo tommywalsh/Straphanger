@@ -40,6 +40,7 @@ public class ProfileEditor extends ListActivity
     private Vector<Integer> m_departures = new Vector<Integer>();
     private boolean[] m_checkMap;
     private Database m_db;
+    private int m_profileId;
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +49,7 @@ public class ProfileEditor extends ListActivity
         Intent i = getIntent();
         // We know that -1 won't be in the database as an index.  Use it here as code for 
         // "new profile"
-        int profileId = i.getIntExtra(getString(R.string.profile_in_intent), -1);
+        m_profileId = i.getIntExtra(getString(R.string.profile_in_intent), -1);
 
 
         Button addToProfileButton = (Button)findViewById(R.id.add_to_profile);
@@ -61,7 +62,7 @@ public class ProfileEditor extends ListActivity
         saveProfileButton.setOnClickListener(m_saveProfileListener);
 
         m_db = new Database(this);
-        Database.DeparturePointCursorWrapper cursor = m_db.getDeparturePointsInProfile(profileId);
+        Database.DeparturePointCursorWrapper cursor = m_db.getDeparturePointsInProfile(m_profileId);
         cursor.moveToFirst();
         while(!(cursor.isAfterLast())) {
             m_departures.addElement(cursor.getDeparturePointId());
@@ -106,7 +107,7 @@ public class ProfileEditor extends ListActivity
                 builder.setNegativeButton("Cancel", null);
                 builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            android.util.Log.d("mbta", "Saving as " + tv.getText());
+                            m_db.saveProfile(m_profileId, tv.getText().toString(), m_departures);
                         }
                     });
                 builder.show();

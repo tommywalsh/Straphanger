@@ -6,6 +6,7 @@
 package com.github.tommywalsh.mbta;
 
 import android.content.Context;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.database.sqlite.SQLiteDatabase;
@@ -225,5 +226,31 @@ public class Database
 	return new ProfileInfoCursorWrapper(cursor);
     }
 
+
+
+    public void saveProfile(int profileId, String name, Vector<Integer> departurePoints) 
+    {
+        ContentValues profileValues = new ContentValues();
+        profileValues.put("name", name);
+        if (profileId < 0) {            
+            android.util.Log.d("mbta", "Saving new profile " + name);
+            profileValues.putNull("id");
+        } else {
+            android.util.Log.d("mbta", "Renaming profile " + Integer.toString(profileId) + " to "+ name);
+            profileValues.put("id", profileId);
+        }
+
+        // TODO: is this row id guaranteed to be the same as the primary key?
+        long rowId = m_db.insert("profile", null, profileValues);
+        
+        m_db.delete("profile_point", "profile = " + rowId, null);
+        for (Integer i : departurePoints) {
+            ContentValues cv = new ContentValues();
+            cv.put("profile", rowId);
+            cv.put("point", i);
+            m_db.insert("profile_point", null, cv);
+        }
+       
+    }
 }
 
