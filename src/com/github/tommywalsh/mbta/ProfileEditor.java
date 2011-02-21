@@ -46,7 +46,15 @@ public class ProfileEditor extends ListActivity
         addToProfileButton.setOnClickListener(m_addToProfileListener);
 
         Database db = new Database(this);
-        setListAdapter(new ProfileInfoAdapter(db.getProfileInfo(profileId)));
+        Database.DeparturePointCursorWrapper cursor = db.getDeparturePointsInProfile(profileId);
+        cursor.moveToFirst();
+        Vector<Integer> ids = new Vector<Integer>();
+        while(!(cursor.isAfterLast())) {
+            ids.addElement(cursor.getDeparturePointId());
+            cursor.moveToNext();
+        }
+    
+        setListAdapter(new ProfileInfoAdapter(db.getProfileInfo(ids)));
     }
 
 
@@ -62,12 +70,24 @@ public class ProfileEditor extends ListActivity
 
 
 
-    
+    private static final int s_locationPickerId = 2050;    
     private OnClickListener m_addToProfileListener = new OnClickListener() {
 	    public void onClick(View v) {
-                android.util.Log.d("mbta", "add to profile");
+                // Launch the location picker.  We'll infer busses when it returns
+                startActivityForResult(new Intent(ProfileEditor.this, LocationPicker.class), s_locationPickerId);
 	    }
 	};
+
+    @Override public void onActivityResult(int request, int result, Intent data) {
+        if (result == RESULT_OK) {
+            if (request == s_locationPickerId) {
+                double lat = data.getDoubleExtra("com.github.tommywalsh.mbta.Lat", 0.0);
+                double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0.0);
+                Vector<Integer> departurePoints = ProximityProfileGenerator.getProximityProfile(this, lat, lng, 0.5);
+            }
+        }
+    }
+
 
 
 
@@ -76,6 +96,7 @@ public class ProfileEditor extends ListActivity
     {
         public class Info 
         {
+            Integer id;
             String stop;
             String subroute;
             String route;
@@ -93,6 +114,7 @@ public class ProfileEditor extends ListActivity
                 i.stop = cursor.getStopTitle();
                 i.route = cursor.getRouteTitle();
                 i.subroute = cursor.getSubrouteTitle();
+                i.id = cursor.getDepartureId();
                 m_profileInfo.addElement(i);
                 cursor.moveToNext();
             }
