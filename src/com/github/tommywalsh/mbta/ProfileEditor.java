@@ -6,14 +6,17 @@
 package com.github.tommywalsh.mbta;
 
 import android.app.ListActivity;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.content.Intent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
+import android.widget.EditText;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.view.View;
@@ -54,6 +57,9 @@ public class ProfileEditor extends ListActivity
         Button deleteFromProfileButton = (Button)findViewById(R.id.delete_from_profile);
         deleteFromProfileButton.setOnClickListener(m_deleteFromProfileListener);
 
+        Button saveProfileButton = (Button)findViewById(R.id.save_profile);
+        saveProfileButton.setOnClickListener(m_saveProfileListener);
+
         m_db = new Database(this);
         Database.DeparturePointCursorWrapper cursor = m_db.getDeparturePointsInProfile(profileId);
         cursor.moveToFirst();
@@ -88,6 +94,25 @@ public class ProfileEditor extends ListActivity
 	};
 
 
+    private OnClickListener m_saveProfileListener = new OnClickListener() {
+            EditText tv;
+	    public void onClick(View v) {
+                tv = new EditText(ProfileEditor.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(ProfileEditor.this);
+                builder.setTitle("Profile Name");
+                builder.setCancelable(true);
+                tv.setText("Foo");
+                builder.setView(tv);
+                builder.setNegativeButton("Cancel", null);
+                builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            android.util.Log.d("mbta", "Saving as " + tv.getText());
+                        }
+                    });
+                builder.show();
+            }
+        };
+
     private OnClickListener m_deleteFromProfileListener = new OnClickListener() {
 	    public void onClick(View v) {
                 Vector<Integer> newDepartures = new Vector<Integer>();
@@ -108,7 +133,7 @@ public class ProfileEditor extends ListActivity
             if (request == s_locationPickerId) {
                 double lat = data.getDoubleExtra("com.github.tommywalsh.mbta.Lat", 0.0);
                 double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0.0);
-                Vector<Integer> newDeparturePoints = ProximityProfileGenerator.getProximityProfile(this, lat, lng, 0.5);
+                Vector<Integer> newDeparturePoints = ProximityProfileGenerator.getProximityProfile(this, lat, lng, 0.25);
                 m_departures.addAll(newDeparturePoints);
                 m_checkMap = new boolean[m_departures.size()];
                 setListAdapter(new ProfileInfoAdapter(m_db.getProfileInfo(m_departures)));

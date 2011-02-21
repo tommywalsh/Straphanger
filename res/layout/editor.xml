@@ -27,16 +27,28 @@
             android:text="No stops in this profile" 
             />
 
-  <Button android:id="@+id/add_to_profile"
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:text="Add Busses to Profile"
-          />
+  <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" >
 
-  <Button android:id="@+id/delete_from_profile"
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:text="Delete Selected"
-          />
+    <TableRow>
+
+      <Button android:id="@+id/add_to_profile"
+              android:text="Add More"
+              />
+      
+      <Button android:id="@+id/delete_from_profile"
+              android:text="Delete Selected"
+              />
+
+      <Button android:id="@+id/save_profile"
+              android:text="Save Profile"
+              />
+
+    </TableRow>
+
+
+
+  </TableLayout>
 
 </LinearLayout>
