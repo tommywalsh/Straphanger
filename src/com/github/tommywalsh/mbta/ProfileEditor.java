@@ -32,6 +32,9 @@ import java.util.Vector;
 public class ProfileEditor extends ListActivity
 {
 
+    private Vector<Integer> m_departures = new Vector<Integer>();
+    private Database m_db;
+
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.editor);
@@ -45,16 +48,15 @@ public class ProfileEditor extends ListActivity
         Button addToProfileButton = (Button)findViewById(R.id.add_to_profile);
         addToProfileButton.setOnClickListener(m_addToProfileListener);
 
-        Database db = new Database(this);
-        Database.DeparturePointCursorWrapper cursor = db.getDeparturePointsInProfile(profileId);
+        m_db = new Database(this);
+        Database.DeparturePointCursorWrapper cursor = m_db.getDeparturePointsInProfile(profileId);
         cursor.moveToFirst();
-        Vector<Integer> ids = new Vector<Integer>();
         while(!(cursor.isAfterLast())) {
-            ids.addElement(cursor.getDeparturePointId());
+            m_departures.addElement(cursor.getDeparturePointId());
             cursor.moveToNext();
         }
     
-        setListAdapter(new ProfileInfoAdapter(db.getProfileInfo(ids)));
+        setListAdapter(new ProfileInfoAdapter(m_db.getProfileInfo(m_departures)));
     }
 
 
@@ -67,7 +69,6 @@ public class ProfileEditor extends ListActivity
     @Override protected void onPause() {
         super.onPause();
     }
-
 
 
     private static final int s_locationPickerId = 2050;    
@@ -83,7 +84,9 @@ public class ProfileEditor extends ListActivity
             if (request == s_locationPickerId) {
                 double lat = data.getDoubleExtra("com.github.tommywalsh.mbta.Lat", 0.0);
                 double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0.0);
-                Vector<Integer> departurePoints = ProximityProfileGenerator.getProximityProfile(this, lat, lng, 0.5);
+                Vector<Integer> newDeparturePoints = ProximityProfileGenerator.getProximityProfile(this, lat, lng, 0.5);
+                m_departures.addAll(newDeparturePoints);
+                setListAdapter(new ProfileInfoAdapter(m_db.getProfileInfo(m_departures)));
             }
         }
     }
@@ -96,7 +99,6 @@ public class ProfileEditor extends ListActivity
     {
         public class Info 
         {
-            Integer id;
             String stop;
             String subroute;
             String route;
@@ -109,13 +111,14 @@ public class ProfileEditor extends ListActivity
             // vector here allows us to add and remove stuff during the editing session quickly,
             // and without worrying about overlapping cursors, and pending DB transactions, etc.
             cursor.moveToFirst();
+            m_departures.clear();
             while (!(cursor.isAfterLast())) {
                 Info i = new Info();
                 i.stop = cursor.getStopTitle();
                 i.route = cursor.getRouteTitle();
                 i.subroute = cursor.getSubrouteTitle();
-                i.id = cursor.getDepartureId();
                 m_profileInfo.addElement(i);
+                m_departures.addElement(cursor.getDepartureId());
                 cursor.moveToNext();
             }
 
