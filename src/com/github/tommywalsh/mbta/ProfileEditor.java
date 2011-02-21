@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
@@ -33,6 +35,7 @@ public class ProfileEditor extends ListActivity
 {
 
     private Vector<Integer> m_departures = new Vector<Integer>();
+    private boolean[] m_checkMap;
     private Database m_db;
 
     @Override public void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,9 @@ public class ProfileEditor extends ListActivity
         Button addToProfileButton = (Button)findViewById(R.id.add_to_profile);
         addToProfileButton.setOnClickListener(m_addToProfileListener);
 
+        Button deleteFromProfileButton = (Button)findViewById(R.id.delete_from_profile);
+        deleteFromProfileButton.setOnClickListener(m_deleteFromProfileListener);
+
         m_db = new Database(this);
         Database.DeparturePointCursorWrapper cursor = m_db.getDeparturePointsInProfile(profileId);
         cursor.moveToFirst();
@@ -55,7 +61,8 @@ public class ProfileEditor extends ListActivity
             m_departures.addElement(cursor.getDeparturePointId());
             cursor.moveToNext();
         }
-    
+
+        m_checkMap = new boolean[m_departures.size()];
         setListAdapter(new ProfileInfoAdapter(m_db.getProfileInfo(m_departures)));
     }
 
@@ -75,9 +82,26 @@ public class ProfileEditor extends ListActivity
     private OnClickListener m_addToProfileListener = new OnClickListener() {
 	    public void onClick(View v) {
                 // Launch the location picker.  We'll infer busses when it returns
-                startActivityForResult(new Intent(ProfileEditor.this, LocationPicker.class), s_locationPickerId);
+                startActivityForResult(new Intent(ProfileEditor.this, LocationPicker.class), 
+                                       s_locationPickerId);
 	    }
 	};
+
+
+    private OnClickListener m_deleteFromProfileListener = new OnClickListener() {
+	    public void onClick(View v) {
+                Vector<Integer> newDepartures = new Vector<Integer>();
+                for (int i = 0; i < m_departures.size(); i++) {
+                    if (!m_checkMap[i]) {
+                        newDepartures.addElement(m_departures.elementAt(i));
+                    }                    
+                }
+                m_departures = newDepartures;
+                m_checkMap = new boolean[m_departures.size()];
+                setListAdapter(new ProfileInfoAdapter(m_db.getProfileInfo(m_departures)));
+	    }
+	};
+
 
     @Override public void onActivityResult(int request, int result, Intent data) {
         if (result == RESULT_OK) {
@@ -86,6 +110,7 @@ public class ProfileEditor extends ListActivity
                 double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0.0);
                 Vector<Integer> newDeparturePoints = ProximityProfileGenerator.getProximityProfile(this, lat, lng, 0.5);
                 m_departures.addAll(newDeparturePoints);
+                m_checkMap = new boolean[m_departures.size()];
                 setListAdapter(new ProfileInfoAdapter(m_db.getProfileInfo(m_departures)));
             }
         }
@@ -121,7 +146,7 @@ public class ProfileEditor extends ListActivity
                 m_departures.addElement(cursor.getDepartureId());
                 cursor.moveToNext();
             }
-
+            m_checkMap = new boolean[m_departures.size()];
         }
 
         public int getCount() {
@@ -153,6 +178,16 @@ public class ProfileEditor extends ListActivity
             TextView stopWidget = (TextView) convertView.findViewById(R.id.stop_title);
             stopWidget.setText(thisInfo.stop);
                 
+            CheckBox check = (CheckBox) convertView.findViewById(R.id.check);
+            check.setTag(new Integer(position));
+            check.setChecked(false);
+            check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        Integer i = (Integer) buttonView.getTag();
+                        m_checkMap[i] = isChecked;
+                    }
+                });
+
             return convertView;
         }
     }

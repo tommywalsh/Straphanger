@@ -33,4 +33,10 @@
           android:text="Add Busses to Profile"
           />
 
+  <Button android:id="@+id/delete_from_profile"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:text="Delete Selected"
+          />
+
 </LinearLayout>
