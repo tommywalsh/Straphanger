@@ -230,7 +230,18 @@ public class Database
 	return new ProfileInfoCursorWrapper(cursor);
     }
 
-
+    // Returns empty string if no such profileId
+    public String getProfileName(int profileId) 
+    {
+        String name = "";
+        Cursor c = m_db.rawQuery("SELECT name FROM profile WHERE id = " + Integer.toString(profileId), null);
+        c.moveToFirst();
+        if (!c.isAfterLast()) {
+            name = c.getString(0);
+        }
+        c.close();
+        return name;        
+    }
 
     public void saveProfile(int profileId, String name, Vector<Integer> departurePoints) 
     {

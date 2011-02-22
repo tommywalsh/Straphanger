@@ -81,11 +81,12 @@ public class ProfileEditor extends ListActivity
         }
     }
 
-    
+    private String m_profileName;
     @Override protected void onResume() {
         super.onResume();
 
         Database db = getDB();
+        m_profileName = db.getProfileName(m_profileId);
         Database.DeparturePointCursorWrapper cursor = db.getDeparturePointsInProfile(m_profileId);
         cursor.moveToFirst();
         while(!(cursor.isAfterLast())) {
@@ -121,8 +122,12 @@ public class ProfileEditor extends ListActivity
                 AlertDialog.Builder builder = new AlertDialog.Builder(ProfileEditor.this);
                 builder.setTitle("Profile Name");
                 builder.setCancelable(true);
-                // TODO: Store name!
-                tv.setText("Foo");
+
+                if (m_profileName.length() == 0) {
+                    tv.setText("Untitled");
+                } else {
+                    tv.setText(m_profileName);
+                }
                 builder.setView(tv);
                 builder.setNegativeButton("Cancel", null);
                 builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
