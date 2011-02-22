@@ -1,0 +1,45 @@
+------ HOW TO INSTALL ------
+
+
+This app has not yet been added to the Google Market, nor is there yet a standalone package.
+It must be built from source code and installed manually to your Android device.
+
+1) Make sure your phone will accept apps installed from your computer.  On your phone, go to 
+"settings", then "Applications".  Check to enable "Unknown Sources".  You may also want go to
+"Development" and check to enable USB debugging.
+
+
+2) Next, you need to have a computer with the Android SDK installed.  You can download the SDK,
+and learn how to install and use it here:
+
+http://developer.android.com/sdk/index.html
+
+
+3) Next, you need to have git (a version control system) installed on your computer.  If you don't
+already have it, you can get it here:
+
+http://git-scm.com/
+
+
+4) Now, you can get the source code for the app.  Make a directory in any convenient location, and 
+from that directory, run this command:
+
+git clone git://github.com/tommywalsh/Straphanger.git
+
+
+5) Now that you've got the code, you need to set it up for building with whatever SDK you have.  
+Go to the "Straphanger" directory (which was created in step #4), and run this command:
+
+android update project -p $(pwd)
+
+
+6) Finally, install the app!  Run this command from the same directory:
+
+ant install
+
+
+
+
+This app is free software released under the GPL, which means you can feel free to make any
+changes to it that you'd like.
+

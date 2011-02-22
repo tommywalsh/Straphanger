@@ -1,6 +1,11 @@
-Straphanger
+--------- Straphanger -----------
 
-Simple app that tells when the next MBTA bus is coming.
+This is a simple Android application that lets you
+tell when the next MBTA bus is coming.
+
+For details on use, see the file HOW_TO_USE
+
+For details on how to install, see the file HOW_TO_INSTALL
 
 Copyright 2010 Tom Walsh
 

@@ -41,10 +41,10 @@ ProximityProfileGenerator: finds nearby departure points
  - takes lat/long pair and distance threshold
  - provides a list of departure point IDs
 
-ProfileEditor (future): allows user to name and refine a Profile
- - takes a Profile
- - takes user interaction
- - provides a (refined) Profile
+ProfileEditor: allows user to name and refine a Profile
+ - takes an optional profile ID
+ - allows user to add and remove busses
+ - optionally saves newly-edited profile to database
 
 DepartureFinder: queries server for departure times
  - takes a list of departure points

@@ -1,0 +1,33 @@
+------ HOW TO USE ------
+
+The first thing the app will need to do is to download a significant amount of data
+from the MBTA server.  This data has to do with where all the bus stops are, and what
+busses stop at each on, and where those busses go.
+
+You can start this process by hitting the "Regenerate Database" button.  This process
+will take a while (about 15 minutes), and you might want to have the phone plugged in,
+and make sure you have good service (3G or wifi).
+
+
+Once the database is loaded, you can check on busses in two ways.
+
+"Nearby Busses"  This will present you with a map.  If you have GPS service, it will indicate
+your position with a small blue dot.  If not, it will start you off in downtown Boston.
+Double-tap on the location you're interested in, and the app will show you all nearby busses
+that are leaving soon.
+
+"Load Profile"  If you have previously saved a "profile" (see below), this will show you all
+of the busses in your profile that are leaving soon.
+
+
+
+A "profile" is simply a list of busses that you have interest in.  For example, you might be
+in Union Square and want to get to the subway to get into Boston.  You could equally well take
+the 85 to Kendall, the 86 to Harvard, the 86 to Sullivan, the 87 to Lechmere, the 91 to Sullivan, 
+the 91 to Central, the CT2 to Sullivan, or the CT2 to Kendall.  You could set up a profile that
+allows you can check on these busses and only these busses.  Any number of profiles can be set up, 
+for whatever recurring use you have: "Union Sq. to Subway", "Work to Home", etc.
+
+You can create new profiles or edit existing ones.  In either case, the workflow is to add a 
+batch of busses by picking a location, then pruning down that list by removing whichever busses
+you're not interested in.
