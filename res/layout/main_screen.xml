@@ -19,19 +19,6 @@
      android:text="Nearby Busses"
      />
 
-  <Button
-     style="@style/BusStopButton"
-     android:id="@+id/new_profile_button"
-     android:layout_below="@id/proximity_button"
-     android:text="Create New Profile"
-     />
-
-  <Button
-     style="@style/BusStopButton"
-     android:id="@+id/edit_profile_button"
-     android:layout_below="@id/new_profile_button"
-     android:text="Edit Existing Profile"
-     />
 
   <TextView
      android:id="@+id/towZone"
@@ -43,14 +30,29 @@
      android:gravity="center"
      android:textSize="20sp"
      android:textColor="#ffffff"
-     android:text="TOW ZONE"
+     android:text="STRAPHANGER"
      />
 
   <Button
      style="@style/BusStopButton"
      android:id="@+id/database_button"
      android:layout_above="@id/towZone"
+     android:layout_marginBottom="22px"
      android:text="Regenerate Database"
+     />
+
+  <Button
+     style="@style/BusStopButton"
+     android:id="@+id/new_profile_button"
+     android:layout_above="@id/database_button"
+     android:text="Create New Profile"
+     />
+
+  <Button
+     style="@style/BusStopButton"
+     android:id="@+id/edit_profile_button"
+     android:layout_above="@id/new_profile_button"
+     android:text="Edit Existing Profile"
      />
 
 
