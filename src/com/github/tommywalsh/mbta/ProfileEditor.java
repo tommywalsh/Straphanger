@@ -36,21 +36,10 @@ import java.util.Vector;
 public class ProfileEditor extends ListActivity
 {
 
-    public class ProfileEntry 
-    {
-        String stop;
-        String subroute;
-        String route;
-        Integer stopId;
+    private ProfileEditHelper m_helper;
 
-        public ProfileEntry(String s, String sr, String r, Integer id) {
-            stop = s; subroute = sr; route = r; stopId = id;
-        }
-    }
-    
-    private Vector<ProfileEntry> m_items = new Vector<ProfileEntry>();
+    private Vector<ProfileEditHelper.Entry> m_items;
     private Vector<Integer> m_departures = new Vector<Integer>();
-    private Database m_db;
     private int m_profileId;
 
     @Override public void onCreate(Bundle savedInstanceState) {
@@ -58,75 +47,49 @@ public class ProfileEditor extends ListActivity
         setContentView(R.layout.editor);
         
         Intent i = getIntent();
-        // We know that -1 won't be in the database as an index.  Use it here as code for 
-        // "new profile"
-        m_profileId = i.getIntExtra(getString(R.string.profile_in_intent), -1);
 
+        m_profileId = i.getIntExtra(getString(R.string.profile_in_intent), ProfileEditHelper.NEW_PROFILE);
 
-        Button addToProfileButton = (Button)findViewById(R.id.add_to_profile);
+        m_helper = new ProfileEditHelper(getApplicationContext(), m_profileId);
+        m_helper.clearBuffer();
+        if (m_profileId != ProfileEditHelper.NEW_PROFILE) {
+            m_helper.loadBufferFromPersistentStorage();
+        }
+
+        /*        Button addToProfileButton = (Button)findViewById(R.id.add_to_profile);
         addToProfileButton.setOnClickListener(m_addToProfileListener);
 
         Button saveProfileButton = (Button)findViewById(R.id.save_profile);
         saveProfileButton.setOnClickListener(m_saveProfileListener);
-
+        */
         Button deleteProfileButton = (Button)findViewById(R.id.delete_profile);
         deleteProfileButton.setOnClickListener(m_deleteProfileListener);
-
+        /*
         Button cancelButton = (Button)findViewById(R.id.cancel_profile);
         cancelButton.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
                     finish();
                 }
             });
-
+        */
         TextView header = (TextView)findViewById(R.id.editor_header);
-        if (m_profileId >= 0) {
-            m_profileName = getDB().getProfileName(m_profileId);
-            header.setText(m_profileName);
-        }
+        header.setText(m_helper.getBufferName());
 
     }
 
-
-    private Database getDB() {
-        if (m_db == null) {
-            m_db = new Database(this);
-        }
-        return m_db;
-    }
-    private void closeDB() {
-        if (m_db != null) {
-            m_db.close();
-            m_db = null;
-        }
-    }
 
     private String m_profileName;
     @Override protected void onResume() {
         super.onResume();
 
-        Database db = getDB();
-        m_profileName = db.getProfileName(m_profileId);
-
-        Database.ProfileInfoCursorWrapper cursor = db.getProfileInfo(m_profileId);
-        cursor.moveToFirst();
-        while(!(cursor.isAfterLast())) {
-            m_departures.addElement(cursor.getDepartureId());
-            m_items.addElement(new ProfileEntry(cursor.getStopTitle(),
-                                                cursor.getSubrouteTitle(),
-                                                cursor.getRouteTitle(),
-                                                cursor.getDepartureId()));
-
-            cursor.moveToNext();
-        }
-        cursor.close();
-
-        setListAdapter(new ProfileInfoAdapter());
+        m_profileName = m_helper.getBufferName();
+        m_items = m_helper.getItemsFromBuffer();
+        setListAdapter(new ProfileInfoAdapter());            
     }
     
     @Override protected void onPause() {
         super.onPause();
-        closeDB();
+        m_helper.suspend();
     }
 
 
@@ -157,7 +120,7 @@ public class ProfileEditor extends ListActivity
                 builder.setNegativeButton("Cancel", null);
                 builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            getDB().saveProfile(m_profileId, tv.getText().toString(), m_departures);
+                            //                            getDB().saveProfile(m_profileId, tv.getText().toString(), m_departures);
                             finish();
                         }
                     });
@@ -177,7 +140,8 @@ public class ProfileEditor extends ListActivity
                 builder.setNegativeButton("OMFG! Noooo!", null);
                 builder.setPositiveButton("Yes!  GTFO!", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            getDB().deleteProfile(m_profileId);
+                            //                            getDB().deleteProfile(m_profileId);
+                            m_helper.deletePersistentStorage();
                             finish();
                         }
                     });
@@ -206,15 +170,11 @@ public class ProfileEditor extends ListActivity
         }
 
         public int getCount() {
-            return m_items.size();
+            return 0;
         }
         
         public Object getItem(int position) {
             return m_items.elementAt(position);
-        }
-
-        private void removeItem(int position) {
-            m_departures.remove(position);
         }
 
         public long getItemId(int position) {
@@ -227,7 +187,7 @@ public class ProfileEditor extends ListActivity
                 convertView = inflater.inflate(R.layout.profile_entry, null);
             }
 
-            ProfileEntry thisInfo = m_items.elementAt(position);
+            ProfileEditHelper.Entry thisInfo = m_items.elementAt(position);
             
             TextView routeWidget = (TextView) convertView.findViewById(R.id.route_title);
             routeWidget.setText(thisInfo.route);

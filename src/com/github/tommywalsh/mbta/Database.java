@@ -39,6 +39,7 @@ public class Database
 	m_db = openHelper.getReadableDatabase();
     }
     void close() {
+        android.util.Log.d("mbta", "CLOSING DB!!!!!!!!!!!!!!!!!!!!!!!");
         m_db.close();
     }
 
@@ -159,7 +160,7 @@ public class Database
     public ProfileCursorWrapper getProfiles()
     {
 	// TODO: Make this a precompiled sql statement
-	String sql = "SELECT id,name FROM profile"; // TODO: make this a pre-c
+	String sql = "SELECT id,name FROM profile WHERE id >= 0"; // TODO: make this a pre-c
         Cursor cursor = m_db.rawQuery(sql, null);
 	return new ProfileCursorWrapper(cursor);
     }
@@ -206,6 +207,13 @@ public class Database
         }
     }
 
+    public void deleteDeparturePointFromProfile(int profileId, int departurePointId)
+    {
+        m_db.delete("profile_point", 
+                    "profile = " + profileId + " AND point = " + departurePointId,
+                    null);
+    }
+
     public ProfileInfoCursorWrapper getProfileInfo(int profileId)
     {
 	String query = "SELECT route.title, subroute.title, stop.title, departure_point.id " +
@@ -247,13 +255,21 @@ public class Database
     // Returns empty string if no such profileId
     public String getProfileName(int profileId) 
     {
+        android.util.Log.d("mbta", "1");
         String name = "";
+        android.util.Log.d("mbta", "2");
         Cursor c = m_db.rawQuery("SELECT name FROM profile WHERE id = " + Integer.toString(profileId), null);
+        android.util.Log.d("mbta", "3");
         c.moveToFirst();
+        android.util.Log.d("mbta", "4");
         if (!c.isAfterLast()) {
+        android.util.Log.d("mbta", "5");
             name = c.getString(0);
+        android.util.Log.d("mbta", "6");
         }
+        android.util.Log.d("mbta", "7");
         c.close();
+        android.util.Log.d("mbta", "8");
         return name;        
     }
 
@@ -265,7 +281,7 @@ public class Database
             android.util.Log.d("mbta", "Saving new profile " + name);
             profileValues.putNull("id");
         } else {
-            android.util.Log.d("mbta", "Renaming profile " + Integer.toString(profileId) + " to "+ name);
+            //            android.util.Log.d("mbta", "Renaming profile " + Integer.toString(profileId) + " to "+ name);
             profileValues.put("id", profileId);
         }
 
