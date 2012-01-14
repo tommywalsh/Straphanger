@@ -25,7 +25,7 @@ import android.os.Bundle;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.Paint;
-
+import android.widget.Toast;
 
 // This activity allows the user to pick a location on a map.
 public class LocationPicker extends MapActivity
@@ -134,6 +134,9 @@ public class LocationPicker extends MapActivity
     @Override protected void onResume() {
         super.onResume();
         m_locationIndicatorOverlay.enableMyLocation();
+        
+        Toast toast = Toast.makeText(getApplicationContext(), R.string.map_instructions, Toast.LENGTH_SHORT);
+        toast.show();
     }
     
     @Override protected void onPause() {
