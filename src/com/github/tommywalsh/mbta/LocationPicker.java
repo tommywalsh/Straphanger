@@ -16,8 +16,10 @@ import android.location.LocationManager;
 import android.location.LocationListener;
 import android.location.Location;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.MotionEvent;
 import android.view.GestureDetector;
+import android.widget.Button;
 
 import android.content.Context;
 import android.content.Intent;
@@ -121,6 +123,14 @@ public class LocationPicker extends MapActivity
 	    m_controller.setZoom(16);
 	    m_controller.setCenter(new GeoPoint(42355500,-71060500)); // Downtown Crossing
 	}
+
+
+        Button cancelButton = (Button)findViewById(R.id.cancel_map);
+        cancelButton.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    finish();
+                }
+            });
     }
 
 

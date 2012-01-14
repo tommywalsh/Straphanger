@@ -3,6 +3,7 @@
               android:orientation="vertical"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent">
+
   <TextView
      android:id="@+id/map_instructions"
      android:layout_width="fill_parent"
@@ -18,8 +19,16 @@
         android:id="@+id/mapView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:clickable="true"
         android:apiKey="0RlcQvIKTQ4oxKos4UA7luwTB1C7ZMB_y7hCAtA"
    />
+
+    <Button android:id="@+id/cancel_map"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:text="Cancel"
+            />
 
 </LinearLayout>

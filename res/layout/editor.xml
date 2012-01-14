@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical" 
+              android:orientation="vertical"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent">
 
@@ -32,37 +32,55 @@
             android:text="No stops in this profile" 
             />
 
-  <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content">
 
-    <TableRow>
+    <Button android:id="@+id/add_to_profile"
+            android:text="Add More"
+            android:layout_weight="1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            />
 
-      <Button android:id="@+id/add_to_profile"
-              android:text="Add More"
-              />
-      
-      <Button android:id="@+id/delete_from_profile"
-              android:text="Delete Selected"
-              />
-
-
-    </TableRow>
-
-    <TableRow>
-
-      <Button android:id="@+id/save_profile"
-              android:text="Save Profile"
-              />
-      
-      <Button android:id="@+id/delete_profile"
-              android:text="Delete Profile"
-              />
-
-    </TableRow>
+    <Button android:id="@+id/delete_from_profile"
+            android:text="Delete Selected"
+            android:layout_weight="1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            />
 
 
+    </LinearLayout>
 
-  </TableLayout>
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+
+
+    <Button android:id="@+id/delete_profile"
+            android:text="Delete Profile"
+            android:layout_weight="1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            />
+
+    <Button android:id="@+id/save_profile"
+            android:text="Save"
+            android:layout_weight="1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            />
+
+    <Button android:id="@+id/cancel_profile"
+            android:text="Cancel"
+            android:layout_weight="1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            />
+
+  </LinearLayout>
 
 </LinearLayout>

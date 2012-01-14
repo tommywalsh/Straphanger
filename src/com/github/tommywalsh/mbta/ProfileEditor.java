@@ -64,6 +64,13 @@ public class ProfileEditor extends ListActivity
         Button deleteProfileButton = (Button)findViewById(R.id.delete_profile);
         deleteProfileButton.setOnClickListener(m_deleteProfileListener);
 
+        Button cancelButton = (Button)findViewById(R.id.cancel_profile);
+        cancelButton.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+
         TextView header = (TextView)findViewById(R.id.editor_header);
         if (m_profileId >= 0) {
             m_profileName = getDB().getProfileName(m_profileId);
