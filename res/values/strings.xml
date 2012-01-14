@@ -9,5 +9,4 @@
   <string name="departures_in_intent">com.github.tommywalsh.mbta.VectorOfDepartures</string>
   <string name="download_message">Downloading.  Please wait...</string>
 
-  <string name="map_instructions">Double-tap on desired location to choose nearby busses</string>
 </resources>
