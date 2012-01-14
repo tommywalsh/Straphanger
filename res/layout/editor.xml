@@ -4,19 +4,24 @@
               android:layout_width="fill_parent"
               android:layout_height="fill_parent">
 
-<!--
-  <TextView android:id="@+id/profile_name"
+
+  <TextView android:id="@+id/editor_header"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Untitled Profile"
             android:gravity="center"
+            android:textSize="20sp"
+            android:background="#ad2125"
+            android:textColor="#ffffff"
+            android:text="New Profile"
             />
-  -->
+
 
   <ListView android:id="@+id/android:list" 
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="10"
+            android:divider="#ad2125"
+            android:dividerHeight="2px"
             />
 
   <TextView android:id="@id/android:empty"
