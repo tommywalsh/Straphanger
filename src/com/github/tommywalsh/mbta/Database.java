@@ -216,13 +216,14 @@ public class Database
 
     public ProfileInfoCursorWrapper getProfileInfo(int profileId)
     {
+        Integer pid = profileId;
 	String query = "SELECT route.title, subroute.title, stop.title, departure_point.id " +
-            " FROM stop,subroute,route,departure_point, profile " +
+            " FROM stop,subroute,route,departure_point" +
             " WHERE stop.tag = departure_point.stop " +
             " AND route.tag = subroute.route " +
             " AND subroute.tag = departure_point.subroute " +
             " AND departure_point.id IN (" +
-               "SELECT point FROM profile_point WHERE profile = " + Integer.toString(profileId) +
+               "SELECT point FROM profile_point WHERE profile = " + pid +
             ")";
         Cursor cursor = m_db.rawQuery(query, null);
 	return new ProfileInfoCursorWrapper(cursor);
@@ -255,23 +256,25 @@ public class Database
     // Returns empty string if no such profileId
     public String getProfileName(int profileId) 
     {
-        android.util.Log.d("mbta", "1");
         String name = "";
-        android.util.Log.d("mbta", "2");
         Cursor c = m_db.rawQuery("SELECT name FROM profile WHERE id = " + Integer.toString(profileId), null);
-        android.util.Log.d("mbta", "3");
         c.moveToFirst();
-        android.util.Log.d("mbta", "4");
         if (!c.isAfterLast()) {
-        android.util.Log.d("mbta", "5");
             name = c.getString(0);
-        android.util.Log.d("mbta", "6");
         }
-        android.util.Log.d("mbta", "7");
         c.close();
-        android.util.Log.d("mbta", "8");
         return name;        
     }
+
+
+    public void setProfileName(int profileId, String name)
+    {
+        m_db.rawQuery("UPDATE profile " +
+                      "SET name = '" + name + "' " +
+                      "WHERE id = " + Integer.toString(profileId),
+                      null);
+    }
+
 
     public void saveProfile(int profileId, String name, Vector<Integer> departurePoints) 
     {
@@ -294,6 +297,19 @@ public class Database
             cv.put("profile", rowId);
             cv.put("point", i);
             m_db.insert("profile_point", null, cv);
+        }
+    }
+
+
+    public void addDeparturePointsToProfile(int profileId, Vector<Integer> departurePoints)
+    {
+        for (Integer pt : departurePoints) {
+            ContentValues cv = new ContentValues();
+            cv.put("profile", profileId);
+            cv.put("point", pt);
+            Long l = m_db.insert("profile_point", null, cv);
+            android.util.Log.d("mbta", "Got return code " + l);
+        
         }
     }
 

@@ -67,6 +67,11 @@ public class ProfileEditHelper
         getDB().deleteDeparturePointFromProfile(BUFFER_PROFILE, departurePoint);
     }    
 
+    public void addItemsToBuffer(Vector<Integer> departurePoints)
+    {
+        getDB().addDeparturePointsToProfile(BUFFER_PROFILE, departurePoints);
+    }
+
     public Vector<Entry> getItemsFromBuffer()
     {
         android.util.Log.d("mbta", "Getting all items...");
@@ -75,10 +80,12 @@ public class ProfileEditHelper
         cursor.moveToFirst();
         while(!(cursor.isAfterLast())) {
             android.util.Log.d("mbta", "Reading an item");
-            entries.addElement(new Entry(cursor.getStopTitle(),
-                                         cursor.getSubrouteTitle(),
-                                         cursor.getRouteTitle(),
-                                         cursor.getDepartureId()));
+            Entry e = new Entry(cursor.getStopTitle(),
+                                cursor.getSubrouteTitle(),
+                                cursor.getRouteTitle(),
+                                cursor.getDepartureId());
+            entries.addElement(e);
+            android.util.Log.d("mbta", e.route);
             
             cursor.moveToNext();
         }
@@ -88,10 +95,13 @@ public class ProfileEditHelper
 
     public String getBufferName()
     {
-        android.util.Log.d("mbta", "Getting name");
         String name = getDB().getProfileName(BUFFER_PROFILE);
-        android.util.Log.d("mbta", "Just got name");
         return name;
+    }
+
+    public void setBufferName(String name)
+    {
+        m_db.setProfileName(BUFFER_PROFILE, name);
     }
 
     public void suspend()
