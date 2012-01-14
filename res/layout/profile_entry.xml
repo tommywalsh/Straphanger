@@ -13,19 +13,11 @@
      android:text="##"
      />
 
-  <CheckBox
-     android:id="@+id/check"
-     android:layout_width="wrap_content"
-     android:layout_height="fill_parent"
-     android:layout_alignParentRight="true"
-     />
-
-
   <TextView
      android:id="@+id/subroute_title"
      android:layout_width="wrap_content" 
      android:layout_height="wrap_content"      
-     android:layout_toLeftOf="@id/check"
+     android:layout_alignParentRight="true"
      android:layout_toRightOf="@id/route_title"
      android:layout_alignParentTop="true"
      android:gravity="center"
@@ -38,7 +30,7 @@
      android:id="@+id/stop_title"
      android:layout_width="wrap_content" 
      android:layout_height="wrap_content"      
-     android:layout_toLeftOf="@id/check"
+     android:layout_alignParentRight="true"
      android:layout_toRightOf="@+id/route_title"
      android:layout_below="@+id/subroute_title"
      android:layout_alignParentBottom="true"

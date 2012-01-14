@@ -38,14 +38,14 @@
                 android:layout_height="wrap_content">
 
     <Button android:id="@+id/add_to_profile"
-            android:text="Add More"
+            android:text="Add More Busses"
             android:layout_weight="1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             />
 
-    <Button android:id="@+id/delete_from_profile"
-            android:text="Delete Selected"
+    <Button android:id="@+id/delete_profile"
+            android:text="Delete Profile"
             android:layout_weight="1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -60,18 +60,12 @@
                 android:layout_height="wrap_content">
 
 
-    <Button android:id="@+id/delete_profile"
-            android:text="Delete Profile"
-            android:layout_weight="1"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            />
-
     <Button android:id="@+id/save_profile"
             android:text="Save"
             android:layout_weight="1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:enabled="false"
             />
 
     <Button android:id="@+id/cancel_profile"

@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
 import android.widget.EditText;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,8 +36,20 @@ import java.util.Vector;
 public class ProfileEditor extends ListActivity
 {
 
+    public class ProfileEntry 
+    {
+        String stop;
+        String subroute;
+        String route;
+        Integer stopId;
+
+        public ProfileEntry(String s, String sr, String r, Integer id) {
+            stop = s; subroute = sr; route = r; stopId = id;
+        }
+    }
+    
+    private Vector<ProfileEntry> m_items = new Vector<ProfileEntry>();
     private Vector<Integer> m_departures = new Vector<Integer>();
-    private boolean[] m_checkMap;
     private Database m_db;
     private int m_profileId;
 
@@ -54,9 +65,6 @@ public class ProfileEditor extends ListActivity
 
         Button addToProfileButton = (Button)findViewById(R.id.add_to_profile);
         addToProfileButton.setOnClickListener(m_addToProfileListener);
-
-        Button deleteFromProfileButton = (Button)findViewById(R.id.delete_from_profile);
-        deleteFromProfileButton.setOnClickListener(m_deleteFromProfileListener);
 
         Button saveProfileButton = (Button)findViewById(R.id.save_profile);
         saveProfileButton.setOnClickListener(m_saveProfileListener);
@@ -99,16 +107,21 @@ public class ProfileEditor extends ListActivity
 
         Database db = getDB();
         m_profileName = db.getProfileName(m_profileId);
-        Database.DeparturePointCursorWrapper cursor = db.getDeparturePointsInProfile(m_profileId);
+
+        Database.ProfileInfoCursorWrapper cursor = db.getProfileInfo(m_profileId);
         cursor.moveToFirst();
         while(!(cursor.isAfterLast())) {
-            m_departures.addElement(cursor.getDeparturePointId());
+            m_departures.addElement(cursor.getDepartureId());
+            m_items.addElement(new ProfileEntry(cursor.getStopTitle(),
+                                                cursor.getSubrouteTitle(),
+                                                cursor.getRouteTitle(),
+                                                cursor.getDepartureId()));
+
             cursor.moveToNext();
         }
         cursor.close();
 
-        m_checkMap = new boolean[m_departures.size()];
-        setListAdapter(new ProfileInfoAdapter(m_db.getProfileInfo(m_departures)));
+        setListAdapter(new ProfileInfoAdapter());
     }
     
     @Override protected void onPause() {
@@ -173,21 +186,6 @@ public class ProfileEditor extends ListActivity
         };
 
 
-    private OnClickListener m_deleteFromProfileListener = new OnClickListener() {
-	    public void onClick(View v) {
-                Vector<Integer> newDepartures = new Vector<Integer>();
-                for (int i = 0; i < m_departures.size(); i++) {
-                    if (!m_checkMap[i]) {
-                        newDepartures.addElement(m_departures.elementAt(i));
-                    }                    
-                }
-                m_departures = newDepartures;
-                m_checkMap = new boolean[m_departures.size()];
-                setListAdapter(new ProfileInfoAdapter(getDB().getProfileInfo(m_departures)));
-	    }
-	};
-
-
     @Override public void onActivityResult(int request, int result, Intent data) {
         if (result == RESULT_OK) {
             if (request == s_locationPickerId) {
@@ -195,52 +193,28 @@ public class ProfileEditor extends ListActivity
                 double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0.0);
                 Vector<Integer> newDeparturePoints = ProximityProfileGenerator.getProximityProfile(this, lat, lng, 0.25);
                 m_departures.addAll(newDeparturePoints);
-                m_checkMap = new boolean[m_departures.size()];
-                setListAdapter(new ProfileInfoAdapter(getDB().getProfileInfo(m_departures)));
+                setListAdapter(new ProfileInfoAdapter());
             }
         }
     }
 
 
 
-
-
     private class ProfileInfoAdapter extends BaseAdapter 
     {
-        public class Info 
-        {
-            String stop;
-            String subroute;
-            String route;
-        }
-
-        private Vector<Info> m_profileInfo = new Vector<Info>();
-        public ProfileInfoAdapter(Database.ProfileInfoCursorWrapper cursor) {
-            // We could just keep a handle to the cursor, and only extract data when we need to.
-            // BUT!  We know we're going to need to access it all anyhow, and converting to a 
-            // vector here allows us to add and remove stuff during the editing session quickly,
-            // and without worrying about overlapping cursors, and pending DB transactions, etc.
-            cursor.moveToFirst();
-            m_departures.clear();
-            while (!(cursor.isAfterLast())) {
-                Info i = new Info();
-                i.stop = cursor.getStopTitle();
-                i.route = cursor.getRouteTitle();
-                i.subroute = cursor.getSubrouteTitle();
-                m_profileInfo.addElement(i);
-                m_departures.addElement(cursor.getDepartureId());
-                cursor.moveToNext();
-            }
-            cursor.close();
-            m_checkMap = new boolean[m_departures.size()];
+        public ProfileInfoAdapter() {
         }
 
         public int getCount() {
-            return m_profileInfo.size();
+            return m_items.size();
         }
         
         public Object getItem(int position) {
-            return m_profileInfo.elementAt(position);
+            return m_items.elementAt(position);
+        }
+
+        private void removeItem(int position) {
+            m_departures.remove(position);
         }
 
         public long getItemId(int position) {
@@ -253,7 +227,7 @@ public class ProfileEditor extends ListActivity
                 convertView = inflater.inflate(R.layout.profile_entry, null);
             }
 
-            Info thisInfo = m_profileInfo.elementAt(position);
+            ProfileEntry thisInfo = m_items.elementAt(position);
             
             TextView routeWidget = (TextView) convertView.findViewById(R.id.route_title);
             routeWidget.setText(thisInfo.route);
@@ -264,16 +238,6 @@ public class ProfileEditor extends ListActivity
             TextView stopWidget = (TextView) convertView.findViewById(R.id.stop_title);
             stopWidget.setText(thisInfo.stop);
                 
-            CheckBox check = (CheckBox) convertView.findViewById(R.id.check);
-            check.setTag(new Integer(position));
-            check.setChecked(false);
-            check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        Integer i = (Integer) buttonView.getTag();
-                        m_checkMap[i] = isChecked;
-                    }
-                });
-
             return convertView;
         }
     }

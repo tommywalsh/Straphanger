@@ -172,9 +172,9 @@ public class Database
 	public DeparturePointCursorWrapper(Cursor cursor) {
 	    super(cursor);
 	}
-	public int getDeparturePointId() {
-	    return getInt(0);
-	}
+        public int getDeparturePointId() {
+            return getInt(0);
+        }
     }
 
 
@@ -186,7 +186,7 @@ public class Database
     }
 
 
-
+    
     public class ProfileInfoCursorWrapper extends CursorWrapper
     {
 	public ProfileInfoCursorWrapper(Cursor cursor) {
@@ -204,6 +204,20 @@ public class Database
         public Integer getDepartureId() {
             return getInt(3);
         }
+    }
+
+    public ProfileInfoCursorWrapper getProfileInfo(int profileId)
+    {
+	String query = "SELECT route.title, subroute.title, stop.title, departure_point.id " +
+            " FROM stop,subroute,route,departure_point, profile " +
+            " WHERE stop.tag = departure_point.stop " +
+            " AND route.tag = subroute.route " +
+            " AND subroute.tag = departure_point.subroute " +
+            " AND departure_point.id IN (" +
+               "SELECT point FROM profile_point WHERE profile = " + Integer.toString(profileId) +
+            ")";
+        Cursor cursor = m_db.rawQuery(query, null);
+	return new ProfileInfoCursorWrapper(cursor);
     }
 
     public ProfileInfoCursorWrapper getProfileInfo(Vector<Integer> departureIds)
