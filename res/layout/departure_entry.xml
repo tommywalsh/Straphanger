@@ -3,6 +3,18 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent">
 
+<TextView
+    android:id="@+id/departure_text"
+    android:layout_width="wrap_content" 
+    android:layout_height="fill_parent"      
+    android:gravity="left|center_vertical"
+    android:textSize="@dimen/small_text"
+    android:textColor="@color/foreground"
+    android:text="##"
+    />
+    
+
+<!--
   <TextView
      android:id="@+id/route_title"
      android:layout_width="wrap_content" 
@@ -39,5 +51,5 @@
      android:textColor="@color/foreground"
      android:text="Street at Intersection"
      />
-
+-->
 </RelativeLayout>

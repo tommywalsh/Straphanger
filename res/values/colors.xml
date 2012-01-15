@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Copyright 2011-12 Tom Walsh
+
+This program is free software released under version 3
+of the GPL.  See file gpl.txt for more information.
+-->
+
+<resources>
+  <color name="accent">#ad2125</color>
+  <color name="foreground">#ffffff</color>
+  <color name="background">#000000</color>
+</resources>
+

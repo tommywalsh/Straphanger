@@ -1,4 +1,4 @@
-// Copyright 2010-11 Tom Walsh
+// Copyright 2010-12 Tom Walsh
 //
 // This program is free software released under version 3
 // of the GPL.  See file gpl.txt for more information.
@@ -9,14 +9,19 @@ import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
+import android.widget.TextView;
+import android.widget.BaseAdapter;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.content.Intent;
-import java.util.SortedSet;
 import java.io.Serializable;
+import java.util.SortedSet;
 import java.util.Vector;
-
+import java.util.Iterator;
 
 // This activity is a viewer that displays all the upcoming departures for a particular profile
 // It's sorted on screen based on how soon the departure will happen
@@ -35,14 +40,14 @@ import java.util.Vector;
 public class DepartureViewer extends ListActivity
 {
     // Here's the data this class holds on to
-    private SortedSet<Prediction> m_predictions = null;   // when are the busses leaving?
+    //    private SortedSet<Prediction> m_predictions = new SortedSet<Prediction>();   // when are the busses leaving?
+    private Vector<Prediction> m_predictions = new Vector<Prediction>();   // when are the busses leaving?
     private Vector<Integer> m_departurePoints = null;    // which busses at which stops do we care about?
 
     // Scheduler that allows us to update the screen, and send periodic requests for new data
     private Handler m_handler = new Handler();
 
     // UI elements
-    private ArrayAdapter<String> m_aa = null;   // Adapter to convert plain list of strings to ListView items
     private ProgressDialog m_downloadingDialog = null;  // Dialog to tell user whassup when we're waiting for data
 
     // "Magic numbers"
@@ -59,8 +64,8 @@ public class DepartureViewer extends ListActivity
         super.onCreate(savedInstanceState);
 
         // ... set up our array adapter...
-	m_aa = new ArrayAdapter<String>(this, R.layout.listitem);
-	m_predictions = null;
+        setListAdapter(new PredictionAdapter());
+        
 
         // ... unpack the profile of interesting busses that has been sent to us...
         Intent i = getIntent();
@@ -117,53 +122,17 @@ public class DepartureViewer extends ListActivity
 
     // Actually update the display.  This must be called from the GUI thread only.
     private void updateDisplay() {
-        if (m_predictions == null) {
+        if (m_predictions.isEmpty()) {
             if (m_downloadingDialog == null) {
                 m_downloadingDialog = ProgressDialog.show(this, "", getString(R.string.download_message), true);
             }
         } else {
+            
             if (m_downloadingDialog != null) {
                 m_downloadingDialog.cancel();
                 m_downloadingDialog = null;
             }
-
-            m_aa.clear();
-            long now = java.lang.System.currentTimeMillis();
-            
-            for (Prediction p : m_predictions) {
-                
-                // We're only going to refresh every so often -- say X seconds,
-                // so this data will be stale for an average of X/2
-                // seconds.  Deduct X/2 seconds from the time left
-                // so that we "average out" the error
-                int secondsLeft = (int) ((p.when - now) / 1000);
-                secondsLeft -= s_refreshInterval/2000;
-                
-                if (secondsLeft > 0) {
-                    int hours = secondsLeft / 3600;
-                    int minutes = (secondsLeft - hours*3600) / 60;
-                    int seconds = (secondsLeft - hours*3600 - minutes*60);
-                    
-                    String mess = p.routeTitle + " to " + p.routeDirection + " stops at " + p.stopTitle + " in ";
-                    if (hours > 0) {
-                        mess += (new Integer(hours)).toString() + ":";
-                        if (minutes < 10) {
-                            mess += "0";
-                        }
-                    } 
-                    if (hours > 0 || minutes > 0) {
-                        mess += (new Integer(minutes)).toString();
-                    }
-                    mess += ":";
-                    if (seconds < 10) {
-                        mess += "0";
-                    }
-                    mess += (new Integer(seconds)).toString();
-                    
-                    m_aa.add(mess);
-                }
-            }
-            setListAdapter(m_aa);
+            ((PredictionAdapter)getListAdapter()).notifyDataSetChanged();
         }
                 
         // do this again in a bit 
@@ -200,7 +169,11 @@ public class DepartureViewer extends ListActivity
     private class DepartureCallback implements DepartureFinder.Callback {
 	@Override public void onReceived(SortedSet<Prediction> predictions) {
 
-	    m_predictions = predictions;
+            m_predictions.clear();
+            Iterator<Prediction> i = predictions.iterator();
+            while (i.hasNext()) {
+                m_predictions.add(i.next());
+            }
 	    
 	    // refresh the display ASAP on the GUI thread
 	    m_handler.post(m_displayUpdater);
@@ -214,5 +187,73 @@ public class DepartureViewer extends ListActivity
 	@Override public void onFailed() {
 	    Toast.makeText(DepartureViewer.this, "Download failed.  Please try again later", Toast.LENGTH_LONG);
 	}
+    }
+
+
+
+    private class PredictionAdapter extends BaseAdapter
+    {
+        public int getCount() {
+            return m_predictions.size();
+        }
+        
+        public Object getItem(int position) {
+            return m_predictions.elementAt(position);
+        }
+
+        public long getItemId(int position) {
+            return position;
+        }
+
+        public View getView(int position, View convertView, ViewGroup viewGroup)
+        {
+            if (convertView == null) {
+                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                convertView = inflater.inflate(R.layout.departure_entry, null);
+            }
+
+
+            Prediction p = m_predictions.elementAt(position);
+            long now = java.lang.System.currentTimeMillis();
+
+            // We're only going to refresh every so often -- say X seconds,
+            // so this data will be stale for an average of X/2
+            // seconds.  Deduct X/2 seconds from the time left
+            // so that we "average out" the error
+            int secondsLeft = (int) ((p.when - now) / 1000);
+            secondsLeft -= s_refreshInterval/2000;
+            
+            String mess;
+            if (secondsLeft > 0) {
+                int hours = secondsLeft / 3600;
+                int minutes = (secondsLeft - hours*3600) / 60;
+                int seconds = (secondsLeft - hours*3600 - minutes*60);
+                
+                mess = p.routeTitle + " to " + p.routeDirection + " stops at " + p.stopTitle + " in ";
+                if (hours > 0) {
+                    mess += (new Integer(hours)).toString() + ":";
+                    if (minutes < 10) {
+                        mess += "0";
+                    }
+                } 
+                if (hours > 0 || minutes > 0) {
+                    mess += (new Integer(minutes)).toString();
+                }
+                mess += ":";
+                if (seconds < 10) {
+                    mess += "0";
+                }
+                mess += (new Integer(seconds)).toString();
+
+                
+            } else {
+                mess = "Just missed " + p.routeTitle + " to " + p.routeDirection;
+            }
+           
+            TextView textView = (TextView)convertView.findViewById(R.id.departure_text);
+            textView.setText(mess);
+           
+            return convertView;
+        }
     }
 }

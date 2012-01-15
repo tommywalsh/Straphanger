@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Copyright 2011-12 Tom Walsh
+
+This program is free software released under version 3
+of the GPL.  See file gpl.txt for more information.
+-->
+
+<resources>
+<dimen name="big_text">20sp</dimen>
+<dimen name="medium_text">18sp</dimen>
+<dimen name="small_text">12sp</dimen>
+<dimen name="giant_text">25sp</dimen>
+</resources>
