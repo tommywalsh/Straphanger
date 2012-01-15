@@ -8,7 +8,7 @@
      android:layout_width="wrap_content" 
      android:layout_height="fill_parent"      
      android:gravity="left|center_vertical"
-     android:textSize="25sp"
+     android:textSize="@dimen/giant_text"
      android:textColor="#ffffff"
      android:text="##"
      />
@@ -21,7 +21,7 @@
      android:layout_toRightOf="@id/route_title"
      android:layout_alignParentTop="true"
      android:gravity="center"
-     android:textSize="18sp"
+     android:textSize="@dimen/medium_text"
      android:textColor="#ffffff"
      android:text="To Destination via Waypoint"
      />
@@ -35,7 +35,7 @@
      android:layout_below="@+id/subroute_title"
      android:layout_alignParentBottom="true"
      android:gravity="center"
-     android:textSize="12sp"
+     android:textSize="@dimen/small_text"
      android:textColor="#ffffff"
      android:text="Street at Intersection"
      />

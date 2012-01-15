@@ -18,11 +18,16 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.EditText;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.MenuItem;
+import android.view.Menu;
 
 import java.util.Vector;
 
@@ -137,6 +142,16 @@ public class ProfileEditor extends ListActivity
         refreshGUI();
     }
 
+    private void deleteBus(int itemIndex)
+    {
+        // Convert from GUI position to stopId
+        m_helper.removeItemFromBuffer(m_items.elementAt(itemIndex).stopId);
+
+        // Update the GUI
+        m_saveButton.setEnabled(true);
+        refreshGUI();
+    }
+
     ///////////////////////////////////////////////////////////
 
 
@@ -149,7 +164,8 @@ public class ProfileEditor extends ListActivity
     // This is called to hook up the GUI when the activity starts
     private void prepGUI() {
         setContentView(R.layout.editor);
-        
+
+        registerForContextMenu(getListView());
 
         Button addToProfileButton = (Button)findViewById(R.id.add_to_profile);
         addToProfileButton.setOnClickListener(new OnClickListener() {
@@ -287,6 +303,38 @@ public class ProfileEditor extends ListActivity
                 double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0.0);
                 addBussesNearLocation(lat, lng);
             }
+        }
+    }
+
+
+    // This function will be called when the user long-presses on a list 
+    // item.  Here, we need to present a context menu based on the list item
+    private static final int DELETE_MENU = 1;
+    private static final int STOP_MENU = 2;
+    @Override public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.add(Menu.NONE, DELETE_MENU, Menu.NONE, "Delete This Bus");
+        menu.add(Menu.NONE, STOP_MENU, Menu.NONE, "Change Stop");
+    }
+
+    // This function will be called when the user selects an option from
+    // the context menu after a long-press on a list item
+    @Override public boolean onContextItemSelected(MenuItem item) {
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        int position = info.position;
+        int menuId = item.getItemId();
+        switch (menuId) {
+        case DELETE_MENU:
+            deleteBus(position);
+            return true;
+        case STOP_MENU:
+            android.widget.Toast.makeText(getApplicationContext(),
+                                          "Sorry, this feature is not implemented yet",
+                                          android.widget.Toast.LENGTH_SHORT);
+            return true;
+        default:
+            return super.onContextItemSelected(item);
+            
         }
     }
 

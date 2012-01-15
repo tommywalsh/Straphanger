@@ -9,4 +9,12 @@
   <string name="departures_in_intent">com.github.tommywalsh.mbta.VectorOfDepartures</string>
   <string name="download_message">Downloading.  Please wait...</string>
 
+
+  <string name="editor_empty_text">There are no busses in this profile.  Get started by selecting the \'Add More Busses\' button</string>
+  <string name="add_busses">Add More Busses</string>
+  <string name="delete_profile_text">Delete This Profile</string>
+
+  <string name="save">Save</string>
+  <string name="cancel">Cancel</string>
+
 </resources>

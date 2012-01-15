@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Copyright 2011-12 Tom Walsh
+
+This program is free software released under version 3
+of the GPL.  See file gpl.txt for more information.
+-->
+
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="fill_parent"
@@ -9,10 +18,9 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textSize="20sp"
-            android:background="#ad2125"
-            android:textColor="#ffffff"
-            android:text="New Profile"
+            android:textSize="@dimen/big_text"
+            android:background="@color/accent"
+            android:textColor="@color/foreground"
             />
 
 
@@ -20,7 +28,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="10"
-            android:divider="#ad2125"
+            android:divider="@color/accent"
             android:dividerHeight="2px"
             />
 
@@ -28,8 +36,9 @@
             android:layout_width="fill_parent"
             android:layout_weight="10"
             android:layout_height="wrap_content"
-            android:background="#ff0000"
-            android:text="No stops in this profile" 
+            android:background="@color/background"
+            android:textColor="@color/foreground"
+            android:text="@string/editor_empty_text"
             />
 
   <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -38,14 +47,14 @@
                 android:layout_height="wrap_content">
 
     <Button android:id="@+id/add_to_profile"
-            android:text="Add More Busses"
+            android:text="@string/add_busses"
             android:layout_weight="1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             />
 
     <Button android:id="@+id/delete_profile"
-            android:text="Delete Profile"
+            android:text="@string/delete_profile_text"
             android:layout_weight="1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -61,7 +70,7 @@
 
 
     <Button android:id="@+id/save_profile"
-            android:text="Save"
+            android:text="@string/save"
             android:layout_weight="1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -69,7 +78,7 @@
             />
 
     <Button android:id="@+id/cancel_profile"
-            android:text="Cancel"
+            android:text="@string/cancel"
             android:layout_weight="1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
