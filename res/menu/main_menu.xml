@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-  <item android:id="@+id/nearby"
-	android:title="@string/nearby_stops" />
+<!--
+Copyright 2011-12 Tom Walsh
 
-<!--  
-   Load profiles menu 
-   is built up in code 
+This program is free software released under version 3
+of the GPL.  See file gpl.txt for more information.
 -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/edit_profile"
+          android:title="Edit A Profile" />
+    <item android:id="@+id/rebuild_database"
+          android:title="Rebuild Database" />
 </menu>

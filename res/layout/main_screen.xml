@@ -1,24 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2011-12 Tom Walsh
+
+This program is free software released under version 3
+of the GPL.  See file gpl.txt for more information.
+-->
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	 	android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
 		android:background="@drawable/bus_stop"
 		>
-
-  <Button
-     style="@style/BusStopButton"
-     android:id="@+id/saved_profile_button"
-     android:layout_marginTop="100px"
-     android:text="Load Profile"
-     />
-
-  <Button
-     style="@style/BusStopButton"
-     android:id="@+id/proximity_button"
-     android:layout_below="@id/saved_profile_button"
-     android:text="Nearby Busses"
-     />
-
 
   <TextView
      android:id="@+id/towZone"
@@ -33,28 +25,20 @@
      android:text="STRAPHANGER"
      />
 
-  <Button
-     style="@style/BusStopButton"
-     android:id="@+id/database_button"
-     android:layout_above="@id/towZone"
-     android:layout_marginBottom="22px"
-     android:text="Regenerate Database"
-     />
-
-  <Button
-     style="@style/BusStopButton"
-     android:id="@+id/new_profile_button"
-     android:layout_above="@id/database_button"
-     android:text="Create New Profile"
-     />
-
-  <Button
-     style="@style/BusStopButton"
-     android:id="@+id/edit_profile_button"
-     android:layout_above="@id/new_profile_button"
-     android:text="Edit Existing Profile"
-     />
-
+  <ListView android:id="@+id/android:list" 
+            android:layout_marginTop="110px"
+            android:layout_above="@id/towZone"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:gravity="center_horizontal|top"
+            android:layout_width="171px"
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="2px"
+            />
+  
 
 </RelativeLayout>
 

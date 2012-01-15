@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Copyright 2011-12 Tom Walsh
+
+This program is free software released under version 3
+of the GPL.  See file gpl.txt for more information.
+-->
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:state_enabled="false"
+        android:drawable="@drawable/bus_stop_button_disabled" />
+    <item
+    	android:state_pressed="true"
+    	android:state_enabled="true"
+        android:drawable="@drawable/bus_stop_button_pressed" />
+    <item
+    	android:state_focused="true"
+    	android:state_enabled="true"
+        android:drawable="@drawable/bus_stop_button_focused" />
+    <item
+    	android:state_enabled="true"
+        android:drawable="@drawable/bus_stop_button_enabled" />
+</selector>

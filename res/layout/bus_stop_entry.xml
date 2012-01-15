@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2012 Tom Walsh
+
+This program is free software released under version 3
+of the GPL.  See file gpl.txt for more information.
+
+-->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+  <Button
+     android:id="@+id/button"
+     style="@style/bus_stop_button"
+     />
+
+</RelativeLayout>

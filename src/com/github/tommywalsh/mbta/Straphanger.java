@@ -1,15 +1,19 @@
-// Copyright 2011 Tom Walsh
+package com.github.tommywalsh.mbta;
+
+// Copyright 2011-12 Tom Walsh
 //
 // This program is free software released under version 3
 // of the GPL.  See file gpl.txt for more information.
 
-package com.github.tommywalsh.mbta;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuInflater;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.content.Intent;
@@ -18,7 +22,7 @@ import android.content.DialogInterface;
 
 import java.util.Vector;
 
-public class Straphanger extends Activity
+public class Straphanger extends ListActivity
 {
     private static final int s_locationPickerId = 1050;
     private static final int s_profileDialogId  = 1060;
@@ -26,53 +30,50 @@ public class Straphanger extends Activity
 
 
     // What to do when we click on the "stored profiles" button
-    private OnClickListener m_profileListener = new OnClickListener() {
-	    public void onClick(View v) {
-                Button button = (Button)v;
-                assert(button != null);
-                
-                Database db = new Database(Straphanger.this);
-                Database.ProfileCursorWrapper cursor = db.getProfiles();
+    private void processProfileDialog(boolean viewDeps) {
+        Database db = new Database(Straphanger.this);
+        Database.ProfileCursorWrapper cursor = db.getProfiles();
         
-                final int size = cursor.getCount();
-                final String[] names = new String[size];
-                final int[] ids = new int[size];
-                
-                cursor.moveToFirst();
-                for (int i = 0; i < size & !(cursor.isAfterLast()); i++) {
-                    names[i] = cursor.getProfileName();
-                    ids[i] = cursor.getProfileId();
-                    cursor.moveToNext();                    
-                }
-                cursor.close();
-                db.close();
+        final int size = cursor.getCount();
+        final String[] names = new String[size];
+        final int[] ids = new int[size];
+        
+        cursor.moveToFirst();
+        for (int i = 0; i < size & !(cursor.isAfterLast()); i++) {
+            names[i] = cursor.getProfileName();
+            ids[i] = cursor.getProfileId();
+            cursor.moveToNext();                    
+        }
+        cursor.close();
+        db.close();
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(Straphanger.this);
+        builder.setTitle("Pick a profile");
+        
+        if (viewDeps) {
+            builder.setItems(names, new DialogInterface.OnClickListener() {                
+                    public void onClick(DialogInterface d, int id) {
+                        viewDepartures(m_profProvider.getDeparturePointsInProfile(ids[id]));
+                    }
+                });
+        } else {
+            builder.setItems(names, new DialogInterface.OnClickListener() {                
+                    public void onClick(DialogInterface d, int id) {
+                        launchEditor(ids[id]);
+                    }
+                });
+        }
+        
+        AlertDialog dlg = builder.create();
+        dlg.setOwnerActivity(Straphanger.this);
+        dlg.show();
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(Straphanger.this);
-                builder.setTitle("Pick a profile");
+    }
 
-                if (button == m_loadProfileButton) {
-                    builder.setItems(names, new DialogInterface.OnClickListener() {                
-                            public void onClick(DialogInterface d, int id) {
-                                viewDepartures(m_profProvider.getDeparturePointsInProfile(ids[id]));
-                            }
-                        });
-                } else {
-                    assert(button == m_editProfileButton);
-                    builder.setItems(names, new DialogInterface.OnClickListener() {                
-                            public void onClick(DialogInterface d, int id) {
-                                launchEditor(ids[id]);
-                            }
-                        });
-                }
-
-                AlertDialog dlg = builder.create();
-                dlg.setOwnerActivity(Straphanger.this);
-                dlg.show();
-	    }
-	};
-
-
-    
+    private OnClickListener m_viewDeparturesListener = new OnClickListener() {
+	    public void onClick(View v) {
+                processProfileDialog(true);
+            }};
 
     private OnClickListener m_databaseListener = new OnClickListener() {
 	    public void onClick(View v) {
@@ -139,6 +140,28 @@ public class Straphanger extends Activity
 
     private DatabaseBuilder m_dbBuilder;
 
+    @Override public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true; 
+    }
+    
+    @Override public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+        case R.id.edit_profile:
+            processProfileDialog(false);
+            return true;
+        case R.id.rebuild_database:
+            //            rebuildDatabase();
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+    
+
     @Override public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
@@ -146,25 +169,42 @@ public class Straphanger extends Activity
 
 	m_dbBuilder = new DatabaseBuilder();
 	m_profProvider = new ProfileProvider(this);
-	
 
-        m_loadProfileButton = (Button)findViewById(R.id.saved_profile_button);
-        m_loadProfileButton.setOnClickListener(m_profileListener);
+        m_buttonInfos.add(new ButtonInfo("Nearby Busses", m_proximityListener));
+        m_buttonInfos.add(new ButtonInfo("View Profile", m_viewDeparturesListener));
+        m_buttonInfos.add(new ButtonInfo("New Profile", m_newProfileListener));
 
-        Button proximityButton = (Button)findViewById(R.id.proximity_button);
-        proximityButton.setOnClickListener(m_proximityListener);
-
-        Button newProfileButton = (Button)findViewById(R.id.new_profile_button);
-        newProfileButton.setOnClickListener(m_newProfileListener);
-        
-        m_editProfileButton = (Button)findViewById(R.id.edit_profile_button);
-        m_editProfileButton.setOnClickListener(m_profileListener);
-
-	Button databaseButton = (Button)findViewById(R.id.database_button);
-	databaseButton.setOnClickListener(m_databaseListener);
-        
+        setListAdapter(new ButtonAdapter());
     }
     Button m_loadProfileButton;
     Button m_editProfileButton;
 
+
+
+    private class ButtonInfo
+    {
+        public String text;
+        public OnClickListener listener;
+        ButtonInfo (String t, OnClickListener l) {
+            text = t; listener = l;
+        }
+    }
+
+    private Vector<ButtonInfo> m_buttonInfos = new Vector<ButtonInfo>();
+
+    private class ButtonAdapter extends VectorAdapter<ButtonInfo>
+    {
+        public ButtonAdapter() {
+            super(getApplicationContext(), R.layout.bus_stop_entry);
+        }
+        public Vector<ButtonInfo> getVector() {
+            return m_buttonInfos;
+        }
+        public View processView(int position, ButtonInfo buttonInfo, View view) {
+            Button button = (Button)view.findViewById(R.id.button);
+            button.setText(buttonInfo.text);
+            button.setOnClickListener(buttonInfo.listener);
+            return view;
+        }
+    }
 }
