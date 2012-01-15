@@ -7,6 +7,7 @@ package com.github.tommywalsh.mbta;
 
 import android.content.Context;
 import java.util.Vector;
+import java.io.Serializable;
 
 // This class works on the analogy of a current working buffer,
 // backed with a persistent storage area.
@@ -18,7 +19,7 @@ import java.util.Vector;
 // In actuality, every action is immediately executed directly in the
 // database.  This is to enable applications to resume where they left
 // off, regardless of the state of the Android system.
-public class ProfileEditHelper
+public class ProfileEditHelper implements Serializable
 {
 
     public static final int NEW_PROFILE = -1;

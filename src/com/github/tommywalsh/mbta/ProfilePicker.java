@@ -7,6 +7,7 @@ package com.github.tommywalsh.mbta;
 
 
 import java.util.Vector;
+import java.io.Serializable;
 import android.widget.TextView;
 import android.widget.CheckBox;
 import android.widget.Button;
@@ -24,8 +25,8 @@ public class ProfilePicker extends ListActivity
         public int id;
         public boolean checked;
     }
-    private Vector<ItemData> m_data = new Vector<ItemData> ();
-
+    //    private Vector<ItemData> m_data = new Vector<ItemData> ();
+    private Vector<ProfileEditHelper.Entry> m_entries = new Vector<ProfileEditHelper.Entry>();
 
     // When this activity is first created...
     @Override public void onCreate(Bundle savedInstanceState) {
@@ -55,35 +56,32 @@ public class ProfilePicker extends ListActivity
 
     private void prepInternals(Intent intent)
     {
-        int ids[] = intent.getIntArrayExtra(getString(R.string.departures_in_intent));
+        int key = intent.getIntExtra(getString(R.string.profile_entries_in_intent), 
+                                     Scratchpad.NO_KEY);
+        if (key != Scratchpad.NO_KEY) {
+            Object o = Scratchpad.popObject(key);
+            m_entries = (Vector<ProfileEditHelper.Entry>)o;
+        }
         String instructions = intent.getStringExtra(getString(R.string.instructions_in_intent));
         
-        if (ids != null) {
-            for (int i=0; i<ids.length; i++) {
-                ItemData d = new ItemData();
-                d.id = ids[i];
-                d.checked = false;
-                m_data.add(d);
-            }
-        }
     }
 
-    private class ItemDataAdapter extends VectorAdapter<ItemData>
+    private class ItemDataAdapter extends VectorAdapter<ProfileEditHelper.Entry>
     {
         public ItemDataAdapter() {
             super(getApplicationContext(), R.layout.picker_entry);
         }
 
-        public Vector<ItemData> getVector() {
-            return m_data;
+        public Vector<ProfileEditHelper.Entry> getVector() {
+            return m_entries;
         }
 
-        public View processView(ItemData d, View view) {
+        public View processView(ProfileEditHelper.Entry e, View view) {
             TextView busText = (TextView) view.findViewById(R.id.bus_text);
-            busText.setText(Integer.toString(d.id));
+            busText.setText(e.route);
 
             CheckBox cb = (CheckBox) view.findViewById(R.id.bus_check);
-            cb.setChecked(d.checked);
+            //            cb.setChecked(d.checked);
             
             return view;
         }

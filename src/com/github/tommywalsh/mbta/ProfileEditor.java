@@ -28,6 +28,7 @@ import android.view.MenuItem;
 import android.view.Menu;
 
 import java.util.Vector;
+import java.io.Serializable;
 
 // This is an on-screen editor that lets users edit profiles
 //   You may pass a profileId in the Intent you use to spawn the activity
@@ -257,8 +258,9 @@ public class ProfileEditor extends ListActivity
         Intent pruneIntent = new Intent(ProfileEditor.this, ProfilePicker.class);
         pruneIntent.putExtra(getString(R.string.instructions_in_intent),
                              "Pick busses to remove from profile");
-        pruneIntent.putExtra(getString(R.string.departures_in_intent),
-                             ids);
+        int key = Scratchpad.putObject(m_items);
+        pruneIntent.putExtra(getString(R.string.profile_entries_in_intent),
+                             key);
         startActivityForResult(pruneIntent, s_prunerId);
     }
 

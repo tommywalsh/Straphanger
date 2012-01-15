@@ -13,9 +13,10 @@ of the GPL.  See file gpl.txt for more information.
   <string name="downloading">Downloading...</string>  
   <string name="nearby_stops">See nearby stops</string>  
 
-  <string name="profile_in_intent">Profile</string>
-  <string name="departures_in_intent">Departures</string>
-  <string name="instructions_in_intent">Instructions</string>
+  <string name="profile_in_intent">com.github.tommywalsh.mbta.Profile</string>
+  <string name="departures_in_intent">com.github.tommywalsh.mbta.Departures</string>
+  <string name="profile_entries_in_intent">com.github.tommywalsh.mbta.ProfileEntries</string>
+  <string name="instructions_in_intent">com.github.tommywalsh.mbta.Instructions</string>
   <string name="download_message">Downloading.  Please wait...</string>
 
 
