@@ -13,6 +13,7 @@
   <application 
      android:label="Straphanger" 
      android:theme="@android:style/Theme.NoTitleBar"
+     android:icon="@drawable/icon"
      >
     
 
