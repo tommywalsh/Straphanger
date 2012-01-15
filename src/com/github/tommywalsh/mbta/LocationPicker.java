@@ -1,4 +1,4 @@
-// Copyright 2011 Tom Walsh
+// Copyright 2011-12 Tom Walsh
 //
 // This program is free software released under version 3
 // of the GPL.  See file gpl.txt for more information.

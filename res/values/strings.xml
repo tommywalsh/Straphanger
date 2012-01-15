@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Copyright 2011-12 Tom Walsh
+
+This program is free software released under version 3
+of the GPL.  See file gpl.txt for more information.
+-->
+
 <resources>
   <string name="load_profile">Load Profile</string>
   <string name="select_option">Please select an option from the menu</string>

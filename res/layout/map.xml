@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2011-12 Tom Walsh
+
+This program is free software released under version 3
+of the GPL.  See file gpl.txt for more information.
+
+-->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="fill_parent"
