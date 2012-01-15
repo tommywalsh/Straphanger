@@ -4,8 +4,11 @@ import android.content.Context;
 import java.util.Vector;
 
 // This class works on the analogy of a current working buffer,
-// which can be saved to (or restored from) persistent storage.
-// Simple edit operations are performed on the current working buffer
+// backed with a persistent storage area.
+//
+// All edits happen in the working buffer.  The working buffer can
+// be saved to persistent storage.  The buffer can also be thrown
+// out and replaced with what's in persistent storage.
 // 
 // In acutality, every action is immediately executed directly in the
 // database.  This is to enable applications to resume where they left
@@ -32,38 +35,39 @@ public class ProfileEditHelper
     // If this is to be a new profile, pass in NEW_PROFILE
     public ProfileEditHelper(Context ctx, int persistentProfileId) {
         Integer i = new Integer(persistentProfileId);
-        android.util.Log.d("mbta", "Editing profile " + i);
         m_ctx = ctx;
         m_persistentId = persistentProfileId;
     }
 
     public void clearBuffer() 
     {
-        android.util.Log.d("mbta", "Clearing buffer");
         clearProfile(BUFFER_PROFILE);
     }
 
     public void loadBufferFromPersistentStorage() 
     {
-        android.util.Log.d("mbta", "Loading buffer");
-        copyProfile(m_persistentId, BUFFER_PROFILE);
+        if (m_persistentId == NEW_PROFILE) {
+            clearBuffer();
+        } else {
+            copyProfile(m_persistentId, BUFFER_PROFILE);
+        }
     }
 
     public void saveBufferToPersistentStorage() 
     {
-        android.util.Log.d("mbta", "Saving buffer");
+        if (m_persistentId == NEW_PROFILE) {
+            m_persistentId = getNewId();
+        }
         copyProfile(BUFFER_PROFILE, m_persistentId);
     }
 
     public void deletePersistentStorage() 
     {
-        android.util.Log.d("mbta", "Deleting persistent");
         clearProfile(m_persistentId);
     }
 
     public void removeItemFromBuffer(int departurePoint) 
     {
-        android.util.Log.d("mbta", "Removing item");
         getDB().deleteDeparturePointFromProfile(BUFFER_PROFILE, departurePoint);
     }    
 
@@ -74,19 +78,15 @@ public class ProfileEditHelper
 
     public Vector<Entry> getItemsFromBuffer()
     {
-        android.util.Log.d("mbta", "Getting all items...");
         Vector<Entry> entries = new Vector<Entry>();
         Database.ProfileInfoCursorWrapper cursor = getDB().getProfileInfo(BUFFER_PROFILE);
         cursor.moveToFirst();
         while(!(cursor.isAfterLast())) {
-            android.util.Log.d("mbta", "Reading an item");
             Entry e = new Entry(cursor.getStopTitle(),
                                 cursor.getSubrouteTitle(),
                                 cursor.getRouteTitle(),
                                 cursor.getDepartureId());
             entries.addElement(e);
-            android.util.Log.d("mbta", e.route);
-            
             cursor.moveToNext();
         }
         cursor.close();
@@ -106,7 +106,6 @@ public class ProfileEditHelper
 
     public void suspend()
     {
-        android.util.Log.d("mbta", "Suspending");
         if (m_db != null) {
             m_db.close();
             m_db = null;
@@ -144,14 +143,11 @@ public class ProfileEditHelper
         Integer d = new Integer(destinationId);
 
         // Pull information out of source
-        android.util.Log.d("mbta", "Pulling from " + s);
-
         String name = db.getProfileName(sourceId);
         Vector<Integer> points = new Vector<Integer>();
         Database.DeparturePointCursorWrapper cursor = db.getDeparturePointsInProfile(sourceId);
         cursor.moveToFirst();
         while (!(cursor.isAfterLast())) {
-            android.util.Log.d("mbta", "Adding point from " + s);
             points.add(cursor.getDeparturePointId());
             cursor.moveToNext();
         }
@@ -161,6 +157,14 @@ public class ProfileEditHelper
     }
 
 
+    private int getNewId() {
+        int max = getDB().getLargestProfileId();
+        if (max < 2) {
+            return 2;
+        } else {
+            return max+1;
+        }
+    }
 
 
 

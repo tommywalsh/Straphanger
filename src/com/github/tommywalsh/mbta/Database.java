@@ -39,7 +39,6 @@ public class Database
 	m_db = openHelper.getReadableDatabase();
     }
     void close() {
-        android.util.Log.d("mbta", "CLOSING DB!!!!!!!!!!!!!!!!!!!!!!!");
         m_db.close();
     }
 
@@ -160,7 +159,7 @@ public class Database
     public ProfileCursorWrapper getProfiles()
     {
 	// TODO: Make this a precompiled sql statement
-	String sql = "SELECT id,name FROM profile WHERE id >= 0"; // TODO: make this a pre-c
+	String sql = "SELECT id,name FROM profile WHERE id > 1"; // TODO: make this a pre-c
         Cursor cursor = m_db.rawQuery(sql, null);
 	return new ProfileCursorWrapper(cursor);
     }
@@ -205,6 +204,15 @@ public class Database
         public Integer getDepartureId() {
             return getInt(3);
         }
+    }
+
+    public int getLargestProfileId() {
+        Cursor cursor = m_db.rawQuery("SELECT MAX(id) AS max_id FROM profile", null);
+        int id = 0;
+        if (cursor.moveToFirst()) {
+            id = cursor.getInt(0);
+        }
+        return id;
     }
 
     public void deleteDeparturePointFromProfile(int profileId, int departurePointId)
@@ -269,32 +277,23 @@ public class Database
 
     public void setProfileName(int profileId, String name)
     {
-        m_db.rawQuery("UPDATE profile " +
-                      "SET name = '" + name + "' " +
-                      "WHERE id = " + Integer.toString(profileId),
-                      null);
+        m_db.delete("profile", "id = " + Integer.toString(profileId), null);
+
+        ContentValues profileValues = new ContentValues();
+        profileValues.put("name", name);
+        profileValues.put("id", profileId);
+        m_db.insert("profile", null, profileValues);
     }
 
 
     public void saveProfile(int profileId, String name, Vector<Integer> departurePoints) 
     {
-        ContentValues profileValues = new ContentValues();
-        profileValues.put("name", name);
-        if (profileId < 0) {            
-            android.util.Log.d("mbta", "Saving new profile " + name);
-            profileValues.putNull("id");
-        } else {
-            //            android.util.Log.d("mbta", "Renaming profile " + Integer.toString(profileId) + " to "+ name);
-            profileValues.put("id", profileId);
-        }
-
-        // TODO: is this row id guaranteed to be the same as the primary key?
-        long rowId = m_db.insert("profile", null, profileValues);
+        setProfileName(profileId, name);
         
-        m_db.delete("profile_point", "profile = " + rowId, null);
+        m_db.delete("profile_point", "profile = " + profileId, null);
         for (Integer i : departurePoints) {
             ContentValues cv = new ContentValues();
-            cv.put("profile", rowId);
+            cv.put("profile", profileId);
             cv.put("point", i);
             m_db.insert("profile_point", null, cv);
         }
@@ -308,8 +307,6 @@ public class Database
             cv.put("profile", profileId);
             cv.put("point", pt);
             Long l = m_db.insert("profile_point", null, cv);
-            android.util.Log.d("mbta", "Got return code " + l);
-        
         }
     }
 
