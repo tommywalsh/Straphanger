@@ -17,4 +17,7 @@
   <string name="save">Save</string>
   <string name="cancel">Cancel</string>
 
+  <string name="upcoming_departures">Upcoming Departures</string>
+  <string name="no_departures">No upcoming departures!</string>
+
 </resources>

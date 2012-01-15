@@ -63,6 +63,9 @@ public class DepartureViewer extends ListActivity
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // ... set up the look and feel...
+        setContentView(R.layout.departures);
+
         // ... set up our array adapter...
         setListAdapter(new PredictionAdapter());
         
@@ -205,6 +208,34 @@ public class DepartureViewer extends ListActivity
             return position;
         }
 
+
+        private String timeString(int secondsLeft)
+        {
+            int hours = secondsLeft / 3600;
+            int minutes = (secondsLeft - hours*3600) / 60;
+            int seconds = (secondsLeft - hours*3600 - minutes*60);
+
+            String str = new String();
+            if (hours > 0) {
+                str += (new Integer(hours)).toString() + ":";
+                if (minutes < 10) {
+                    str += "0";
+                }
+            }
+
+            if (hours > 0 || minutes > 0) {
+                str += (new Integer(minutes)).toString();
+            }
+            str += ":";
+            if (seconds < 10) {
+                str += "0";
+            }
+            str += (new Integer(seconds)).toString();
+
+            return str;
+        }
+
+
         public View getView(int position, View convertView, ViewGroup viewGroup)
         {
             if (convertView == null) {
@@ -223,36 +254,32 @@ public class DepartureViewer extends ListActivity
             int secondsLeft = (int) ((p.when - now) / 1000);
             secondsLeft -= s_refreshInterval/2000;
             
-            String mess;
-            if (secondsLeft > 0) {
-                int hours = secondsLeft / 3600;
-                int minutes = (secondsLeft - hours*3600) / 60;
-                int seconds = (secondsLeft - hours*3600 - minutes*60);
-                
-                mess = p.routeTitle + " to " + p.routeDirection + " stops at " + p.stopTitle + " in ";
-                if (hours > 0) {
-                    mess += (new Integer(hours)).toString() + ":";
-                    if (minutes < 10) {
-                        mess += "0";
-                    }
-                } 
-                if (hours > 0 || minutes > 0) {
-                    mess += (new Integer(minutes)).toString();
-                }
-                mess += ":";
-                if (seconds < 10) {
-                    mess += "0";
-                }
-                mess += (new Integer(seconds)).toString();
+            String timeStr;
+            String busStr = p.routeTitle + " - " + p.routeDirection;
+            String stopStr = p.stopTitle;
 
-                
+            if (secondsLeft > 0) {
+                timeStr = timeString(secondsLeft);
             } else {
-                mess = "Just missed " + p.routeTitle + " to " + p.routeDirection;
+                timeStr = "XXX";
             }
            
-            TextView textView = (TextView)convertView.findViewById(R.id.departure_text);
-            textView.setText(mess);
+            TextView timeText = (TextView)convertView.findViewById(R.id.departure_time);
+            timeText.setText(timeStr);
+            if (secondsLeft < 60*5) {
+                timeText.setTextColor(getResources().getColor(R.color.accent));
+            } else {
+                timeText.setTextColor(getResources().getColor(R.color.foreground));
+            }
+
+            TextView busText = (TextView)convertView.findViewById(R.id.departure_bus);
+            busText.setText(busStr);
+
+            TextView stopText = (TextView)convertView.findViewById(R.id.departure_stop);
+            stopText.setText(stopStr);
            
+
+
             return convertView;
         }
     }

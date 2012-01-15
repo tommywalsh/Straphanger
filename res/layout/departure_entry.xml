@@ -3,20 +3,8 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent">
 
-<TextView
-    android:id="@+id/departure_text"
-    android:layout_width="wrap_content" 
-    android:layout_height="fill_parent"      
-    android:gravity="left|center_vertical"
-    android:textSize="@dimen/small_text"
-    android:textColor="@color/foreground"
-    android:text="##"
-    />
-    
-
-<!--
   <TextView
-     android:id="@+id/route_title"
+     android:id="@+id/departure_time"
      android:layout_width="wrap_content" 
      android:layout_height="fill_parent"      
      android:gravity="left|center_vertical"
@@ -26,11 +14,11 @@
      />
 
   <TextView
-     android:id="@+id/subroute_title"
+     android:id="@+id/departure_bus"
      android:layout_width="wrap_content" 
      android:layout_height="wrap_content"      
      android:layout_alignParentRight="true"
-     android:layout_toRightOf="@id/route_title"
+     android:layout_toRightOf="@id/departure_time"
      android:layout_alignParentTop="true"
      android:gravity="center"
      android:textSize="@dimen/medium_text"
@@ -39,17 +27,17 @@
      />
 
   <TextView
-     android:id="@+id/stop_title"
+     android:id="@+id/departure_stop"
      android:layout_width="wrap_content" 
      android:layout_height="wrap_content"      
      android:layout_alignParentRight="true"
-     android:layout_toRightOf="@+id/route_title"
-     android:layout_below="@+id/subroute_title"
+     android:layout_toRightOf="@+id/departure_time"
+     android:layout_below="@+id/departure_bus"
      android:layout_alignParentBottom="true"
      android:gravity="center"
      android:textSize="@dimen/small_text"
      android:textColor="@color/foreground"
      android:text="Street at Intersection"
      />
--->
+
 </RelativeLayout>
