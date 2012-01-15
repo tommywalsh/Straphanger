@@ -1,9 +1,10 @@
+package com.github.tommywalsh.mbta;
+
 // Copyright 2011-12 Tom Walsh
 //
 // This program is free software released under version 3
 // of the GPL.  See file gpl.txt for more information.
 
-package com.github.tommywalsh.mbta;
 
 import android.app.ListActivity;
 import android.app.AlertDialog;
@@ -14,7 +15,6 @@ import android.content.Intent;
 import android.content.Context;
 import android.content.DialogInterface;
 
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.EditText;
@@ -22,8 +22,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.LayoutInflater;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
@@ -345,49 +343,29 @@ public class ProfileEditor extends ListActivity
 
 
 
-
-
-
-
-
-    // This class fills in the Adapter API to enable the ListView to get
-    // filled with m_items.
-    private class ProfileInfoAdapter extends BaseAdapter 
+    private class ProfileInfoAdapter extends VectorAdapter<ProfileEditHelper.Entry>
     {
-        public ProfileInfoAdapter() {
+        public Vector<ProfileEditHelper.Entry> getVector() {
+            return m_items;
         }
 
-        public int getCount() {
-            return m_items.size();
-        }
-        
-        public Object getItem(int position) {
-            return m_items.elementAt(position);
-        }
-
-        public long getItemId(int position) {
-            return position;
-        }
-        
-        public View getView(int position, View convertView, ViewGroup viewGroup) {
-            if (convertView == null) {
-                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = inflater.inflate(R.layout.profile_entry, null);
-            }
-
-            ProfileEditHelper.Entry thisInfo = m_items.elementAt(position);
-            
-            TextView routeWidget = (TextView) convertView.findViewById(R.id.route_title);
+        public View processView(ProfileEditHelper.Entry thisInfo, View view) {
+            TextView routeWidget = (TextView) view.findViewById(R.id.route_title);
             routeWidget.setText(thisInfo.route);
 
-            TextView subrouteWidget = (TextView) convertView.findViewById(R.id.subroute_title);
+            TextView subrouteWidget = (TextView) view.findViewById(R.id.subroute_title);
             subrouteWidget.setText(thisInfo.subroute);
 
-            TextView stopWidget = (TextView) convertView.findViewById(R.id.stop_title);
+            TextView stopWidget = (TextView) view.findViewById(R.id.stop_title);
             stopWidget.setText(thisInfo.stop);
                 
-            return convertView;
+            return view;
+        }
+
+        public ProfileInfoAdapter() {
+            super(getApplicationContext(), R.layout.profile_entry);
         }
     }
+
 }
 

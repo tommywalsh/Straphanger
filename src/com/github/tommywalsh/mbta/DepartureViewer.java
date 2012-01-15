@@ -10,10 +10,7 @@ import android.app.ProgressDialog;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 import android.widget.TextView;
-import android.widget.BaseAdapter;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,8 +37,7 @@ import java.util.Iterator;
 public class DepartureViewer extends ListActivity
 {
     // Here's the data this class holds on to
-    //    private SortedSet<Prediction> m_predictions = new SortedSet<Prediction>();   // when are the busses leaving?
-    private Vector<Prediction> m_predictions = new Vector<Prediction>();   // when are the busses leaving?
+     private Vector<Prediction> m_predictions = new Vector<Prediction>();   // when are the busses leaving?
     private Vector<Integer> m_departurePoints = null;    // which busses at which stops do we care about?
 
     // Scheduler that allows us to update the screen, and send periodic requests for new data
@@ -193,58 +189,17 @@ public class DepartureViewer extends ListActivity
     }
 
 
-
-    private class PredictionAdapter extends BaseAdapter
+    private class PredictionAdapter extends VectorAdapter<Prediction>
     {
-        public int getCount() {
-            return m_predictions.size();
-        }
-        
-        public Object getItem(int position) {
-            return m_predictions.elementAt(position);
+        public PredictionAdapter() {
+            super(getApplicationContext(), R.layout.departure_entry);
         }
 
-        public long getItemId(int position) {
-            return position;
+        public Vector<Prediction> getVector() {
+            return m_predictions;
         }
 
-
-        private String timeString(int secondsLeft)
-        {
-            int hours = secondsLeft / 3600;
-            int minutes = (secondsLeft - hours*3600) / 60;
-            int seconds = (secondsLeft - hours*3600 - minutes*60);
-
-            String str = new String();
-            if (hours > 0) {
-                str += (new Integer(hours)).toString() + ":";
-                if (minutes < 10) {
-                    str += "0";
-                }
-            }
-
-            if (hours > 0 || minutes > 0) {
-                str += (new Integer(minutes)).toString();
-            }
-            str += ":";
-            if (seconds < 10) {
-                str += "0";
-            }
-            str += (new Integer(seconds)).toString();
-
-            return str;
-        }
-
-
-        public View getView(int position, View convertView, ViewGroup viewGroup)
-        {
-            if (convertView == null) {
-                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = inflater.inflate(R.layout.departure_entry, null);
-            }
-
-
-            Prediction p = m_predictions.elementAt(position);
+        public View processView(Prediction p, View view) {
             long now = java.lang.System.currentTimeMillis();
 
             // We're only going to refresh every so often -- say X seconds,
@@ -259,12 +214,12 @@ public class DepartureViewer extends ListActivity
             String stopStr = p.stopTitle;
 
             if (secondsLeft > 0) {
-                timeStr = timeString(secondsLeft);
+                timeStr = Util.timeString(secondsLeft);
             } else {
                 timeStr = "XXX";
             }
            
-            TextView timeText = (TextView)convertView.findViewById(R.id.departure_time);
+            TextView timeText = (TextView)view.findViewById(R.id.departure_time);
             timeText.setText(timeStr);
             if (secondsLeft < 60*5) {
                 timeText.setTextColor(getResources().getColor(R.color.accent));
@@ -272,15 +227,13 @@ public class DepartureViewer extends ListActivity
                 timeText.setTextColor(getResources().getColor(R.color.foreground));
             }
 
-            TextView busText = (TextView)convertView.findViewById(R.id.departure_bus);
+            TextView busText = (TextView)view.findViewById(R.id.departure_bus);
             busText.setText(busStr);
 
-            TextView stopText = (TextView)convertView.findViewById(R.id.departure_stop);
+            TextView stopText = (TextView)view.findViewById(R.id.departure_stop);
             stopText.setText(stopStr);
            
-
-
-            return convertView;
+            return view;
         }
     }
 }
