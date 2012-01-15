@@ -1,3 +1,8 @@
+// Copyright 2012 Tom Walsh
+//
+// This program is free software released under version 3
+// of the GPL.  See file gpl.txt for more information.
+
 package com.github.tommywalsh.mbta;
 
 import android.content.Context;
@@ -10,7 +15,7 @@ import java.util.Vector;
 // be saved to persistent storage.  The buffer can also be thrown
 // out and replaced with what's in persistent storage.
 // 
-// In acutality, every action is immediately executed directly in the
+// In actuality, every action is immediately executed directly in the
 // database.  This is to enable applications to resume where they left
 // off, regardless of the state of the Android system.
 public class ProfileEditHelper
