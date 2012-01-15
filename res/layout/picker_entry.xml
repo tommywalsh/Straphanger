@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2012 Tom Walsh
+
+This program is free software released under version 3
+of the GPL.  See file gpl.txt for more information.
+
+-->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+  <CheckBox
+     android:id="@+id/bus_check"
+     android:layout_width="wrap_content" 
+     android:layout_height="wrap_content"      
+     android:layout_alignParentRight="true"
+     android:layout_alignParentBottom="true"
+     android:layout_alignParentTop="true"
+     android:gravity="center"
+     />
+
+  <TextView
+     android:id="@+id/bus_text"
+     android:layout_width="wrap_content" 
+     android:layout_height="wrap_content"      
+     android:layout_alignParentLeft="true"
+     android:layout_toLeftOf="@id/bus_check"
+     android:layout_alignParentTop="true"
+     android:gravity="center"
+     android:textSize="@dimen/medium_text"
+     android:textColor="@color/foreground"
+     android:text="To Destination via Waypoint"
+     />
+
+  <TextView
+     android:id="@+id/stop_text"
+     android:layout_width="wrap_content" 
+     android:layout_height="wrap_content"      
+     android:layout_alignParentLeft="true"
+     android:layout_toLeftOf="@+id/bus_check"
+     android:layout_below="@+id/subroute_title"
+     android:layout_alignParentBottom="true"
+     android:gravity="center"
+     android:textSize="@dimen/small_text"
+     android:textColor="@color/foreground"
+     android:text="Street at Intersection"
+     />
+
+
+
+</RelativeLayout>

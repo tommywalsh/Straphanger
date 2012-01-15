@@ -13,13 +13,15 @@ of the GPL.  See file gpl.txt for more information.
   <string name="downloading">Downloading...</string>  
   <string name="nearby_stops">See nearby stops</string>  
 
-  <string name="profile_in_intent">com.github.tommywalsh.mbta.Profile</string>
-  <string name="departures_in_intent">com.github.tommywalsh.mbta.VectorOfDepartures</string>
+  <string name="profile_in_intent">Profile</string>
+  <string name="departures_in_intent">Departures</string>
+  <string name="instructions_in_intent">Instructions</string>
   <string name="download_message">Downloading.  Please wait...</string>
 
 
   <string name="editor_empty_text">There are no busses in this profile.  Get started by selecting the \'Add More Busses\' button</string>
   <string name="add_busses">Add More Busses</string>
+  <string name="prune_busses">Remove Busses</string>
   <string name="delete_profile_text">Delete This Profile</string>
 
   <string name="save">Save</string>

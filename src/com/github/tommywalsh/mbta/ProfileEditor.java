@@ -171,6 +171,11 @@ public class ProfileEditor extends ListActivity
                     launchLocationPicker();
                 }});
         
+        Button removeFromProfileButton = (Button)findViewById(R.id.delete_stops);
+        removeFromProfileButton.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    launchPruner();
+                }});
 
         
         m_saveButton = (Button)findViewById(R.id.save_profile);
@@ -234,8 +239,28 @@ public class ProfileEditor extends ListActivity
 
     /////////////// SUB-ACTIVITIES and DIALOGS ////////////////
 
-    private static final int s_locationPickerId = 2050;    
+    private static final int s_locationPickerId = 2050;
+    private static final int s_prunerId = 2060;
 
+
+    // This launches a sub-activity, from which the user can pick
+    // busses to REMOVE from the current edit buffer
+    private void launchPruner() {
+        // Make an array of stop IDs to send to the pruner
+        int size = m_items.size();
+        int[] ids = new int[size];
+        for (int i=0; i<size; i++) {
+            ids[i] = m_items.elementAt(i).stopId;
+        }
+
+        // Send the pruner its instructions
+        Intent pruneIntent = new Intent(ProfileEditor.this, ProfilePicker.class);
+        pruneIntent.putExtra(getString(R.string.instructions_in_intent),
+                             "Pick busses to remove from profile");
+        pruneIntent.putExtra(getString(R.string.departures_in_intent),
+                             ids);
+        startActivityForResult(pruneIntent, s_prunerId);
+    }
 
     // This launches a map, from which the user can pick a location.
     // If the user does so, we'll get the picked location in the
