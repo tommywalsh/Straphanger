@@ -82,6 +82,23 @@ public class ProfileEditHelper implements Serializable
         getDB().addDeparturePointsToProfile(BUFFER_PROFILE, departurePoints);
     }
 
+    public Vector<Entry> getItemsFromIds(Vector<Integer> departurePoints)
+    {
+        Vector<Entry> entries = new Vector<Entry>();
+        Database.ProfileInfoCursorWrapper cursor = getDB().getProfileInfo(departurePoints);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            Entry e = new Entry(cursor.getStopTitle(),
+                                cursor.getSubrouteTitle(),
+                                cursor.getRouteTitle(),
+                                cursor.getDepartureId());
+            entries.addElement(e);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return entries;
+    }
+
     public Vector<Entry> getItemsFromBuffer()
     {
         Vector<Entry> entries = new Vector<Entry>();

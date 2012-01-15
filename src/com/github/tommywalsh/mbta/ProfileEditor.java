@@ -124,19 +124,16 @@ public class ProfileEditor extends ListActivity
         finish();
     }
 
-    // This function needs to figure out which busses stop near
-    // the given point, and add them all to the current edit buffer
-    private void addBussesNearLocation(double lat, double lng) {
-        // Find the relevant busses
-        Vector<Integer> newDeparturePoints = ProximityProfileGenerator.getProximityProfile(this, lat, lng, 0.25);
 
+    private void addBusses(Vector<Integer> newDeparturePoints)
+    {
         // Add them to the edit buffer
         m_helper.addItemsToBuffer(newDeparturePoints);
 
         // Our edit buffer is newly-changed, 
         // so let the user save it if desired
         m_saveButton.setEnabled(true);
-        
+
         // Update the rest of the GUI
         refreshGUI();
     }
@@ -251,17 +248,32 @@ public class ProfileEditor extends ListActivity
 
     private static final int s_locationPickerId = 2050;
     private static final int s_prunerId = 2060;
+    private static final int s_adderId = 2070;
 
+
+    // This launches a sub-activity, from which the user can pick
+    // busses to ADD to the current edit buffer
+    private void launchAddSelector(double lat, double lng) {
+        Vector<Integer> newDeparturePoints = ProximityProfileGenerator.getProximityProfile(this, lat, lng, 0.25);
+        if (newDeparturePoints.isEmpty()) {
+            // Add in a toast here explaining that there were no nearby bus stops
+        } else {
+            Vector<ProfileEditHelper.Entry> entries = m_helper.getItemsFromIds(newDeparturePoints);
+            int key = Scratchpad.putObject(entries);
+            Intent pruneIntent = new Intent(ProfileEditor.this, ProfilePicker.class);
+            pruneIntent.putExtra(getString(R.string.instructions_in_intent),
+                                 "Pick busses to add to profile");
+            pruneIntent.putExtra(getString(R.string.profile_entries_in_intent),
+                                 key);
+            startActivityForResult(pruneIntent, s_adderId);
+        }
+    }
 
     // This launches a sub-activity, from which the user can pick
     // busses to REMOVE from the current edit buffer
     private void launchPruner() {
         // Make an array of stop IDs to send to the pruner
         int size = m_items.size();
-        int[] ids = new int[size];
-        for (int i=0; i<size; i++) {
-            ids[i] = m_items.elementAt(i).stopId;
-        }
 
         // Send the pruner its instructions
         Intent pruneIntent = new Intent(ProfileEditor.this, ProfilePicker.class);
@@ -332,20 +344,32 @@ public class ProfileEditor extends ListActivity
     @Override public void onActivityResult(int request, int result, Intent data) {
         if (result == RESULT_OK) {
             switch (request) {
-                case s_locationPickerId:
-                    double lat = data.getDoubleExtra("com.github.tommywalsh.mbta.Lat", 0.0);
-                    double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0.0);
-                    addBussesNearLocation(lat, lng);
-                    break;
-                case s_prunerId:
-                    int key = data.getIntExtra(getString(R.string.departures_in_intent),
-                                               Scratchpad.NO_KEY);
-                    if (key != Scratchpad.NO_KEY) {
-                        Object o = Scratchpad.popObject(key);
-                        Vector<Integer> ids = (Vector<Integer>)o;
-                        deleteBusses(ids);
-                    }
-                    break;
+            case s_locationPickerId: {
+                double lat = data.getDoubleExtra("com.github.tommywalsh.mbta.Lat", 0.0);
+                double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0.0);
+                launchAddSelector(lat, lng);
+                break;
+            }
+            case s_prunerId: {
+                int key = data.getIntExtra(getString(R.string.departures_in_intent),
+                                           Scratchpad.NO_KEY);
+                if (key != Scratchpad.NO_KEY) {
+                    Object o = Scratchpad.popObject(key);
+                    Vector<Integer> ids = (Vector<Integer>)o;
+                    deleteBusses(ids);
+                }
+                break;
+            }
+            case s_adderId: {
+                int key = data.getIntExtra(getString(R.string.departures_in_intent),
+                                           Scratchpad.NO_KEY);
+                if (key != Scratchpad.NO_KEY) {
+                    Object o = Scratchpad.popObject(key);
+                    Vector<Integer> ids = (Vector<Integer>)o;
+                    addBusses(ids);
+                }
+                break;
+            }
             default:
                     super.onActivityResult(request, result, data);
             }
