@@ -141,12 +141,21 @@ public class ProfileEditor extends ListActivity
         refreshGUI();
     }
 
-    private void deleteBus(int itemIndex)
+    private void deleteBus(int stopId)
     {
         // Convert from GUI position to stopId
-        m_helper.removeItemFromBuffer(m_items.elementAt(itemIndex).stopId);
+        m_helper.removeItemFromBuffer(stopId);
 
         // Update the GUI
+        m_saveButton.setEnabled(true);
+        refreshGUI();
+    }
+   
+    private void deleteBusses(Vector<Integer> stopIds)
+    {
+        for (int stopId : stopIds) {
+            m_helper.removeItemFromBuffer(stopId);
+        }
         m_saveButton.setEnabled(true);
         refreshGUI();
     }
@@ -322,11 +331,23 @@ public class ProfileEditor extends ListActivity
     // Right now, the only sub-activity we have is the map (location picker)
     @Override public void onActivityResult(int request, int result, Intent data) {
         if (result == RESULT_OK) {
-            if (request == s_locationPickerId) {
-
-                double lat = data.getDoubleExtra("com.github.tommywalsh.mbta.Lat", 0.0);
-                double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0.0);
-                addBussesNearLocation(lat, lng);
+            switch (request) {
+                case s_locationPickerId:
+                    double lat = data.getDoubleExtra("com.github.tommywalsh.mbta.Lat", 0.0);
+                    double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0.0);
+                    addBussesNearLocation(lat, lng);
+                    break;
+                case s_prunerId:
+                    int key = data.getIntExtra(getString(R.string.departures_in_intent),
+                                               Scratchpad.NO_KEY);
+                    if (key != Scratchpad.NO_KEY) {
+                        Object o = Scratchpad.popObject(key);
+                        Vector<Integer> ids = (Vector<Integer>)o;
+                        deleteBusses(ids);
+                    }
+                    break;
+            default:
+                    super.onActivityResult(request, result, data);
             }
         }
     }
@@ -350,7 +371,8 @@ public class ProfileEditor extends ListActivity
         int menuId = item.getItemId();
         switch (menuId) {
         case DELETE_MENU:
-            deleteBus(position);
+            int stopId = m_items.elementAt(position).stopId;
+            deleteBus(stopId);
             return true;
         case STOP_MENU:
             android.widget.Toast.makeText(getApplicationContext(),
@@ -376,7 +398,7 @@ public class ProfileEditor extends ListActivity
             return m_items;
         }
 
-        public View processView(ProfileEditHelper.Entry thisInfo, View view) {
+        public View processView(int position, ProfileEditHelper.Entry thisInfo, View view) {
             TextView routeWidget = (TextView) view.findViewById(R.id.route_title);
             routeWidget.setText(thisInfo.route);
 

@@ -40,7 +40,7 @@ of the GPL.  See file gpl.txt for more information.
      android:layout_height="wrap_content"      
      android:layout_alignParentLeft="true"
      android:layout_toLeftOf="@+id/bus_check"
-     android:layout_below="@+id/subroute_title"
+     android:layout_below="@+id/bus_text"
      android:layout_alignParentBottom="true"
      android:gravity="center"
      android:textSize="@dimen/small_text"

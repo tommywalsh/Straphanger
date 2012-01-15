@@ -29,7 +29,7 @@ public abstract class VectorAdapter<V> extends BaseAdapter
 
     // Fill in the UI of the given view with information from the
     // given Vector item
-    public abstract View processView(V item, View view);
+    public abstract View processView(int position, V item, View view);
 
 
     ////////////////////////////////////////////////////
@@ -63,6 +63,6 @@ public abstract class VectorAdapter<V> extends BaseAdapter
             LayoutInflater inflater = (LayoutInflater)m_context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(m_layoutId, null);
         }
-        return processView(getItem(position), convertView);
+        return processView(position, getItem(position), convertView);
     }
 }

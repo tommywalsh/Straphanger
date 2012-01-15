@@ -199,7 +199,7 @@ public class DepartureViewer extends ListActivity
             return m_predictions;
         }
 
-        public View processView(Prediction p, View view) {
+        public View processView(int position, Prediction p, View view) {
             long now = java.lang.System.currentTimeMillis();
 
             // We're only going to refresh every so often -- say X seconds,

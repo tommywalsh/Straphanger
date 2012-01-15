@@ -11,6 +11,8 @@ import java.io.Serializable;
 import android.widget.TextView;
 import android.widget.CheckBox;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.app.ListActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,23 +22,18 @@ import android.content.Intent;
 public class ProfilePicker extends ListActivity
 {
 
-    private class ItemData
-    {
-        public int id;
-        public boolean checked;
-    }
-    //    private Vector<ItemData> m_data = new Vector<ItemData> ();
     private Vector<ProfileEditHelper.Entry> m_entries = new Vector<ProfileEditHelper.Entry>();
+    private Vector<Boolean> m_checked = new Vector<Boolean>();
 
     // When this activity is first created...
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        prepInternals(getIntent());
-        prepGUI();
+        String instructions = prepInternals(getIntent());
+        prepGUI(instructions);
     }
 
 
-    private void prepGUI()
+    private void prepGUI(String instructions)
     {
         // ... set up the look and feel...
         setContentView(R.layout.profile_picker);        
@@ -44,8 +41,16 @@ public class ProfilePicker extends ListActivity
         // ... set up our array adapter...
         setListAdapter(new ItemDataAdapter());
 
+        // ... give instructions...
+        TextView header = (TextView) findViewById(R.id.picker_header);
+        header.setText(instructions);
+
         // ... hook up our buttons ...
-        //        Button okButton = (Button) findViewById(R.id.picker_ok);
+        Button okButton = (Button) findViewById(R.id.picker_ok);
+        okButton.setOnClickListener(new OnClickListener() {
+                @Override public void onClick(View v) {
+                    reportResults();
+                }});
 
         Button cancelButton = (Button) findViewById(R.id.picker_cancel);
         cancelButton.setOnClickListener(new OnClickListener() {
@@ -54,17 +59,44 @@ public class ProfilePicker extends ListActivity
                 }});
     }
 
-    private void prepInternals(Intent intent)
+    private String prepInternals(Intent intent)
     {
         int key = intent.getIntExtra(getString(R.string.profile_entries_in_intent), 
                                      Scratchpad.NO_KEY);
         if (key != Scratchpad.NO_KEY) {
             Object o = Scratchpad.popObject(key);
             m_entries = (Vector<ProfileEditHelper.Entry>)o;
+            // All checkboxes are initially unchecked (guaranteed by our XML layout)
+            for (int i=0; i<m_entries.size(); i++) {
+                m_checked.add(false);
+            }
         }
-        String instructions = intent.getStringExtra(getString(R.string.instructions_in_intent));
-        
+
+        return intent.getStringExtra(getString(R.string.instructions_in_intent));
     }
+
+
+
+    private void reportResults()
+    {
+        // Collect checked items
+        Vector<Integer> ids = new Vector<Integer>();
+        for(int i=0; i<m_checked.size(); i++) {
+            if (m_checked.elementAt(i)) {
+                ids.add(m_entries.elementAt(i).stopId);
+                //                android.util.Log.d("mbta", "Added " + Integer.toString(m_entries.elementAt(i).stopId));
+            }
+        }
+
+        // And package them up for whoever called us
+        int key = Scratchpad.putObject(ids);
+        Intent i = new Intent();
+        i.putExtra(getString(R.string.departures_in_intent), key);
+        setResult(RESULT_OK, i);
+
+        finish();
+    }
+
 
     private class ItemDataAdapter extends VectorAdapter<ProfileEditHelper.Entry>
     {
@@ -76,34 +108,25 @@ public class ProfilePicker extends ListActivity
             return m_entries;
         }
 
-        public View processView(ProfileEditHelper.Entry e, View view) {
+        @Override public View processView(int p, ProfileEditHelper.Entry e, View view) {
+
+            final int position = p;
+
             TextView busText = (TextView) view.findViewById(R.id.bus_text);
-            busText.setText(e.route);
+            busText.setText(e.route + " - " + e.subroute);
+
+            TextView stopText = (TextView) view.findViewById(R.id.stop_text);
+            stopText.setText(e.stop);
 
             CheckBox cb = (CheckBox) view.findViewById(R.id.bus_check);
-            //            cb.setChecked(d.checked);
+            // no point doing setChecked(), since it can't change except by the user
+            cb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+                    public void onCheckedChanged(CompoundButton button, boolean isChecked) {
+                        m_checked.add(position, isChecked);
+                    }});
             
             return view;
         }
     }
 }
-
-/*
-
-
-import android.app.AlertDialog;
-
-import android.content.Context;
-import android.content.DialogInterface;
-
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.AdapterView.AdapterContextMenuInfo;
-
-import android.view.View.OnClickListener;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.MenuItem;
-import android.view.Menu;
-*/
 
