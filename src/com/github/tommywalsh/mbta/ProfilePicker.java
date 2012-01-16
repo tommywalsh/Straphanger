@@ -66,7 +66,7 @@ public class ProfilePicker extends ListActivity
         if (key != Scratchpad.NO_KEY) {
             Object o = Scratchpad.popObject(key);
             m_entries = (Vector<ProfileEditHelper.Entry>)o;
-            // All checkboxes are initially unchecked (guaranteed by our XML layout)
+            // All checkboxes are initially unchecked until someone tells them not to be
             for (int i=0; i<m_entries.size(); i++) {
                 m_checked.add(false);
             }
@@ -108,7 +108,7 @@ public class ProfilePicker extends ListActivity
 
         @Override public View processView(int p, ProfileEditHelper.Entry e, View view) {
 
-            final int position = p;
+            Integer position = p;
 
             TextView busText = (TextView) view.findViewById(R.id.bus_text);
             busText.setText(e.route + " - " + e.subroute);
@@ -117,10 +117,12 @@ public class ProfilePicker extends ListActivity
             stopText.setText(e.stop);
 
             CheckBox cb = (CheckBox) view.findViewById(R.id.bus_check);
-            // no point doing setChecked(), since it can't change except by the user
+            cb.setTag(position);
+            cb.setChecked(m_checked.elementAt(position));
             cb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
                     public void onCheckedChanged(CompoundButton button, boolean isChecked) {
-                        m_checked.add(position, isChecked);
+                        m_checked.set((Integer)button.getTag(), isChecked);
+                        notifyDataSetChanged();
                     }});
             
             return view;
