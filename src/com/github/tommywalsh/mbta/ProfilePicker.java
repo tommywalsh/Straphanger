@@ -84,7 +84,6 @@ public class ProfilePicker extends ListActivity
         for(int i=0; i<m_checked.size(); i++) {
             if (m_checked.elementAt(i)) {
                 ids.add(m_entries.elementAt(i).stopId);
-                //                android.util.Log.d("mbta", "Added " + Integer.toString(m_entries.elementAt(i).stopId));
             }
         }
 
@@ -93,7 +92,6 @@ public class ProfilePicker extends ListActivity
         Intent i = new Intent();
         i.putExtra(getString(R.string.departures_in_intent), key);
         setResult(RESULT_OK, i);
-
         finish();
     }
 

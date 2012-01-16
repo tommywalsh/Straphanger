@@ -26,6 +26,7 @@ public class Straphanger extends ListActivity
 {
     private static final int s_locationPickerId = 1050;
     private static final int s_profileDialogId  = 1060;
+    private static final int s_editorId = 1070;
     private ProfileProvider m_profProvider;
 
 
@@ -137,7 +138,7 @@ public class Straphanger extends ListActivity
         if (profileId != null) {
             i.putExtra(getString(R.string.profile_in_intent), profileId.intValue());
         }
-        startActivity(i);        
+        startActivityForResult(i, s_editorId);
     }
 
 
@@ -146,11 +147,21 @@ public class Straphanger extends ListActivity
     // result when we launched the sub-activity 
     @Override public void onActivityResult(int request, int result, Intent data) {
         if (result == RESULT_OK) {
-            if (request == s_locationPickerId) {
-                double lat = data.getDoubleExtra("com.github.tommywalsh.mbta.Lat", 0.0);
-                double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0);
-                Vector<Integer> departurePoints = ProximityProfileGenerator.getProximityProfile(this, lat, lng, 0.5);
-		viewDepartures(departurePoints);
+            switch (request) {
+            case s_locationPickerId:
+                {
+                    double lat = data.getDoubleExtra("com.github.tommywalsh.mbta.Lat", 0.0);
+                    double lng = data.getDoubleExtra("com.github.tommywalsh.mbta.Lng", 0);
+                    Vector<Integer> departurePoints = ProximityProfileGenerator.getProximityProfile(this, lat, lng, 0.5);
+                    viewDepartures(departurePoints);
+                    break;
+                }
+            case s_editorId:
+                {
+                    loadButtons();
+                    ((ButtonAdapter)getListAdapter()).notifyDataSetChanged();
+                    break;
+                }
             }
         }
     }
@@ -202,11 +213,19 @@ public class Straphanger extends ListActivity
 	m_profProvider = new ProfileProvider(this);
 
         m_buttonInfos.add(new ButtonInfo("Nearby Busses", m_proximityListener));
-        m_buttonInfos.add(new ButtonInfo("View Profile", m_viewDeparturesListener));
+        m_buttonInfos = addProfileButtonInfo(m_buttonInfos);
         m_buttonInfos.add(new ButtonInfo("New Profile", m_newProfileListener));
 
         setListAdapter(new ButtonAdapter());
     }
+
+    void loadButtons() {
+        m_buttonInfos.clear();
+        m_buttonInfos.add(new ButtonInfo("Nearby Busses", m_proximityListener));
+        m_buttonInfos = addProfileButtonInfo(m_buttonInfos);
+        m_buttonInfos.add(new ButtonInfo("New Profile", m_newProfileListener));
+    }
+
     Button m_loadProfileButton;
     Button m_editProfileButton;
 
@@ -222,6 +241,33 @@ public class Straphanger extends ListActivity
     }
 
     private Vector<ButtonInfo> m_buttonInfos = new Vector<ButtonInfo>();
+
+    private class ButtonListener implements OnClickListener
+    {
+        public ButtonListener(int id) {
+            profileId = id;
+        }
+        private int profileId;
+        public void onClick(View v) {
+            viewDepartures(m_profProvider.getDeparturePointsInProfile(profileId));
+        }
+    }
+
+    private Vector<ButtonInfo> addProfileButtonInfo(Vector<ButtonInfo> buttonInfos)
+    {
+        Database db = new Database(Straphanger.this);
+        Database.ProfileCursorWrapper cursor = db.getProfiles();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            buttonInfos.add(new ButtonInfo(cursor.getProfileName(),
+                                           new ButtonListener(cursor.getProfileId())));
+            cursor.moveToNext();
+        }
+        cursor.close();
+        db.close();
+
+        return buttonInfos;
+    }
 
     private class ButtonAdapter extends VectorAdapter<ButtonInfo>
     {

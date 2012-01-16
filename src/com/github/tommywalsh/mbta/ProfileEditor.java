@@ -109,6 +109,7 @@ public class ProfileEditor extends ListActivity
         m_helper.setBufferName(bufferName);
         m_helper.saveBufferToPersistentStorage();
         m_saveButton.setEnabled(false);
+        setResult(RESULT_OK, new Intent());
         finish();
     }
 
