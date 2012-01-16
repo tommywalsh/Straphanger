@@ -27,6 +27,8 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
 import android.view.Menu;
 
+import android.text.InputType;
+
 import java.util.Vector;
 import java.io.Serializable;
 
@@ -106,6 +108,9 @@ public class ProfileEditor extends ListActivity
     // This is called after the user confirms the save dialog
     private void saveEditBuffer(String bufferName)
     {
+        if (bufferName.equals("")) {
+            bufferName = "(Untitled)";
+        }
         m_helper.setBufferName(bufferName);
         m_helper.saveBufferToPersistentStorage();
         m_saveButton.setEnabled(false);
@@ -301,15 +306,12 @@ public class ProfileEditor extends ListActivity
     // profile name, really save, and/or cancel
     private void launchSaveDialog() {
         final EditText tv = new EditText(ProfileEditor.this);
+        tv.setText(m_profileName);
+        tv.setRawInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(ProfileEditor.this);
         builder.setTitle("Profile Name");
         builder.setCancelable(true);
-        
-        if (m_profileName.length() == 0) {
-            tv.setText("Untitled");
-        } else {
-            tv.setText(m_profileName);
-        }
         builder.setView(tv);
         builder.setNegativeButton("Cancel", null);
         builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
