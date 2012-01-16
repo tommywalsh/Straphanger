@@ -18,7 +18,7 @@ of the GPL.  See file gpl.txt for more information.
      android:layout_height="wrap_content"      
      android:layout_centerHorizontal="true"
      android:layout_alignParentBottom="true"
-     android:layout_marginBottom="25px"
+     android:layout_marginBottom="30px"
      android:gravity="center"
      android:textSize="20sp"
      android:textColor="#ffffff"
@@ -31,12 +31,14 @@ of the GPL.  See file gpl.txt for more information.
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
+            android:layout_marginBottom="30px"
             android:gravity="center_horizontal|top"
             android:layout_width="171px"
             android:layout_height="wrap_content"
             android:layout_weight="10"
             android:divider="@android:color/transparent"
             android:dividerHeight="2px"
+            android:cacheColorHint="#00000000"
             />
   
 

@@ -122,6 +122,7 @@ public class ProfileEditor extends ListActivity
 
         // Since we've just deleted our profile, there's nothing
         // left for the editor to do.  So, let's end this activity
+        setResult(RESULT_OK, new Intent());
         finish();
     }
 
