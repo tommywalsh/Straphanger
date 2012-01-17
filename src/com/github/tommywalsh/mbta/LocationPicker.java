@@ -35,10 +35,6 @@ import android.graphics.Paint;
 // If the user does pick a location, we "return" a RESULT_OK code with
 // the latitude and longitude stored in the returned intent.
 //
-// The map is hard-coded to start showing Downtown Boston.  If we get
-// a location fix, we scroll the map to show the current location
-// (unless the user has already moved/zoomed the map)
-//
 // The user selects a location by double-tap.
 public class LocationPicker extends MapActivity
 {
