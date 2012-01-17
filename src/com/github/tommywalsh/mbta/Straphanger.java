@@ -37,51 +37,18 @@ public class Straphanger extends ListActivity
     private static final int VIEW_DEPARTURES = 1;
     private static final int EDIT_PROFILE = 2;
 
-    private class ProfileDialogInfo
-    {
-        String[] profileNames;
-        int[] profileIds;
-    };
-
-    // What goes into the dialog?
-    private ProfileDialogInfo getProfileDialogInfo()
-    {
-        Database db = new Database(Straphanger.this);
-        Database.ProfileCursorWrapper cursor = db.getProfiles();
-
-        final int size = cursor.getCount();
-
-        ProfileDialogInfo pdi = new ProfileDialogInfo();
-        pdi.profileNames = new String[size];
-        pdi.profileIds = new int[size];
-        
-        cursor.moveToFirst();
-        for (int i = 0; i < size & !(cursor.isAfterLast()); i++) {
-            pdi.profileNames[i] = cursor.getProfileName();
-            pdi.profileIds[i] = cursor.getProfileId();
-            cursor.moveToNext();                    
-        }
-        cursor.close();
-        db.close();
-
-        return pdi;
-    }
-
     // Launches the dialog, for purposes of the given action
     void launchProfileSelectionDialog(int act)
     {
         final int action = act;
-        final ProfileDialogInfo pdi = getProfileDialogInfo();
-        AlertDialog.Builder builder = new AlertDialog.Builder(Straphanger.this);
-        builder.setTitle("Pick a profile");
-        
-        builder.setItems(pdi.profileNames, new DialogInterface.OnClickListener() {                
-                public void onClick(DialogInterface d, int id) {
-                    onProfileSelectionDialogConfirm(action, pdi.profileIds[id]);
-                }});
-        
-        AlertDialog dlg = builder.create();
-        dlg.setOwnerActivity(Straphanger.this);
+        ProfileChooserDialog dlg = new ProfileChooserDialog(
+            Straphanger.this,
+            new ProfileChooserDialog.Listener() {
+                public void onProfileChoose(int profileId) {
+                    onProfileSelectionDialogConfirm(action, profileId);
+                }
+            });
+
         dlg.show();
     }
 
