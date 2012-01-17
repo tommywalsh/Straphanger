@@ -19,7 +19,7 @@ import android.view.View.OnClickListener;
 import android.os.Bundle;
 import android.content.Intent;
 
-public class ProfilePicker extends ListActivity
+public class BusChooser extends ListActivity
 {
 
     private Vector<ProfileEditHelper.Entry> m_entries = new Vector<ProfileEditHelper.Entry>();

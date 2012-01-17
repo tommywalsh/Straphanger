@@ -267,7 +267,7 @@ public class ProfileEditor extends ListActivity
         } else {
             Vector<ProfileEditHelper.Entry> entries = m_helper.getItemsFromIds(newDeparturePoints);
             int key = Scratchpad.putObject(entries);
-            Intent pruneIntent = new Intent(ProfileEditor.this, ProfilePicker.class);
+            Intent pruneIntent = new Intent(ProfileEditor.this, BusChooser.class);
             pruneIntent.putExtra(getString(R.string.instructions_in_intent),
                                  "Pick busses to add to profile");
             pruneIntent.putExtra(getString(R.string.profile_entries_in_intent),
@@ -283,7 +283,7 @@ public class ProfileEditor extends ListActivity
         int size = m_items.size();
 
         // Send the pruner its instructions
-        Intent pruneIntent = new Intent(ProfileEditor.this, ProfilePicker.class);
+        Intent pruneIntent = new Intent(ProfileEditor.this, BusChooser.class);
         pruneIntent.putExtra(getString(R.string.instructions_in_intent),
                              "Pick busses to remove from profile");
         int key = Scratchpad.putObject(m_items);
