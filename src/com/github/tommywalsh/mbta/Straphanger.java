@@ -34,7 +34,6 @@ public class Straphanger extends ListActivity
     //////////////////////////////////////////////////////////////////////////////
     ///// FUNCTIONS FOR LAUNCHING AND REACTING TO "PICK A PROFILE" DIALOGS ///////
 
-    private static final int VIEW_DEPARTURES = 1;
     private static final int EDIT_PROFILE = 2;
 
     // Launches the dialog, for purposes of the given action
@@ -55,25 +54,14 @@ public class Straphanger extends ListActivity
     // React to user selecting a profile from the dialog
     void onProfileSelectionDialogConfirm(int action, int id)
     {
-        switch (action) {
-        case VIEW_DEPARTURES:
-            viewDepartures(m_profProvider.getDeparturePointsInProfile(id));
-            break;
-        case EDIT_PROFILE:
-            launchEditor(id);
-            break;
-        }
+        assert(action == EDIT_PROFILE);
+        launchEditor(id);
     }
     ///////////////////////////////////////////////////////////////////////////////
 
 
 
 
-
-    private OnClickListener m_viewDeparturesListener = new OnClickListener() {
-	    public void onClick(View v) {
-                launchProfileSelectionDialog(VIEW_DEPARTURES);
-            }};
 
     private OnClickListener m_databaseListener = new OnClickListener() {
 	    public void onClick(View v) {
