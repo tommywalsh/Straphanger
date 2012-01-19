@@ -33,16 +33,18 @@ import android.database.sqlite.SQLiteDatabase;
 // anew from the server.  Takes a long time.
 public class DatabaseBuilder
 {
-    // Must pass in the application context here, so that 
-    // database may be shared with entire application
-    public DatabaseBuilder()
+
+    private Context m_context;
+    static private String PREFS_NAME = "db_status";
+    public DatabaseBuilder(Context ctx)
     {
+        m_context = ctx;
     }
 
     // Returns immediately, but opens progress dialog on the given context
-    public void spawnRebuildTask(Context ctx) 
+    public void spawnRebuildTask()
     {
-	new RebuilderTask(ctx).execute();
+	new RebuilderTask(m_context).execute();
     }
 
 
@@ -59,12 +61,14 @@ public class DatabaseBuilder
 	private int m_dialogs; // how many dialogs have we created?
 
 	@Override protected void onPreExecute() {
+            DatabaseMonitor.setComplete(false);
 	    m_dlg = ProgressDialog.show(m_ctx, "", "Loading Route List", true);
 	    m_dialogs = 1;
 	}
 
 	@Override protected void onPostExecute(java.lang.Void v) {
 	    m_dlg.cancel();
+            DatabaseMonitor.setComplete(true);
 	}
 
 	@Override protected void onProgressUpdate(Integer... val) {

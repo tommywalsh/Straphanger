@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2011-12 Tom Walsh
+
+This program is free software released under version 3
+of the GPL.  See file gpl.txt for more information.
+-->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	 	android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		>
+
+  <TextView
+     android:id="@+id/welcome_text"
+     android:layout_width="fill_parent"
+     android:layout_height="wrap_content"
+     android:layout_alignParentTop="true"
+     android:gravity="center"
+     android:textSize="20sp"
+     android:text="Welcome to Straphanger"
+     />
+
+  <TextView
+     android:id="@+id/scare_text"
+     android:layout_width="fill_parent" 
+     android:layout_height="wrap_content"      
+     android:layout_below="@id/welcome_text"
+     android:textSize="14sp"
+     android:text=
+"Before the application can function, a fairly large set of data needs to 
+be retrieved from the MBTA.  This can take several minutes.  It's advisable 
+to do this while you have stable high-speed service or are connected to the
+internet via WiFi"
+     />
+
+  <Button 
+      android:id="@+id/build_button"
+      android:layout_below="@id/scare_text"
+      android:layout_alignParentBottom="true"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:text="Rebuild Database Now"
+      />
+  
+
+</RelativeLayout>
+

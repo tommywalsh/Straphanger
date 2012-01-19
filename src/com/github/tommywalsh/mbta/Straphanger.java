@@ -65,7 +65,8 @@ public class Straphanger extends ListActivity
 
     private OnClickListener m_databaseListener = new OnClickListener() {
 	    public void onClick(View v) {
-		m_dbBuilder.spawnRebuildTask(Straphanger.this);
+                DatabaseBuilder b = new DatabaseBuilder(Straphanger.this);
+		b.spawnRebuildTask();
 	    }
 	};
 
@@ -131,11 +132,9 @@ public class Straphanger extends ListActivity
 	}
 	Intent i = new Intent(this, DepartureViewer.class);
 	i.putExtra(getString(R.string.departures_in_intent), transitArray);
-	startActivity(i);        
+	startActivity(i);
     }
 
-
-    private DatabaseBuilder m_dbBuilder;
 
     @Override public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -162,9 +161,16 @@ public class Straphanger extends ListActivity
     @Override public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
+
+        DatabaseMonitor.init(getApplicationContext());
+        if (!DatabaseMonitor.isComplete()) {
+            Intent i = new Intent(this, DatabaseActivity.class);
+            startActivity(i);        
+            finish();
+        }
+
         setContentView(R.layout.main_screen);
 
-	m_dbBuilder = new DatabaseBuilder();
 	m_profProvider = new ProfileProvider(this);
 
         m_buttonInfos.add(new ButtonInfo("Nearby Busses", m_proximityListener));
