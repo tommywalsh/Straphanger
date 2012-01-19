@@ -27,6 +27,15 @@ public class DatabaseActivity extends Activity
                     DatabaseBuilder b = new DatabaseBuilder(DatabaseActivity.this);
                     b.spawnRebuildTask();
                 }});
+
+        Button cancelButton = (Button)findViewById(R.id.cancel_build_button);
+        cancelButton.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    android.util.Log.d("mbta", "CANCEL REQUEST");
+                    DatabaseActivity.this.finish();
+                }});
+
+
     }
 
     @Override protected void onResume() {

@@ -16,6 +16,8 @@ of the GPL.  See file gpl.txt for more information.
      android:layout_width="fill_parent"
      android:layout_height="wrap_content"
      android:layout_alignParentTop="true"
+     android:layout_alignParentLeft="true"
+     android:layout_alignParentRight="true"
      android:gravity="center"
      android:textSize="20sp"
      android:text="Welcome to Straphanger"
@@ -23,8 +25,10 @@ of the GPL.  See file gpl.txt for more information.
 
   <TextView
      android:id="@+id/scare_text"
-     android:layout_width="fill_parent" 
-     android:layout_height="wrap_content"      
+     android:layout_width="fill_parent"
+     android:layout_height="wrap_content"
+     android:layout_alignParentLeft="true"
+     android:layout_alignParentRight="true"
      android:layout_below="@id/welcome_text"
      android:textSize="14sp"
      android:text=
@@ -34,15 +38,33 @@ to do this while you have stable high-speed service or are connected to the
 internet via WiFi"
      />
 
-  <Button 
-      android:id="@+id/build_button"
-      android:layout_below="@id/scare_text"
-      android:layout_alignParentBottom="true"
+  <LinearLayout
+      android:orientation="horizontal"
       android:layout_width="fill_parent"
       android:layout_height="wrap_content"
-      android:text="Rebuild Database Now"
-      />
-  
+      android:layout_alignParentBottom="true"
+      >
+
+    <Button 
+        android:id="@+id/build_button"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:text="Rebuild Database Now"
+        />
+
+    <Button
+        android:id="@+id/cancel_build_button"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="Exit Straphanger"
+        />
+  </LinearLayout>  
 
 </RelativeLayout>
 
