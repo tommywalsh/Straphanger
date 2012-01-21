@@ -117,7 +117,12 @@ public class DatabaseBuilder
 
 		// and the stop data
 		for (ContentValues stopData : rih.stopData) {
-		    m_db.insert("stop", null, stopData);
+                    // Some stops are shared between routes.  If we just
+                    // "insert" here, we'll get constraint violations.
+                    // But, we also don't want to bother searching.
+                    // Just call "replace" which might as well be called 
+                    // "insertOrReplace"
+		    m_db.replace("stop", null, stopData);
 		}
 
 		// and the subroute data...
@@ -137,6 +142,7 @@ public class DatabaseBuilder
 
             m_db.setTransactionSuccessful();
             m_db.endTransaction();
+            m_db.close();
 
 	    return null;
 	}

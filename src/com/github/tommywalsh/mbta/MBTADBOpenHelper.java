@@ -43,7 +43,7 @@ public class MBTADBOpenHelper extends SQLiteOpenHelper
 
     private static final String STOP_NAME = "stop";
     private static final String STOP_SCHEMA = 
-	"(tag TEXT PRIMARY KEY, lat REAL, lng REAL, title TEXT)";
+	"(tag TEXT PRIMARY KEY, lat REAL, lng REAL, title TEXT, UNIQUE(tag) ON CONFLICT REPLACE)";
 
     private static final String ROUTE_DIRECTION_NAME = "subroute";
     private static final String ROUTE_DIRECTION_SCHEMA = 
