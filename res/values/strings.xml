@@ -31,4 +31,18 @@ of the GPL.  See file gpl.txt for more information.
   <string name="upcoming_departures">Upcoming Departures</string>
   <string name="no_departures">No upcoming departures!</string>
 
+  <string name="welcome_banner">Welcome To Straphanger!</string>
+  <string name="download_banner">Refresh Database</string>  
+  <string name="welcome_text">
+    Before this app can do anything interesting, a database of route data
+    must be downloaded from the MBTA.
+  </string>
+  <string name="scare_text">
+    Downloading the database can take several minutes.  It\'s advisable
+    to do this while you have stable high-speed service or are connected
+    to the internet via WiFi.
+  </string>
+  <string name="dl_text">Download Database Now</string>
+  <string name="quit">Exit Straphanger</string>
+
 </resources>

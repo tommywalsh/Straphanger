@@ -12,30 +12,32 @@ of the GPL.  See file gpl.txt for more information.
 		>
 
   <TextView
-     android:id="@+id/welcome_text"
+     android:id="@+id/welcome_title"
      android:layout_width="fill_parent"
      android:layout_height="wrap_content"
      android:layout_alignParentTop="true"
      android:layout_alignParentLeft="true"
      android:layout_alignParentRight="true"
      android:gravity="center"
-     android:textSize="20sp"
-     android:text="Welcome to Straphanger"
+     android:background="@color/accent"
+     android:textSize="22sp"
+     android:text="@string/welcome_banner"
      />
 
   <TextView
-     android:id="@+id/scare_text"
-     android:layout_width="fill_parent"
-     android:layout_height="wrap_content"
-     android:layout_alignParentLeft="true"
-     android:layout_alignParentRight="true"
-     android:layout_below="@id/welcome_text"
-     android:textSize="14sp"
-     android:text=
-"Before the application can function, a fairly large set of data needs to 
-be retrieved from the MBTA.  This can take several minutes.  It's advisable 
-to do this while you have stable high-speed service or are connected to the
-internet via WiFi"
+     android:id="@+id/welcome_text"
+     style="@style/info_text"
+     android:layout_below="@id/welcome_title"
+     android:text="@string/welcome_text"
+     />
+
+    <TextView
+        android:id="@+id/scare_text"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/welcome_text"
+        style="@style/scare_text"
+        android:text="@string/scare_text"
      />
 
   <LinearLayout
@@ -52,7 +54,7 @@ internet via WiFi"
         android:layout_weight="1"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:text="Rebuild Database Now"
+        android:text="@string/dl_text"
         />
 
     <Button
@@ -62,7 +64,7 @@ internet via WiFi"
         android:layout_weight="1"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:text="Exit Straphanger"
+        android:text="@string/quit"
         />
   </LinearLayout>  
 
