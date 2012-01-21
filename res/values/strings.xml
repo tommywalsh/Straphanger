@@ -17,6 +17,8 @@ of the GPL.  See file gpl.txt for more information.
   <string name="departures_in_intent">com.github.tommywalsh.mbta.Departures</string>
   <string name="profile_entries_in_intent">com.github.tommywalsh.mbta.ProfileEntries</string>
   <string name="instructions_in_intent">com.github.tommywalsh.mbta.Instructions</string>
+  <string name="db_screen_style_in_intent">com.github.tommywalsh.mbta.ScreenStyle</string>
+
   <string name="download_message">Downloading.  Please wait...</string>
 
 
@@ -32,7 +34,7 @@ of the GPL.  See file gpl.txt for more information.
   <string name="no_departures">No upcoming departures!</string>
 
   <string name="welcome_banner">Welcome To Straphanger!</string>
-  <string name="download_banner">Refresh Database</string>  
+  <string name="download_banner">Refresh Database</string>
   <string name="welcome_text">
     Before this app can do anything interesting, a database of route data
     must be downloaded from the MBTA.

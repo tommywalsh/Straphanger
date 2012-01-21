@@ -96,6 +96,16 @@ public class Straphanger extends ListActivity
         }
         startActivityForResult(i, s_editorId);
     }
+    private void launchDatabase(int behavior)
+    {
+        Intent i = new Intent(this, DatabaseActivity.class);
+        i.putExtra(getString(R.string.db_screen_style_in_intent), 
+                   behavior);
+        startActivity(i);
+    }        
+
+
+
 
 
 
@@ -150,22 +160,23 @@ public class Straphanger extends ListActivity
             launchProfileSelectionDialog(EDIT_PROFILE);
             return true;
         case R.id.rebuild_database:
-            //            rebuildDatabase();
+            android.util.Log.d("mbta", "Got here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            launchDatabase(DatabaseActivity.REBUILD_BEHAVIOR);
             return true;
         default:
             return super.onOptionsItemSelected(item);
         }
     }
-    
 
     @Override public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
 
         DatabaseMonitor.init(getApplicationContext());
+        android.util.Log.d("mbta", "Starting main screen");
         if (!DatabaseMonitor.isComplete()) {
-            Intent i = new Intent(this, DatabaseActivity.class);
-            startActivity(i);        
+                android.util.Log.d("mbta", "Starting dbactivity because no db");
+            launchDatabase(DatabaseActivity.WELCOME_BEHAVIOR);
             finish();
         }
 

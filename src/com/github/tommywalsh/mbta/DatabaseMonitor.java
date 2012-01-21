@@ -7,7 +7,7 @@ package com.github.tommywalsh.mbta;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
+import java.util.Vector;
 
 // This is a simple singleton class that can be used to 
 // check whether or not we have a complete database
@@ -20,7 +20,13 @@ public class DatabaseMonitor
 
     public static void setComplete (boolean complete) {
         s_isComplete = complete;
-        savePersistent();        
+        savePersistent();
+        if (s_isComplete) {
+            for (CompletionListener listener : s_listeners) {
+                listener.onCompleted();
+            }
+            s_listeners.clear();
+        }
     }
 
     public static void init(Context applicationContext) {
@@ -28,8 +34,19 @@ public class DatabaseMonitor
         loadPersistent();
     }
 
+    public interface CompletionListener {
+        public void onCompleted();
+    }
+    
+    public static void addCompletionListener(CompletionListener listener)
+    {
+        s_listeners.add(listener);
+    }
 
 
+
+
+    private static Vector<CompletionListener> s_listeners = new Vector<CompletionListener>();
 
     private static boolean s_isComplete = false;
     private static Context s_appContext;
