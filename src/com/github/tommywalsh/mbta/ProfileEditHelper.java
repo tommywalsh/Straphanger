@@ -30,9 +30,10 @@ public class ProfileEditHelper implements Serializable
         String subroute;
         String route;
         Integer stopId;
+        String subrouteTag;
         
-        public Entry(String s, String sr, String r, Integer id) {
-            stop = s; subroute = sr; route = r; stopId = id;
+        public Entry(String s, String sr, String r, Integer id, String srTag) {
+            stop = s; subroute = sr; route = r; stopId = id; subrouteTag = srTag;
         }
     }
 
@@ -91,7 +92,8 @@ public class ProfileEditHelper implements Serializable
             Entry e = new Entry(cursor.getStopTitle(),
                                 cursor.getSubrouteTitle(),
                                 cursor.getRouteTitle(),
-                                cursor.getDepartureId());
+                                cursor.getDepartureId(),
+                                cursor.getSubrouteTag());
             entries.addElement(e);
             cursor.moveToNext();
         }
@@ -108,7 +110,8 @@ public class ProfileEditHelper implements Serializable
             Entry e = new Entry(cursor.getStopTitle(),
                                 cursor.getSubrouteTitle(),
                                 cursor.getRouteTitle(),
-                                cursor.getDepartureId());
+                                cursor.getDepartureId(),
+                                cursor.getSubrouteTag());
             entries.addElement(e);
             cursor.moveToNext();
         }

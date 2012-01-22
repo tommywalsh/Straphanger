@@ -157,10 +157,10 @@ public class Straphanger extends ListActivity
     {
         switch (item.getItemId()) {
         case R.id.edit_profile:
+            android.util.Log.d("mbta", "Got here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             launchProfileSelectionDialog(EDIT_PROFILE);
             return true;
         case R.id.rebuild_database:
-            android.util.Log.d("mbta", "Got here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             launchDatabase(DatabaseActivity.REBUILD_BEHAVIOR);
             return true;
         default:

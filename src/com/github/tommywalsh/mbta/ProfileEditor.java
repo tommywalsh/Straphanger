@@ -73,8 +73,10 @@ public class ProfileEditor extends ListActivity
 
     // We locally cache the items in the profile list...
     private Vector<ProfileEditHelper.Entry> m_items;
-    // ... and the profile name
+    // ... and the profile name...
     private String m_profileName;
+    // ... and the profileId
+    private int m_profileId;
 
     // We need to disable/enable the save button occasionally...
     private Button m_saveButton;
@@ -96,11 +98,11 @@ public class ProfileEditor extends ListActivity
     // the activity starts up
     private void prepEditBuffer() {
         Intent i = getIntent();
-        int profileId = i.getIntExtra(getString(R.string.profile_in_intent), ProfileEditHelper.NEW_PROFILE);
+        m_profileId = i.getIntExtra(getString(R.string.profile_in_intent), ProfileEditHelper.NEW_PROFILE);
         
-        m_helper = new ProfileEditHelper(getApplicationContext(), profileId);
+        m_helper = new ProfileEditHelper(getApplicationContext(), m_profileId);
         m_helper.clearBuffer();
-        if (profileId != ProfileEditHelper.NEW_PROFILE) {
+        if (m_profileId != ProfileEditHelper.NEW_PROFILE) {
             m_helper.loadBufferFromPersistentStorage();
         }
     }
@@ -256,6 +258,7 @@ public class ProfileEditor extends ListActivity
     private static final int s_locationPickerId = 2050;
     private static final int s_prunerId = 2060;
     private static final int s_adderId = 2070;
+    private static final int s_stopChoiceId = 2080;
 
 
     // This launches a sub-activity, from which the user can pick
@@ -374,6 +377,12 @@ public class ProfileEditor extends ListActivity
                 }
                 break;
             }
+            case s_stopChoiceId: {
+                int stop = data.getIntExtra(getString(R.string.stop_choice_in_intent),
+                                            -55);
+                android.util.Log.d("mbta", "User picked stop " + Integer.toString(stop));
+                break;
+            }
             default:
                     super.onActivityResult(request, result, data);
             }
@@ -397,15 +406,18 @@ public class ProfileEditor extends ListActivity
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
         int position = info.position;
         int menuId = item.getItemId();
+        int stopId = m_items.elementAt(position).stopId;
+        String subroute = m_items.elementAt(position).subrouteTag;
         switch (menuId) {
         case DELETE_MENU:
-            int stopId = m_items.elementAt(position).stopId;
             deleteBus(stopId);
             return true;
         case STOP_MENU:
-            android.widget.Toast.makeText(getApplicationContext(),
-                                          "Sorry, this feature is not implemented yet",
-                                          android.widget.Toast.LENGTH_SHORT);
+            Intent i = new Intent(ProfileEditor.this, StopChooser.class);
+            android.util.Log.d("mbta", "Subroute is " + subroute);
+            i.putExtra(getString(R.string.subroute_in_intent), subroute);
+            i.putExtra(getString(R.string.stop_choice_in_intent), stopId);
+            startActivityForResult(i, s_stopChoiceId);
             return true;
         default:
             return super.onContextItemSelected(item);

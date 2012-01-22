@@ -36,6 +36,7 @@
     <activity android:name=".ProfileEditor" android:label="Profile Editor" android:launchMode="standard" />
     <activity android:name=".BusChooser" android:label="Bus Chooser" android:launchMode="standard" />
     <activity android:name=".DatabaseActivity" android:label="Welcome Screen" android:launchMode="standard" />
+    <activity android:name=".StopChooser" android:label="Stop Chooser" android:launchMode="standard" />
     
   </application>
   

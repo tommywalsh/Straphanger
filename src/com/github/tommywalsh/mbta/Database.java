@@ -25,8 +25,8 @@ import java.util.Vector;
 //
 // Database my_db = new Database(mycontext);
 // SpecializedCursor cursor = my_db.getStuffIWant();
-// cursor.moveToFront();
-// while (!(cursor.isAfterEnd())) {
+// cursor.moveToFirst();
+// while (!(cursor.isAfterLast())) {
 //     doSomethingWithValue(cursor.getSpecificValue());
 //     cursor.moveToNext();
 // }
@@ -44,7 +44,31 @@ public class Database
 
 
 
+    public class SubrouteStopCursorWrapper extends CursorWrapper
+    {
+        public SubrouteStopCursorWrapper(Cursor cursor) {
+            super(cursor);
+        }
+        public String getStopName() {
+            return getString(1);
+        }
+        public int getStopId() {
+            return getInt(0);
+        }
+    }
 
+    public SubrouteStopCursorWrapper getStopsForSubroute(String subroute)
+    {
+        String query = "SELECT departure_point.id, stop.title, " +
+            " stop.tag, departure_point.subroute, departure_point.stop, departure_point.stopNum " + 
+            " FROM departure_point, stop" +
+            " WHERE departure_point. subroute = '" + subroute + "'" +
+            " AND departure_point.stop = stop.tag" +
+            " ORDER BY departure_point.stopNum";
+        
+        Cursor cursor = m_db.rawQuery(query, null);
+	return new SubrouteStopCursorWrapper(cursor);
+    }
 
 
     public class RouteStopCursorWrapper extends CursorWrapper
@@ -204,6 +228,9 @@ public class Database
         public Integer getDepartureId() {
             return getInt(3);
         }
+        public String getSubrouteTag() {
+            return getString(4);
+        }
     }
 
     public int getLargestProfileId() {
@@ -225,7 +252,7 @@ public class Database
     public ProfileInfoCursorWrapper getProfileInfo(int profileId)
     {
         Integer pid = profileId;
-	String query = "SELECT route.title, subroute.title, stop.title, departure_point.id " +
+	String query = "SELECT route.title, subroute.title, stop.title, departure_point.id, subroute.tag " +
             " FROM stop,subroute,route,departure_point" +
             " WHERE stop.tag = departure_point.stop " +
             " AND route.tag = subroute.route " +
@@ -239,7 +266,7 @@ public class Database
 
     public ProfileInfoCursorWrapper getProfileInfo(Vector<Integer> departureIds)
     {
-	String query = "SELECT route.title, subroute.title, stop.title, departure_point.id " +
+	String query = "SELECT route.title, subroute.title, stop.title, departure_point.id, subroute.tag" +
             " FROM stop,subroute,route,departure_point " +
             " WHERE stop.tag = departure_point.stop " +
             " AND route.tag = subroute.route " +

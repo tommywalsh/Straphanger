@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Copyright 2012 Tom Walsh
+
+This program is free software released under version 3
+of the GPL.  See file gpl.txt for more information.
+-->
+
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent">
+
+  <TextView android:id="@+id/stop_picker_header"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="@dimen/big_text"
+            android:textColor="@color/foreground"
+            />
+
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/titles"
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/stop_picker_header">
+
+    <TextView
+        android:id="@+id/route_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:gravity="left|center_vertical"
+        android:textSize="@dimen/giant_text"
+        android:textColor="@color/foreground"
+        android:text="##"
+        />
+
+    <TextView
+        android:id="@+id/subroute_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@id/route_title"
+        android:gravity="center"
+        android:textSize="@dimen/medium_text"
+        android:textColor="@color/foreground"
+        android:text="To Destination via Waypoint"
+        />
+
+  </LinearLayout>
+
+
+
+
+
+  <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/ok_and_cancel"
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+
+
+    <Button android:id="@+id/ok"
+            android:text="@string/ok"
+            android:layout_weight="1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            />
+
+    <Button android:id="@+id/cancel"
+            android:text="@string/cancel"
+            android:layout_weight="1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            />
+    
+  </LinearLayout>
+
+
+  <ScrollView
+      android:id="@+id/stop_scrollview"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:layout_alignParentLeft="true"
+      android:layout_alignParentRight="true"
+      android:layout_weight="1"
+      android:layout_above="@id/ok_and_cancel"
+      android:layout_below="@id/titles"
+      >
+
+    <RadioGroup android:id="@+id/stop_group" 
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                />
+  </ScrollView>
+  
+
+
+  
+</RelativeLayout>

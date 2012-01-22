@@ -18,6 +18,9 @@ of the GPL.  See file gpl.txt for more information.
   <string name="profile_entries_in_intent">com.github.tommywalsh.mbta.ProfileEntries</string>
   <string name="instructions_in_intent">com.github.tommywalsh.mbta.Instructions</string>
   <string name="db_screen_style_in_intent">com.github.tommywalsh.mbta.ScreenStyle</string>
+  <string name="stop_choice_in_intent">com.github.tommywalsh.mbta.StopChoice</string>
+  <string name="subroute_in_intent">com.github.tommywalsh.mbta.Subroute</string>
+  
 
   <string name="download_message">Downloading.  Please wait...</string>
 
@@ -29,6 +32,7 @@ of the GPL.  See file gpl.txt for more information.
 
   <string name="save">Save</string>
   <string name="cancel">Cancel</string>
+  <string name="ok">OK</string>
 
   <string name="upcoming_departures">Upcoming Departures</string>
   <string name="no_departures">No upcoming departures!</string>
