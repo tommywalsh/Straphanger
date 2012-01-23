@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.ScrollView;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -26,19 +28,29 @@ public class StopChooser extends Activity
         m_subroute = i.getStringExtra(getString(R.string.subroute_in_intent));
         m_stopChoice = i.getIntExtra(getString(R.string.stop_choice_in_intent),
                                      -1);
+        String route = i.getStringExtra(getString(R.string.route_in_intent));
+        String srTitle = i.getStringExtra(getString(R.string.srtitle_in_intent));
 
-        initGUI();
+        initGUI(route, srTitle);
     }
 
 
     private String m_subroute;
     private int m_stopChoice;
+    private RadioGroup m_group;
 
-    private void initGUI()
+    private void initGUI(String route, String srTitle)
     {
-        RadioGroup group = (RadioGroup)findViewById(R.id.stop_group);        
+        m_group = (RadioGroup)findViewById(R.id.stop_group);        
         Button buttonToSelect = null;
-        
+
+        TextView routeTV = (TextView)findViewById(R.id.route_title);
+        routeTV.setText(route);
+
+        TextView subrouteTV = (TextView)findViewById(R.id.subroute_title);
+        subrouteTV.setText(srTitle);
+
+
         Database db = new Database(this);
         Database.SubrouteStopCursorWrapper cursor = db.getStopsForSubroute(m_subroute);
         cursor.moveToFirst();
@@ -53,10 +65,7 @@ public class StopChooser extends Activity
                 buttonToSelect = button;
             }
 
-            android.util.Log.d("mbta", "Adding " + 
-                               Integer.toString(stopId));
-            
-            group.addView(button);
+            m_group.addView(button);
 
             cursor.moveToNext();
         } 
@@ -65,21 +74,18 @@ public class StopChooser extends Activity
             
 
         if (buttonToSelect != null) {
-            group.check(buttonToSelect.getId());
+            m_group.check(buttonToSelect.getId());
+            int top = buttonToSelect.getTop();
+            ScrollView sv = (ScrollView)findViewById(R.id.stop_scrollview);
+            sv.scrollTo(0, top);
         }
             
-
-        android.util.Log.d("mbta", "User is editing route " + 
-                           m_subroute +
-                           " with stop " +
-                           Integer.toString(m_stopChoice));
-
-
         Button okButton = (Button)findViewById(R.id.ok);
         okButton.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
+                    View button = m_group.findViewById(m_group.getCheckedRadioButtonId());
                     Intent i = new Intent();
-                    i.putExtra(getString(R.string.stop_choice_in_intent),7);
+                    i.putExtra(getString(R.string.stop_choice_in_intent),(Integer)button.getTag());
                     setResult(RESULT_OK, i);
                     finish();
                 }});

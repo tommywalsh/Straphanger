@@ -62,7 +62,7 @@ public class Database
         String query = "SELECT departure_point.id, stop.title, " +
             " stop.tag, departure_point.subroute, departure_point.stop, departure_point.stopNum " + 
             " FROM departure_point, stop" +
-            " WHERE departure_point. subroute = '" + subroute + "'" +
+            " WHERE departure_point.subroute = '" + subroute + "'" +
             " AND departure_point.stop = stop.tag" +
             " ORDER BY departure_point.stopNum";
         

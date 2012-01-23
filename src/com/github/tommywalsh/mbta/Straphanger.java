@@ -85,7 +85,6 @@ public class Straphanger extends ListActivity
 
     private OnClickListener m_newProfileListener = new OnClickListener() {
 	    public void onClick(View v) {
-                android.util.Log.d("mbta", "clicked");
                 launchEditor(null);
 	    }
 	};
@@ -157,7 +156,6 @@ public class Straphanger extends ListActivity
     {
         switch (item.getItemId()) {
         case R.id.edit_profile:
-            android.util.Log.d("mbta", "Got here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             launchProfileSelectionDialog(EDIT_PROFILE);
             return true;
         case R.id.rebuild_database:
@@ -173,9 +171,7 @@ public class Straphanger extends ListActivity
         super.onCreate(savedInstanceState);
 
         DatabaseMonitor.init(getApplicationContext());
-        android.util.Log.d("mbta", "Starting main screen");
         if (!DatabaseMonitor.isComplete()) {
-                android.util.Log.d("mbta", "Starting dbactivity because no db");
             launchDatabase(DatabaseActivity.WELCOME_BEHAVIOR);
             finish();
         }

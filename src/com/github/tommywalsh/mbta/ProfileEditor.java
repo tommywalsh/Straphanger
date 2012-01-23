@@ -379,12 +379,16 @@ public class ProfileEditor extends ListActivity
             }
             case s_stopChoiceId: {
                 int stop = data.getIntExtra(getString(R.string.stop_choice_in_intent),
-                                            -55);
-                android.util.Log.d("mbta", "User picked stop " + Integer.toString(stop));
+                                            -1);
+                if (stop != -1) {
+                    m_helper.replaceStop(m_changingStopId, stop);
+                    m_saveButton.setEnabled(true);
+                    refreshGUI();
+                }
                 break;
             }
             default:
-                    super.onActivityResult(request, result, data);
+                super.onActivityResult(request, result, data);
             }
         }
     }
@@ -402,21 +406,25 @@ public class ProfileEditor extends ListActivity
 
     // This function will be called when the user selects an option from
     // the context menu after a long-press on a list item
+    private int m_changingStopId;
     @Override public boolean onContextItemSelected(MenuItem item) {
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
         int position = info.position;
         int menuId = item.getItemId();
-        int stopId = m_items.elementAt(position).stopId;
+        m_changingStopId = m_items.elementAt(position).stopId;
         String subroute = m_items.elementAt(position).subrouteTag;
+        String srTitle = m_items.elementAt(position).subroute;
+        String route = m_items.elementAt(position).route;
         switch (menuId) {
         case DELETE_MENU:
-            deleteBus(stopId);
+            deleteBus(m_changingStopId);
             return true;
         case STOP_MENU:
             Intent i = new Intent(ProfileEditor.this, StopChooser.class);
-            android.util.Log.d("mbta", "Subroute is " + subroute);
             i.putExtra(getString(R.string.subroute_in_intent), subroute);
-            i.putExtra(getString(R.string.stop_choice_in_intent), stopId);
+            i.putExtra(getString(R.string.stop_choice_in_intent), m_changingStopId);
+            i.putExtra(getString(R.string.route_in_intent), route);
+            i.putExtra(getString(R.string.srtitle_in_intent), srTitle);
             startActivityForResult(i, s_stopChoiceId);
             return true;
         default:

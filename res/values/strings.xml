@@ -20,7 +20,8 @@ of the GPL.  See file gpl.txt for more information.
   <string name="db_screen_style_in_intent">com.github.tommywalsh.mbta.ScreenStyle</string>
   <string name="stop_choice_in_intent">com.github.tommywalsh.mbta.StopChoice</string>
   <string name="subroute_in_intent">com.github.tommywalsh.mbta.Subroute</string>
-  
+  <string name="route_in_intent">com.github.tommywalsh.mbta.Route</string>
+  <string name="srtitle_in_intent">com.github.tommywalsh.mbta.SRTitle</string>
 
   <string name="download_message">Downloading.  Please wait...</string>
 

@@ -43,7 +43,6 @@ public class DatabaseActivity extends Activity
         Button cancelButton = (Button)findViewById(R.id.cancel_build_button);
         cancelButton.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
-                    android.util.Log.d("mbta", "CANCEL REQUEST");
                     DatabaseActivity.this.finish();
                 }});
 
@@ -67,16 +66,13 @@ public class DatabaseActivity extends Activity
     private DatabaseMonitor.CompletionListener m_listener = 
         new DatabaseMonitor.CompletionListener() {
             public void onCompleted() {
-                android.util.Log.d("mbta", "Notified of completion");
                 if (m_behavior == WELCOME_BEHAVIOR) {
                     // When we're the welcome screen, we need to spawn the 
                     // main screen now, else the app will just exit.
                     // (otherwise, the main screen will already be running)
-                    android.util.Log.d("mbta", "Spawning Straphanger because DB is done");
                     startActivity(new Intent(DatabaseActivity.this,
                                              Straphanger.class));
                 }
-                android.util.Log.d("mbta", "Finishing dbactivity");
                 finish();
             }
         };
