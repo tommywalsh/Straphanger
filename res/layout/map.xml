@@ -29,7 +29,10 @@ of the GPL.  See file gpl.txt for more information.
       android:layout_height="wrap_content"
       android:layout_weight="1"
       android:clickable="true"
-      android:apiKey="0RlcQvIKTQ4oxKos4UA7luwTB1C7ZMB_y7hCAtA"
+      android:apiKey="0RlcQvIKTQ4rVssnRcZ5NBJnzQMYsRUkZWJhSYw"
       />
+
+  <!-- debug key is "0RlcQvIKTQ4oxKos4UA7luwTB1C7ZMB_y7hCAtA" -->
+  <!-- release key is "0RlcQvIKTQ4rVssnRcZ5NBJnzQMYsRUkZWJhSYw" -->
 
 </LinearLayout>
